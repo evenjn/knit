@@ -1042,7 +1042,7 @@ public class DiffPatch {
   /**
    * loc is a location in text1, compute and return the equivalent location in
    * text2.
-   * e.g. "The cat" vs "The big cat", 1->1, 5->8
+   * e.g. "The cat" vs "The big cat", 1 goes to 1, 5 goes to 8
    * @param diffs LinkedList of Diff objects.
    * @param loc Location within text1.
    * @return Location within text2.
@@ -1180,7 +1180,7 @@ public class DiffPatch {
    * @param text2 Ignored.
    * @param diffs Array of Diff objects for text1 to text2.
    * @return LinkedList of Patch objects.
-   * @deprecated Prefer patch_make(String text1, LinkedList<Diff> diffs).
+   * @deprecated Prefer patch_make(String text1, LinkedList_Diff_ diffs).
    */
   public LinkedList<Patch> patch_make(String text1, String text2,
       LinkedList<Diff> diffs) {

@@ -128,8 +128,6 @@ public class KnittingItterator<I> implements
 	/**
 	 * Stops as soon as one of the sources is depleted.
 	 * 
-	 * @param selector
-	 * @param iterators
 	 * @return an iterator that pulls the next element from the i-th iterator,
 	 *         where i is the next integer pulled by selector.
 	 */
