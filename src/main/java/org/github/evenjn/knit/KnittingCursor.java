@@ -38,6 +38,7 @@ import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMaph;
 import org.github.evenjn.yarn.CursorUnfold;
 import org.github.evenjn.yarn.CursorUnfoldH;
+import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
 import org.github.evenjn.yarn.IterableMaph;
@@ -400,6 +401,20 @@ public class KnittingCursor<I> implements
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				return new SingletonCursor<O>( function.apply( input ) );
+			}
+
+		};
+		return wrap( new CursorStitchProcessor<I, O>(
+				wrapped,
+				stitch ) );
+	}
+
+	public <O> KnittingCursor<O> map( Hook hook, FunctionH<? super I, O> function ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
+
+			@Override
+			public Cursor<O> next( Hook hook, I input ) {
+				return new SingletonCursor<O>( function.get( hook, input ) );
 			}
 
 		};

@@ -18,6 +18,7 @@
 package org.github.evenjn.knit;
 
 import java.util.Vector;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.Cursor;
@@ -43,7 +44,7 @@ public class KnittingItterable<I> implements
 
 			@Override
 			public Itterator<K> pull( ) {
-				return new ArrayCursor(elements);
+				return new ArrayCursor<>(elements);
 			}
 		};
 		return wrap( cursable );
@@ -62,6 +63,15 @@ public class KnittingItterable<I> implements
 			}
 		} );
 	}
+
+	public <K extends Consumer<I>> K consume( K consumer ) {
+		return pull( ).consume( consumer );
+	}
+
+	public void consume( ) {
+		pull( ).consume( );
+	}
+  
 	
 	/**
 	 * @param stateless_predicate

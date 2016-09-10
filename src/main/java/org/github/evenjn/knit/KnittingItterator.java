@@ -19,10 +19,11 @@ package org.github.evenjn.knit;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.CursorUnfoldH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IteratorUnfoldH;
 import org.github.evenjn.yarn.Itterator;
@@ -62,6 +63,10 @@ public class KnittingItterator<I> implements
 				throw PastTheEndException.neo;
 			}
 		} );
+	}
+
+	public static <K> KnittingItterator<K> wrap( Stream<K> to_wrap ) {
+		return wrap( to_wrap.iterator( ) );
 	}
 
 	@Override
@@ -127,6 +132,27 @@ public class KnittingItterator<I> implements
 				};
 			}
 		};
+	}
+
+	public <K extends Consumer<I>> K consume( K consumer ) {
+		try {
+			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
+				consumer.accept( next );
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
+		return consumer;
+	}
+
+	public void consume( ) {
+		try {
+			for (;;) {
+				 wrapped.next( );
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
 	}
 
 	/**

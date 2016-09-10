@@ -165,7 +165,14 @@ public class KnittingCursable<I> implements
 			return pull( hook ).consume( consumer );
 		}
 	}
-	
+
+
+  public void consume( ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			pull( hook ).consume( );
+		}
+	}
+  
 	/**
 	 * @param stateless_predicate
 	 *          A stateless system that decides to keep or to discard elements.
