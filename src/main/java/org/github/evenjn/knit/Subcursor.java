@@ -37,16 +37,15 @@ class Subcursor<T> implements
 		this.length = length;
 	}
 
-	public static <T> Subcursor<T> tail( Cursor<T> wrapped, int start ) {
+	static <T> Subcursor<T> headless( Cursor<T> wrapped, int start ) {
 		return new Subcursor<>( wrapped, start, -1 );
 	}
 
-	public static <T> Subcursor<T> head( Cursor<T> wrapped, int limit ) {
+	static <T> Subcursor<T> head( Cursor<T> wrapped, int limit ) {
 		return new Subcursor<>( wrapped, 0, limit );
 	}
 
-	public static <T> Subcursor<T> sub( Cursor<T> wrapped, int start,
-			int limit ) {
+	static <T> Subcursor<T> sub( Cursor<T> wrapped, int start, int limit ) {
 		return new Subcursor<>( wrapped, start, limit );
 	}
 

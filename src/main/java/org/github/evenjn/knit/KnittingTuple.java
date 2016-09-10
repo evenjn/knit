@@ -146,15 +146,13 @@ public class KnittingTuple<I> implements
 		return wrap( new Subtuple<>( wrapped, start, length ) );
 	}
 
-	public KnittingTuple<I> tail( int start ) {
+	public KnittingTuple<I> headless( int start ) {
 		return wrap( new Subtuple<>( wrapped, start, wrapped.size( ) ) );
 	}
 
 	public KnittingTuple<I> head( int limit ) {
 		return wrap( new Subtuple<>( wrapped, 0, limit ) );
 	}
-
-	// public Cursor<I> pull( ) {return null;}
 
 	public boolean equals( Object other ) {
 		if ( other == this )
@@ -233,7 +231,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * Returns the index within this tuple of the first occurrence of the
-	 * specified tuple, or -1.
+	 * specified tuple.
 	 */
 	public Optional<Integer> findSubtuple( KnittingTuple<I> target ) {
 		return findSubtuple( target, 0 );
@@ -248,7 +246,7 @@ public class KnittingTuple<I> implements
 	public boolean endsWith( KnittingTuple<I> target ) {
 		if ( size( ) < target.size( ) )
 			return false;
-		return tail( size( ) - target.size( ) ).equals( target );
+		return headless( size( ) - target.size( ) ).equals( target );
 	}
 
 	public KnittingTuple<I> chain( KnittingTuple<I> other ) {
@@ -271,7 +269,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * Returns the index within this tuple of the first occurrence of the
-	 * specified tuple, starting at the specified index, or -1.
+	 * specified tuple, starting at the specified index.
 	 */
 	public Optional<Integer> findSubtuple( KnittingTuple<I> target, int skip ) {
 		int size = size( );

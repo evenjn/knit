@@ -18,6 +18,7 @@
 package org.github.evenjn.knit;
 
 import java.util.Vector;
+import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.Itterable;
@@ -36,6 +37,17 @@ public class KnittingItterable<I> implements
 	private KnittingItterable(Itterable<I> to_wrap) {
 		this.wrapped = to_wrap;
 	}
+	@SafeVarargs
+	public static <K> KnittingItterable<K> on( K ... elements ) {
+		Itterable<K> cursable = new Itterable<K>( ) {
+
+			@Override
+			public Itterator<K> pull( ) {
+				return new ArrayCursor(elements);
+			}
+		};
+		return wrap( cursable );
+	}
 
 	public static <K> KnittingItterable<K> wrap( Itterable<K> to_wrap ) {
 		return new KnittingItterable<K>( to_wrap );
@@ -50,6 +62,23 @@ public class KnittingItterable<I> implements
 			}
 		} );
 	}
+	
+	/**
+	 * @param stateless_predicate
+	 *          A stateless system that decides to keep or to discard elements.
+	 * @return A cursable to access the only the elements of this cursable that
+	 *         are not discarded by the predicate.
+	 */
+	public KnittingItterable<I> filter( Predicate<? super I> stateless_predicate ) {
+		return wrap( new Itterable<I>( ) {
+
+			@Override
+			public Itterator<I> pull( ) {
+				return KnittingItterator.wrap( wrapped.pull( ) )
+						.filter( stateless_predicate );
+			}
+		} );
+	}
 
 	@Override
 	public KnittingItterator<I> pull( ) {
@@ -58,6 +87,10 @@ public class KnittingItterable<I> implements
 
 	public Iterable<I> once( ) {
 		return pull( ).once( );
+	}
+
+	public int size( ) {
+			return pull( ).size( );
 	}
 
 	/**

@@ -125,39 +125,12 @@ public class KnittingCursable<I> implements
 	}
 
 	public KnittingCursable<I> chain( final Cursable<I> other ) {
-		Cursable<I> outer_cursable = this;
+		KnittingCursable<I> outer_cursable = this;
 		Cursable<I> result = new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				Cursor<I> first_cursor = outer_cursable.pull( hook );
-				Cursor<I> second_cursor = other.pull( hook );
-				Cursor<I> chained = new Cursor<I>( ) {
-
-					Cursor<I> current = first_cursor;
-
-					@Override
-					public I next( )
-							throws PastTheEndException {
-						if ( current == null ) {
-							throw PastTheEndException.neo;
-						}
-						try {
-							return current.next( );
-						}
-						catch ( PastTheEndException t ) {
-							if ( current == first_cursor ) {
-								current = second_cursor;
-								return current.next( );
-							}
-							else {
-								current = null;
-								throw PastTheEndException.neo;
-							}
-						}
-					}
-				};
-				return chained;
+				return outer_cursable.pull( hook ).chain( other.pull( hook ) );
 			}
 		};
 		return wrap( result );
@@ -192,7 +165,13 @@ public class KnittingCursable<I> implements
 			return pull( hook ).consume( consumer );
 		}
 	}
-
+	
+	/**
+	 * @param stateless_predicate
+	 *          A stateless system that decides to keep or to discard elements.
+	 * @return A cursable to access the only the elements of this cursable that
+	 *         are not discarded by the predicate.
+	 */
 	public KnittingCursable<I> filter( Predicate<? super I> stateless_predicate ) {
 		return wrap( new Cursable<I>( ) {
 
@@ -347,12 +326,12 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public KnittingCursable<I> tail( int start ) {
+	public KnittingCursable<I> headless( int start ) {
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.tail( wrapped.pull( hook ), start );
+				return Subcursor.headless( wrapped.pull( hook ), start );
 			}
 		} );
 	}

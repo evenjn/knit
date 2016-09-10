@@ -17,27 +17,31 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Itterator;
-import org.github.evenjn.yarn.PastTheEndException;
+import java.util.Iterator;
 
-class ArrayCursor<T> implements
-		Itterator<T> {
+class SingletonIterator<T> implements
+		Iterator<T> {
 
-	private T[] array;
+	private final T element;
 
-	private int i = 0;
+	private boolean consumed = false;
 
-	public ArrayCursor(T[] array) {
-		this.array = array;
+	public SingletonIterator(T element) {
+		this.element = element;
 	}
 
 	@Override
-	public T next( )
-			throws PastTheEndException {
-		if ( i < array.length ) {
-			return array[i++];
+	public T next( ) {
+		if ( consumed ) {
+			throw new IllegalStateException( );
 		}
-		throw PastTheEndException.neo;
+		consumed = true;
+		return element;
+	}
+
+	@Override
+	public boolean hasNext( ) {
+		return !consumed;
 	}
 
 }

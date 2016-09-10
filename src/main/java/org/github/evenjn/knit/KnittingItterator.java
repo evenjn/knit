@@ -19,8 +19,12 @@ package org.github.evenjn.knit;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.Cursor;
+import org.github.evenjn.yarn.CursorUnfoldH;
+import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.IteratorUnfoldH;
 import org.github.evenjn.yarn.Itterator;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
@@ -126,6 +130,28 @@ public class KnittingItterator<I> implements
 	}
 
 	/**
+	 * @param predicate
+	 *          A system that decides to keep or to discard elements.
+	 * @return An itterator to access the only the elements of this itterator that
+	 *         are not discarded by the predicate.
+	 */
+	public KnittingItterator<I> filter( Predicate<? super I> predicate ) {
+		IteratorUnfoldH<I, I> stitch = new IteratorUnfoldH<I, I>( ) {
+
+			@Override
+			public Iterator<I> next( Hook hook, I input ) {
+				if ( predicate.test( input ) ) {
+					return new SingletonIterator<I>( input );
+				}
+				return null;
+			}
+		};
+		return wrap( new ItteratorStitchProcessor<I, I>(
+				wrapped,
+				stitch ) );
+	}
+
+	/**
 	 * Stops as soon as one of the sources is depleted.
 	 * 
 	 * @return an iterator that pulls the next element from the i-th iterator,
@@ -143,5 +169,18 @@ public class KnittingItterator<I> implements
 				return iterator.next( );
 			}
 		};
+	}
+
+	public int size( ) {
+		int size = 0;
+		try {
+			for ( ;; ) {
+				wrapped.next( );
+				size++;
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
+		return size;
 	}
 }
