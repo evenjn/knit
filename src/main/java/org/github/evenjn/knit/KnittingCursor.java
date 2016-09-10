@@ -320,7 +320,7 @@ public class KnittingCursor<I> implements
 				internal_stitch ) );
 	}
 
-	public <O> KnittingCursor<O> fold( Hook hook, SkipFoldH<? super I, O> stitch ) {
+	public <O> KnittingCursor<O> skipfold( Hook hook, SkipFoldH<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -349,7 +349,7 @@ public class KnittingCursor<I> implements
 				internal_stitch ) );
 	}
 
-	public <O> KnittingCursor<O> fold( SkipFold<? super I, O> stitch ) {
+	public <O> KnittingCursor<O> skipfold( SkipFold<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override

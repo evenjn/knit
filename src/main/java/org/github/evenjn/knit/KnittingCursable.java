@@ -465,9 +465,8 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public <O> KnittingCursable<O> unfoldStream(
-			StreamUnfoldHFactory<? super I, O> factory
-			) {
+	public <O> KnittingCursable<O>
+			unfoldStream( StreamUnfoldHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -491,24 +490,24 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O>
-			fold( SkipFoldFactory<? super I, O> factory ) {
+			skipfold( SkipFoldFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).fold(
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).skipfold(
 						factory.create( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			fold( SkipFoldHFactory<? super I, O> factory ) {
+			skipfold( SkipFoldHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).fold( hook,
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).skipfold( hook,
 						factory.create( ) );
 			}
 		} );
