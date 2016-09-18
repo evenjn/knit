@@ -20,6 +20,7 @@ package org.github.evenjn.knit;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -112,15 +113,51 @@ public class KnittingCursor<I> implements
 		}
 	}
 
-	public <K extends Consumer<I>> K consume( K consumer ) {
-		try {
-			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
-				consumer.accept( next );
+	/**
+	 * @return the concatenation of this cursor an the argument cursor.
+	 */
+	public KnittingCursor<I> chain( Cursor<I> other ) {
+
+		Cursor<I> chained = new Cursor<I>( ) {
+
+			Cursor<I> current = wrapped;
+
+			@Override
+			public I next( )
+					throws PastTheEndException {
+				if ( current == null ) {
+					throw PastTheEndException.neo;
+				}
+				try {
+					return current.next( );
+				}
+				catch ( PastTheEndException t ) {
+					if ( current == wrapped ) {
+						current = other;
+						return current.next( );
+					}
+					else {
+						current = null;
+						throw PastTheEndException.neo;
+					}
+				}
 			}
+		};
+		return wrap( chained );
+	}
+
+	public <K extends Collection<? super I>> K collect( K collection ) {
+		failWhenDirty( );
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			try {
+				for ( ;; ) {
+					collection.add( wrapped.next( ) );
+				}
+			}
+			catch ( PastTheEndException e ) {
+			}
+			return collection;
 		}
-		catch ( PastTheEndException e ) {
-		}
-		return consumer;
 	}
 
 	public void consume( ) {
@@ -131,6 +168,38 @@ public class KnittingCursor<I> implements
 		}
 		catch ( PastTheEndException e ) {
 		}
+	}
+
+	public <K extends Consumer<I>> K consume( K consumer ) {
+		try {
+			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
+				consumer.accept( next );
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
+		return consumer;
+	}
+	
+  /**
+   * 
+   * @return a cursor that scrolls over this and the other in parallel,
+   *   each time applying the bifunction on the result of the two elements,
+   *   and returning in output the application result.
+   */
+	public <R, M> KnittingCursor<M> entwine(
+			Cursor<R> other,
+			BiFunction<I, R, M> bifunction ) {
+		Cursor<I> outer = this;
+		Cursor<M> result = new Cursor<M>( ) {
+
+			@Override
+			public M next( )
+					throws PastTheEndException {
+				return bifunction.apply( outer.next( ), other.next( ) );
+			}
+		};
+		return wrap( result );
 	}
 
 	/**
@@ -489,50 +558,6 @@ public class KnittingCursor<I> implements
 				};
 			}
 		};
-	}
-
-	public KnittingCursor<I> chain( final Cursor<I> other ) {
-
-		Cursor<I> chained = new Cursor<I>( ) {
-
-			Cursor<I> current = wrapped;
-
-			@Override
-			public I next( )
-					throws PastTheEndException {
-				if ( current == null ) {
-					throw PastTheEndException.neo;
-				}
-				try {
-					return current.next( );
-				}
-				catch ( PastTheEndException t ) {
-					if ( current == wrapped ) {
-						current = other;
-						return current.next( );
-					}
-					else {
-						current = null;
-						throw PastTheEndException.neo;
-					}
-				}
-			}
-		};
-		return wrap( chained );
-	}
-
-	public <K extends Collection<? super I>> K collect( K collection ) {
-		failWhenDirty( );
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			try {
-				for ( ;; ) {
-					collection.add( wrapped.next( ) );
-				}
-			}
-			catch ( PastTheEndException e ) {
-			}
-			return collection;
-		}
 	}
 
 	public int soFar( ) {

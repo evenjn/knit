@@ -17,7 +17,9 @@
  */
 package org.github.evenjn.knit;
 
+import java.util.Collection;
 import java.util.Vector;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -63,15 +65,53 @@ public class KnittingItterable<I> implements
 			}
 		} );
 	}
+	
+	/**
+	 * @return the concatenation of this itterable an the argument itterable.
+	 */
+	public KnittingItterable<I> chain( final Itterable<I> other ) {
+		KnittingItterable<I> outer = this;
+		Itterable<I> result = new Itterable<I>( ) {
 
-	public <K extends Consumer<I>> K consume( K consumer ) {
-		return pull( ).consume( consumer );
+			@Override
+			public Itterator<I> pull( ) {
+				return outer.pull( ).chain( other.pull( ) );
+			}
+		};
+		return wrap( result );
 	}
 
 	public void consume( ) {
 		pull( ).consume( );
 	}
-  
+
+	public <K extends Consumer<I>> K consume( K consumer ) {
+		return pull( ).consume( consumer );
+	}
+
+	public <K extends Collection<? super I>> K collect( K collection ) {
+		return pull( ).collect( collection );
+	}
+
+	/**
+	 * 
+	 * @return an itterable that scrolls over this and the other in parallel, each
+	 *         time applying the bifunction on the result of the two elements, and
+	 *         returning in output the application result.
+	 */
+	public <R, M> KnittingItterable<M> entwine(
+			Itterable<R> other,
+			BiFunction<I, R, M> bifunction ) {
+		KnittingItterable<I> outer = this;
+		Itterable<M> result = new Itterable<M>( ) {
+
+			@Override
+			public Itterator<M> pull( ) {
+				return outer.pull( ).entwine( other.pull( ), bifunction );
+			}
+		};
+		return wrap( result );
+	}
 	
 	/**
 	 * @param stateless_predicate

@@ -123,7 +123,10 @@ public class KnittingCursable<I> implements
 			}
 		};
 	}
-
+	
+	/**
+	 * @return the concatenation of this cursable an the argument cursable.
+	 */
 	public KnittingCursable<I> chain( final Cursable<I> other ) {
 		KnittingCursable<I> outer_cursable = this;
 		Cursable<I> result = new Cursable<I>( ) {
@@ -136,28 +139,10 @@ public class KnittingCursable<I> implements
 		return wrap( result );
 	}
 
-	public <R, M> KnittingCursable<M> entwine(
-			Cursable<R> right,
-			BiFunction<I, R, M> bifunction ) {
-		Cursable<I> outer_cursable = this;
-		Cursable<M> result = new Cursable<M>( ) {
-
-			@Override
-			public Cursor<M> pull( Hook hook ) {
-				Cursor<I> left_cursor = outer_cursable.pull( hook );
-				Cursor<R> right_cursor = right.pull( hook );
-				Cursor<M> comapd = new Cursor<M>( ) {
-
-					@Override
-					public M next( )
-							throws PastTheEndException {
-						return bifunction.apply( left_cursor.next( ), right_cursor.next( ) );
-					}
-				};
-				return comapd;
-			}
-		};
-		return wrap( result );
+	public <K extends Collection<? super I>> K collect( K collection ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			return pull( hook ).collect( collection );
+		}
 	}
 
 	public <K extends Consumer<I>> K consume( K consumer ) {
@@ -171,6 +156,26 @@ public class KnittingCursable<I> implements
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			pull( hook ).consume( );
 		}
+	}
+
+	/**
+	 * 
+	 * @return a cursable that scrolls over this and the other in parallel, each
+	 *         time applying the bifunction on the result of the two elements, and
+	 *         returning in output the application result.
+	 */
+	public <R, M> KnittingCursable<M> entwine(
+			Cursable<R> other,
+			BiFunction<I, R, M> bifunction ) {
+		KnittingCursable<I> outer = this;
+		Cursable<M> result = new Cursable<M>( ) {
+
+			@Override
+			public Cursor<M> pull( Hook hook ) {
+				return outer.pull( hook ).entwine( other.pull( hook ), bifunction );
+			}
+		};
+		return wrap( result );
 	}
   
 	/**
@@ -530,20 +535,6 @@ public class KnittingCursable<I> implements
 			catch ( PastTheEndException e ) {
 			}
 			return reduction;
-		}
-	}
-
-	public <K extends Collection<I>> K collect( K collection ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<I> kc = pull( hook );
-			try {
-				for ( ;; ) {
-					collection.add( kc.next( ) );
-				}
-			}
-			catch ( PastTheEndException e ) {
-			}
-			return collection;
 		}
 	}
 

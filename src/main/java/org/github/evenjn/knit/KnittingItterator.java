@@ -17,12 +17,15 @@
  */
 package org.github.evenjn.knit;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.github.evenjn.yarn.AutoHook;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IteratorUnfoldH;
@@ -134,6 +137,62 @@ public class KnittingItterator<I> implements
 		};
 	}
 
+	/**
+	 * @return the concatenation of this itterator an the argument itterator.
+	 */
+	public KnittingItterator<I> chain( Itterator<I> other ) {
+
+		Itterator<I> chained = new Itterator<I>( ) {
+
+			Itterator<I> current = wrapped;
+
+			@Override
+			public I next( )
+					throws PastTheEndException {
+				if ( current == null ) {
+					throw PastTheEndException.neo;
+				}
+				try {
+					return current.next( );
+				}
+				catch ( PastTheEndException t ) {
+					if ( current == wrapped ) {
+						current = other;
+						return current.next( );
+					}
+					else {
+						current = null;
+						throw PastTheEndException.neo;
+					}
+				}
+			}
+		};
+		return wrap( chained );
+	}
+
+	public <K extends Collection<? super I>> K collect( K collection ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			try {
+				for ( ;; ) {
+					collection.add( wrapped.next( ) );
+				}
+			}
+			catch ( PastTheEndException e ) {
+			}
+			return collection;
+		}
+	}
+
+	public void consume( ) {
+		try {
+			for (;;) {
+				 wrapped.next( );
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
+	}
+
 	public <K extends Consumer<I>> K consume( K consumer ) {
 		try {
 			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
@@ -145,14 +204,25 @@ public class KnittingItterator<I> implements
 		return consumer;
 	}
 
-	public void consume( ) {
-		try {
-			for (;;) {
-				 wrapped.next( );
+	/**
+	 * 
+	 * @return an itterator that scrolls over this and the other in parallel, each
+	 *         time applying the bifunction on the result of the two elements, and
+	 *         returning in output the application result.
+	 */
+	public <R, M> KnittingItterator<M> entwine(
+			Itterator<R> other,
+			BiFunction<I, R, M> bifunction ) {
+		Itterator<I> outer = this;
+		Itterator<M> result = new Itterator<M>( ) {
+
+			@Override
+			public M next( )
+					throws PastTheEndException {
+				return bifunction.apply( outer.next( ), other.next( ) );
 			}
-		}
-		catch ( PastTheEndException e ) {
-		}
+		};
+		return wrap( result );
 	}
 
 	/**
