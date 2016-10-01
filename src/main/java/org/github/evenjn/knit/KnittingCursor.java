@@ -64,7 +64,7 @@ public class KnittingCursor<I> implements
 
 	@SafeVarargs
 	public static <K> KnittingCursor<K> on( K ... elements ) {
-		return wrap( new ArrayCursor<K>( elements ) );
+		return wrap( new ArrayItterator<K>( elements ) );
 	}
 
 	public static <K> KnittingCursor<K> wrap( Cursor<K> cursor ) {
@@ -102,11 +102,11 @@ public class KnittingCursor<I> implements
 	private I cached = null;
 
 	private boolean is_cached = false;
-
+	
 	private KnittingCursor(Cursor<I> to_wrap) {
 		this.wrapped = to_wrap;
 	}
-
+	
 	private void failWhenDirty( ) {
 		if ( so_far != 0 ) {
 			throw new IllegalStateException( "This cursor has already been used." );
@@ -146,6 +146,9 @@ public class KnittingCursor<I> implements
 		return wrap( chained );
 	}
 
+	/**
+	 * This is a terminal operation.
+	 */
 	public <K extends Collection<? super I>> K collect( K collection ) {
 		failWhenDirty( );
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
@@ -159,7 +162,10 @@ public class KnittingCursor<I> implements
 			return collection;
 		}
 	}
-
+	
+	/**
+	 * This is a terminal operation.
+	 */
 	public void consume( ) {
 		try {
 			for (;;) {
@@ -251,7 +257,7 @@ public class KnittingCursor<I> implements
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				O[] nextArray = stitch.get( input );
-				return nextArray == null ? null : new ArrayCursor<>( nextArray );
+				return nextArray == null ? null : new ArrayItterator<>( nextArray );
 			}
 		};
 		return wrap( new CursorStitchProcessor<I, O>( wrapped, internal_stitch ) );
@@ -389,6 +395,14 @@ public class KnittingCursor<I> implements
 				internal_stitch ) );
 	}
 
+	public KnittingCursor<I> head( int limit ) {
+		return wrap( Subcursor.head( wrapped, limit ) );
+	}
+
+	public KnittingCursor<I> headless( int start ) {
+		return wrap( Subcursor.headless( wrapped, start ) );
+	}
+
 	public <O> KnittingCursor<O> skipfold( Hook hook, SkipFoldH<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
@@ -460,10 +474,6 @@ public class KnittingCursor<I> implements
 		return true;
 	}
 
-	public KnittingCursor<I> head( int limit ) {
-		return wrap( Subcursor.head( wrapped, limit ) );
-	}
-
 	public <O> KnittingCursor<O> map( Function<? super I, O> function ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
@@ -508,6 +518,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
+	 * This is a terminal operation.
+	 * 
 	 * throws IllegalStateException when it it not the case that there is exactly one element.
 	 */
 	public I one( ) {
@@ -568,11 +580,6 @@ public class KnittingCursor<I> implements
 		return wrap( Subcursor.sub( wrapped, start, length ) );
 	}
 
-	public KnittingCursor<I> headless( int start ) {
-		
-		return wrap( Subcursor.headless( wrapped, start ) );
-	}
-
 	public <O> KnittingCursor<O> unfoldArray(
 			ArrayUnfold<? super I, O> stitch
 			) {
@@ -581,13 +588,13 @@ public class KnittingCursor<I> implements
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				O[] array = stitch.next( input );
-				return array == null ? null : new ArrayCursor<>( array );
+				return array == null ? null : new ArrayItterator<>( array );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
 				O[] array = stitch.end( );
-				return array == null ? null : new ArrayCursor<>( array );
+				return array == null ? null : new ArrayItterator<>( array );
 			}
 		};
 		return wrap( new CursorStitchProcessor<I, O>(

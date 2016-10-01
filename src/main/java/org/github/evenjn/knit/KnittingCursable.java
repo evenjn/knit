@@ -65,7 +65,7 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<K> pull( Hook hook ) {
-				return new ArrayCursor<K>( elements );
+				return new ArrayItterator<K>( elements );
 			}
 		};
 		return wrap( cursable );
@@ -83,7 +83,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public static <K> KnittingCursable<K> wrap( K[] array ) {
-		return wrap( new ArrayCursable<K>( array ) );
+		return wrap( new ArrayItterable<K>( array ) );
 	}
 
 	private KnittingCursable(Cursable<I> cursable) {
@@ -316,6 +316,26 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
+	public KnittingCursable<I> head( int limit ) {
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return Subcursor.head( wrapped.pull( hook ), limit );
+			}
+		} );
+	}
+
+	public KnittingCursable<I> headless( int start ) {
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return Subcursor.headless( wrapped.pull( hook ), start );
+			}
+		} );
+	}
+
 	public <O> KnittingCursable<O> skipmap(
 			SkipMap<? super I, O> skipmap ) {
 		return wrap( new Cursable<O>( ) {
@@ -334,26 +354,6 @@ public class KnittingCursable<I> implements
 			@Override
 			public Cursor<I> pull( Hook hook ) {
 				return Subcursor.sub( wrapped.pull( hook ), start, length );
-			}
-		} );
-	}
-
-	public KnittingCursable<I> headless( int start ) {
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.headless( wrapped.pull( hook ), start );
-			}
-		} );
-	}
-
-	public KnittingCursable<I> head( int limit ) {
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.head( wrapped.pull( hook ), limit );
 			}
 		} );
 	}

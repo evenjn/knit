@@ -56,7 +56,7 @@ class Subcursor<T> implements
 			wrapped.next( );
 			i++;
 		}
-		if ( length >= 0 && i >= length ) {
+		if ( length >= 0 && i >= start + length ) {
 			throw PastTheEndException.neo;
 		}
 		T next = wrapped.next( );

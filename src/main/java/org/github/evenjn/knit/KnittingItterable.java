@@ -46,7 +46,7 @@ public class KnittingItterable<I> implements
 
 			@Override
 			public Itterator<K> pull( ) {
-				return new ArrayCursor<>(elements);
+				return new ArrayItterator<>(elements);
 			}
 		};
 		return wrap( cursable );
