@@ -29,10 +29,10 @@ import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.AutoHook;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
-import org.github.evenjn.yarn.CursableMaph;
+import org.github.evenjn.yarn.CursableMapH;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
-import org.github.evenjn.yarn.CursorMaph;
+import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.CursorUnfoldH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IteratorUnfoldH;
@@ -281,7 +281,7 @@ public class KnittingItterator<I> implements
 
 	public <O> KnittingCursor<O> flatmapCursable(
 			Hook hook,
-			CursableMaph<? super I, O> stitch ) {
+			CursableMapH<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -308,7 +308,7 @@ public class KnittingItterator<I> implements
 
 	public <O> KnittingCursor<O> flatmapCursor(
 			Hook hook,
-			CursorMaph<? super I, O> stitch ) {
+			CursorMapH<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
