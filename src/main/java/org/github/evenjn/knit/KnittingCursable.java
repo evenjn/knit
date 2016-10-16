@@ -48,6 +48,7 @@ import org.github.evenjn.yarn.IteratorMaph;
 import org.github.evenjn.yarn.IteratorUnfoldFactory;
 import org.github.evenjn.yarn.IteratorUnfoldHFactory;
 import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.SkipException;
 import org.github.evenjn.yarn.SkipFoldFactory;
 import org.github.evenjn.yarn.SkipFoldHFactory;
 import org.github.evenjn.yarn.SkipMap;
@@ -60,8 +61,6 @@ public class KnittingCursable<I> implements
 		Cursable<I> {
 
 	private final Cursable<I> wrapped;
-
-
 
 	private KnittingCursable(Cursable<I> cursable) {
 		this.wrapped = cursable;
@@ -347,6 +346,23 @@ public class KnittingCursable<I> implements
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			return pull( hook ).size( );
 		}
+	}
+	
+	public KnittingCursable<I> skipFilter( SkipMap<? super I, ?> stitch ) {
+		Predicate<I> p = new Predicate<I>( ) {
+
+			@Override
+			public boolean test( I t ) {
+				try {
+					stitch.get( t );
+					return true;
+				}
+				catch ( SkipException e ) {
+					return false;
+				}
+			}
+		};
+		return filter( p );
 	}
 
 	public <O> KnittingCursable<O>

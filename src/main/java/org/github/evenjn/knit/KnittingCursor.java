@@ -196,7 +196,7 @@ public class KnittingCursor<I> implements
 				wrapped,
 				stitch ) );
 	}
-
+	
 	public <O> KnittingCursor<O> flatmapArray( ArrayMap<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
@@ -496,6 +496,23 @@ public class KnittingCursor<I> implements
 		catch ( PastTheEndException e ) {
 		}
 		return size;
+	}
+	
+	public KnittingCursor<I> skipFilter( SkipMap<? super I, ?> stitch ) {
+		Predicate<I> p = new Predicate<I>( ) {
+
+			@Override
+			public boolean test( I t ) {
+				try {
+					stitch.get( t );
+					return true;
+				}
+				catch ( SkipException e ) {
+					return false;
+				}
+			}
+		};
+		return filter( p );
 	}
 
 	public <O> KnittingCursor<O> skipfold( SkipFold<? super I, O> stitch ) {
