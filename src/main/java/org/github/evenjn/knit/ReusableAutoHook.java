@@ -22,19 +22,13 @@ import java.util.LinkedList;
 
 import org.github.evenjn.yarn.AutoHook;
 
-public final class BasicAutoHook implements
+public final class ReusableAutoHook implements
 		AutoHook {
 
 	private LinkedList<AutoCloseable> objects_to_close;
 
-	private boolean closed = false;
-
 	@Override
 	public void close( ) {
-		if ( closed ) {
-			throw new IllegalStateException(
-					"BasicAutoHook can't be closed more than once." );
-		}
 		if ( objects_to_close != null ) {
 			Collections.reverse( objects_to_close );
 			for ( AutoCloseable c : objects_to_close ) {
@@ -47,7 +41,6 @@ public final class BasicAutoHook implements
 			}
 			objects_to_close = null;
 		}
-		closed = true;
 	}
 
 	@Override

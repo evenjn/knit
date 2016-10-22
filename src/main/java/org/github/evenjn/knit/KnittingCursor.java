@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.ArrayUnfold;
 import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
 import org.github.evenjn.yarn.CursableMapH;
@@ -143,7 +144,7 @@ public class KnittingCursor<I> implements
 		}
 	}
 
-	public <K extends Consumer<I>> K consume( K consumer ) {
+	public <K extends Consumer<? super I>> K consume( K consumer ) {
 		try {
 			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
 				consumer.accept( next );
@@ -152,6 +153,18 @@ public class KnittingCursor<I> implements
 		catch ( PastTheEndException e ) {
 		}
 		return consumer;
+	}
+
+	public <K extends Consumer<? super I>> void consumeHook(
+			Function<Hook, K> hook_consumer ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			K consumer = hook_consumer.apply( hook );
+			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
+				consumer.accept( next );
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
 	}
 
 	/**
@@ -196,7 +209,7 @@ public class KnittingCursor<I> implements
 				wrapped,
 				stitch ) );
 	}
-	
+
 	public <O> KnittingCursor<O> flatmapArray( ArrayMap<? super I, O> stitch ) {
 		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
 
@@ -415,6 +428,19 @@ public class KnittingCursor<I> implements
 		return result;
 	}
 
+	public KnittingCursor<Bi<Integer, I>> numbered( ) {
+		KnittingCursor<I> outer_this = this;
+		Bi<Integer, I> bi = Bi.nu( null, null );
+		return wrap( new Cursor<Bi<Integer, I>>( ) {
+
+			@Override
+			public Bi<Integer, I> next( )
+					throws PastTheEndException {
+				return bi.set( soFar( ), outer_this.next( ) );
+			}
+		} );
+	}
+
 	public Iterable<I> once( ) {
 		failWhenDirty( );
 		KnittingCursor<I> outer_this = this;
@@ -496,23 +522,6 @@ public class KnittingCursor<I> implements
 		catch ( PastTheEndException e ) {
 		}
 		return size;
-	}
-	
-	public KnittingCursor<I> skipFilter( SkipMap<? super I, ?> stitch ) {
-		Predicate<I> p = new Predicate<I>( ) {
-
-			@Override
-			public boolean test( I t ) {
-				try {
-					stitch.get( t );
-					return true;
-				}
-				catch ( SkipException e ) {
-					return false;
-				}
-			}
-		};
-		return filter( p );
 	}
 
 	public <O> KnittingCursor<O> skipfold( SkipFold<? super I, O> stitch ) {
