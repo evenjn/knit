@@ -62,7 +62,7 @@ public class KnittingTuple<I> implements
 	}
 
 	public KnittingItterable<Bi<I, I>> diff( Tuple<I> other ) {
-		return KnittingItterable.wrap( ( ) -> new PatchItterator<I>( this, other ) );
+		return KnittingItterable.wrap( ( ) -> new DiffIterator<I>( this, other ) );
 	}
 
 	/**
@@ -142,6 +142,10 @@ public class KnittingTuple<I> implements
 		return false;
 	}
 
+	/**
+	 * Use head(start, length). 
+	 */
+	@Deprecated
 	public KnittingTuple<I> sub( final int start, final int length ) {
 		return wrap( new Subtuple<>( wrapped, start, length ) );
 	}
@@ -152,6 +156,10 @@ public class KnittingTuple<I> implements
 
 	public KnittingTuple<I> head( int limit ) {
 		return wrap( new Subtuple<>( wrapped, 0, limit ) );
+	}
+
+	public KnittingTuple<I> head( int skip, int limit ) {
+		return wrap( new Subtuple<>( wrapped, skip, limit ) );
 	}
 
 	public boolean equals( Object other ) {

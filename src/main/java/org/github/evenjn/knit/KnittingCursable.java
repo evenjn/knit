@@ -41,11 +41,11 @@ import org.github.evenjn.yarn.CursorUnfoldHFactory;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
-import org.github.evenjn.yarn.IterableMaph;
+import org.github.evenjn.yarn.IterableMapH;
 import org.github.evenjn.yarn.IterableUnfoldFactory;
 import org.github.evenjn.yarn.IterableUnfoldHFactory;
 import org.github.evenjn.yarn.IteratorMap;
-import org.github.evenjn.yarn.IteratorMaph;
+import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorUnfoldFactory;
 import org.github.evenjn.yarn.IteratorUnfoldHFactory;
 import org.github.evenjn.yarn.PastTheEndException;
@@ -218,7 +218,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O> flatmapIterable(
-			IterableMaph<? super I, O> stitch ) {
+			IterableMapH<? super I, O> stitch ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -242,7 +242,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O> flatmapIterator(
-			IteratorMaph<? super I, O> stitch ) {
+			IteratorMapH<? super I, O> stitch ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -270,7 +270,17 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.head( wrapped.pull( hook ), limit );
+				return Subcursor.sub( wrapped.pull( hook ), 0, limit );
+			}
+		} );
+	}
+
+	public KnittingCursable<I> head( int start, int limit ) {
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return Subcursor.sub( wrapped.pull( hook ), start, limit );
 			}
 		} );
 	}
@@ -280,7 +290,7 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.headless( wrapped.pull( hook ), start );
+				return Subcursor.skip( wrapped.pull( hook ), start );
 			}
 		} );
 	}
@@ -416,6 +426,10 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
+	/**
+	 * Use head(start, length) 
+	 */
+	@Deprecated
 	public KnittingCursable<I> sub( int start, int length ) {
 		return wrap( new Cursable<I>( ) {
 
@@ -436,7 +450,22 @@ public class KnittingCursable<I> implements
 				if ( length > size ) {
 					return wrapped.pull( hook );
 				}
-				return Subcursor.sub( wrapped.pull( hook ), size - length, -1 );
+				return Subcursor.skip( wrapped.pull( hook ), size - length );
+			}
+		} );
+	}
+
+	public KnittingCursable<I> tail( int skip, int length ) {
+		KnittingCursable<I> outer = this;
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				int size = outer.size( );
+				if ( length > size ) {
+					return wrapped.pull( hook );
+				}
+				return Subcursor.sub( wrapped.pull( hook ), size - ( length + skip ), length );
 			}
 		} );
 	}
@@ -600,13 +629,13 @@ public class KnittingCursable<I> implements
 	 * @return an iterator that pulls the next element from the i-th iterator,
 	 *         where i is the next integer pulled by selector.
 	 */
-	public static <T> Cursable<T> blend( Cursor<Integer> selector,
+	public static <T> KnittingCursable<T> blend( Cursable<Integer> selector,
 			final Tuple<Cursable<T>> sources ) {
-		return new Cursable<T>( ) {
+		return wrap(new Cursable<T>( ) {
 
 			@Override
 			public Cursor<T> pull( Hook hook ) {
-				Cursor<Integer> selector_pulled = selector;
+				Cursor<Integer> selector_pulled = selector.pull( hook );
 				Vector<Cursor<T>> sources_vector = new Vector<>( );
 				int size = sources.size( );
 				for ( int i = 0; i < size; i++ ) {
@@ -625,7 +654,7 @@ public class KnittingCursable<I> implements
 				};
 				return result;
 			}
-		};
+		});
 	}
 
 	@SafeVarargs

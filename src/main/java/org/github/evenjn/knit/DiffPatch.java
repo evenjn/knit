@@ -621,7 +621,7 @@ public class DiffPatch {
   @SuppressWarnings("unchecked")
 	private KnittingTuple<Object>[] diff_halfMatchI(KnittingTuple<Object> longtext, KnittingTuple<Object> shorttext, int i) {
     // Start with a 1/4 length substring at position i as a seed.
-  	KnittingTuple<Object> seed = longtext.sub(i, (i + longtext.size( ) / 4) - i);
+  	KnittingTuple<Object> seed = longtext.head(i, (i + longtext.size( ) / 4) - i);
     int j = -1;
     KnittingTuple<Object> best_common = the_empty_tuple;
     KnittingTuple<Object> best_longtext_a = the_empty_tuple, best_longtext_b = the_empty_tuple;
@@ -632,8 +632,8 @@ public class DiffPatch {
       int suffixLength = diff_commonSuffix(longtext.head(i),
                                            shorttext.head(j));
       if (best_common.size() < suffixLength + prefixLength) {
-        best_common = shorttext.sub(j - suffixLength, (j) - (j - suffixLength)).chain(
-            shorttext.sub(j, (j + prefixLength) - (j)));
+        best_common = shorttext.head(j - suffixLength, (j) - (j - suffixLength)).chain(
+            shorttext.head(j, (j + prefixLength) - (j)));
         best_longtext_a = longtext.head(i - suffixLength);
         best_longtext_b = longtext.headless(i + prefixLength);
         best_shorttext_a = shorttext.head(j - suffixLength);
@@ -1232,12 +1232,14 @@ public class DiffPatch {
 
       switch (aDiff.operation) {
       case INSERT:
+      	System.out.println( "INSERT " + aDiff.text );
         patch.diffs.add(aDiff);
         patch.length2 += aDiff.text.size();
         postpatch_text = postpatch_text.substring(0, char_count2)
             + aDiff.text + postpatch_text.substring(char_count2);
         break;
       case DELETE:
+      	System.out.println( "DELETE" + aDiff.text );
         patch.length1 += aDiff.text.size();
         patch.diffs.add(aDiff);
         postpatch_text = postpatch_text.substring(0, char_count2)
@@ -1266,6 +1268,7 @@ public class DiffPatch {
             char_count1 = char_count2;
           }
         }
+      	System.out.println( "EQUAL" + aDiff.text );
         break;
       }
 

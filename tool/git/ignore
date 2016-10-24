@@ -1,6 +1,6 @@
-.classpath
-.gitignore
-.project
-.settings
-pom.xml
-target
+/.classpath
+/.gitignore
+/.project
+/.settings
+/pom.xml
+/target/

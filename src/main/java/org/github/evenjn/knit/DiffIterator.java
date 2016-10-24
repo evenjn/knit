@@ -20,33 +20,31 @@ package org.github.evenjn.knit;
 import java.util.LinkedList;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
-import org.github.evenjn.knit.DiffPatch.Patch;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Itterator;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
-public class PatchItterator<K> implements
+public class DiffIterator<K> implements
 		Itterator<Bi<K, K>> {
 
-	private final KnittingItterator<Patch> kd;
+	private final KnittingItterator<Diff> kd;
 
 	private final KnittingCursor<K> ka;
 
 	private final KnittingCursor<K> kb;
 
-	public PatchItterator(Tuple<K> a, Tuple<K> b) {
+	public DiffIterator(Tuple<K> a, Tuple<K> b) {
 		ka = KnittingTuple.wrap( a ).pull( );
 		kb = KnittingTuple.wrap( b ).pull( );
 		DiffPatch dmp = new DiffPatch( );
 		LinkedList<Diff> diffs =
 				dmp.diff_main( KnittingTuple.wrap( a ).map( x -> x ), KnittingTuple
 						.wrap( b ).map( x -> x ) );
-		LinkedList<Patch> patch_make = dmp.patch_make( diffs );
-		kd = KnittingItterator.wrap( patch_make.iterator( ) );
+		kd = KnittingItterator.wrap( diffs.iterator( ) );
 	}
 
-	private Patch current = null;
+	private Diff current = null;
 
 	private Bi<K, K> tray = new Bi<>( );
 
@@ -61,45 +59,63 @@ public class PatchItterator<K> implements
 	@Override
 	public Bi<K, K> next( )
 			throws PastTheEndException {
-		int a_pos = ka.soFar( );
-		int b_pos = kb.soFar( );
 
 		if ( current == null && kd.hasNext( ) ) {
 			current = kd.next( );
-			original_start = current.start1;
-			original_length = current.length1;
-			revised_start = current.start2;
-			revised_length = current.length2;
+			switch ( current.operation ) {
+				case INSERT:
+					revised_length = current.text.size( );
+					break;
+				case EQUAL:
+					original_length = current.text.size( );
+					revised_length = current.text.size( );
+					break;
+				case DELETE:
+					original_length = current.text.size( );
+					break;
+				default:
+					break;
+			}
 		}
 
 		if ( current != null ) {
-
-			if ( a_pos == original_start && original_length > 0 ) {
-				tray.first = ka.next( );
-				tray.second = null;
-				original_start++;
-				original_length--;
-				if ( original_length == 0 && revised_length == 0 )
-					current = null;
-				return tray;
+			switch ( current.operation ) {
+				case INSERT:
+					tray.set( null, kb.next( ) );
+					revised_length--;
+					if ( revised_length == 0 ) {
+						current = null;
+					}
+					revised_start++;
+					break;
+				case EQUAL:
+					tray.set( ka.next( ), kb.next( ) );
+					original_length--;
+					if ( original_length == 0 ) {
+						current = null;
+					}
+					revised_length--;
+					if ( revised_length == 0 ) {
+						current = null;
+					}
+					original_start++;
+					revised_start++;
+					break;
+				case DELETE:
+					tray.set( ka.next( ), null );
+					original_length--;
+					if ( original_length == 0 ) {
+						current = null;
+					}
+					original_start++;
+					break;
+				default:
+					break;
 			}
-
-			if ( b_pos == revised_start && revised_length > 0 ) {
-				tray.first = null;
-				tray.second = kb.next( );
-				revised_start++;
-				revised_length--;
-				if ( original_length == 0 && revised_length == 0 )
-					current = null;
-				return tray;
-			}
+			return tray;
 
 		}
-		if ( !ka.hasNext( ) && !kb.hasNext( ) )
-			throw PastTheEndException.neo;
-		tray.first = ka.hasNext( ) ? ka.next( ) : null;
-		tray.second = kb.hasNext( ) ? kb.next( ) : null;
-		return tray;
+		throw PastTheEndException.neo;
 	}
 
 }

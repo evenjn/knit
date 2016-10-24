@@ -37,12 +37,8 @@ class Subcursor<T> implements
 		this.length = length;
 	}
 
-	static <T> Subcursor<T> headless( Cursor<T> wrapped, int start ) {
+	static <T> Subcursor<T> skip( Cursor<T> wrapped, int start ) {
 		return new Subcursor<>( wrapped, start, -1 );
-	}
-
-	static <T> Subcursor<T> head( Cursor<T> wrapped, int limit ) {
-		return new Subcursor<>( wrapped, 0, limit );
 	}
 
 	static <T> Subcursor<T> sub( Cursor<T> wrapped, int start, int limit ) {

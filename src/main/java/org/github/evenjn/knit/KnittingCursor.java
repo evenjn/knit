@@ -43,11 +43,11 @@ import org.github.evenjn.yarn.CursorUnfoldH;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
-import org.github.evenjn.yarn.IterableMaph;
+import org.github.evenjn.yarn.IterableMapH;
 import org.github.evenjn.yarn.IterableUnfold;
 import org.github.evenjn.yarn.IterableUnfoldH;
 import org.github.evenjn.yarn.IteratorMap;
-import org.github.evenjn.yarn.IteratorMaph;
+import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorUnfold;
 import org.github.evenjn.yarn.IteratorUnfoldH;
 import org.github.evenjn.yarn.PastTheEndException;
@@ -135,6 +135,7 @@ public class KnittingCursor<I> implements
 	 * This is a terminal operation.
 	 */
 	public void consume( ) {
+		failWhenDirty( );
 		try {
 			for ( ;; ) {
 				wrapped.next( );
@@ -145,6 +146,7 @@ public class KnittingCursor<I> implements
 	}
 
 	public <K extends Consumer<? super I>> K consume( K consumer ) {
+		failWhenDirty( );
 		try {
 			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
 				consumer.accept( next );
@@ -157,6 +159,7 @@ public class KnittingCursor<I> implements
 
 	public <K extends Consumer<? super I>> void consumeHook(
 			Function<Hook, K> hook_consumer ) {
+		failWhenDirty( );
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			K consumer = hook_consumer.apply( hook );
 			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
@@ -280,7 +283,7 @@ public class KnittingCursor<I> implements
 
 	public <O> KnittingCursor<O> flatmapIterable(
 			Hook hook,
-			IterableMaph<? super I, O> maph ) {
+			IterableMapH<? super I, O> maph ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -309,7 +312,7 @@ public class KnittingCursor<I> implements
 
 	public <O> KnittingCursor<O> flatmapIterator(
 			Hook hook,
-			IteratorMaph<? super I, O> maph ) {
+			IteratorMapH<? super I, O> maph ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -373,14 +376,21 @@ public class KnittingCursor<I> implements
 	 * Keep the head, discard the rest.
 	 */
 	public KnittingCursor<I> head( int length ) {
-		return wrap( Subcursor.head( wrapped, length ) );
+		return wrap( Subcursor.sub( wrapped, 0, length ) );
+	}
+
+	/**
+	 * Takes a secion of the head, skipping some elements.
+	 */
+	public KnittingCursor<I> head( int start, int length ) {
+		return wrap( Subcursor.sub( wrapped, start, length ) );
 	}
 
 	/**
 	 * Discard the head, keep the rest.
 	 */
 	public KnittingCursor<I> headless( int skip ) {
-		return wrap( Subcursor.headless( wrapped, skip ) );
+		return wrap( Subcursor.skip( wrapped, skip ) );
 	}
 
 	public <O> KnittingCursor<O> map( Function<? super I, O> function ) {
@@ -485,6 +495,7 @@ public class KnittingCursor<I> implements
 	 * one element.
 	 */
 	public I one( ) {
+		failWhenDirty( );
 		try {
 			I result = next( );
 			if ( hasNext( ) ) {
@@ -627,6 +638,10 @@ public class KnittingCursor<I> implements
 		return so_far;
 	}
 
+	/**
+	 * Use head(start, length).
+	 */
+	@Deprecated
 	public KnittingCursor<I> sub( int start, int length ) {
 		return wrap( Subcursor.sub( wrapped, start, length ) );
 	}
@@ -879,10 +894,10 @@ public class KnittingCursor<I> implements
 	 * @return an iterator that pulls the next element from the i-th iterator,
 	 *         where i is the next integer pulled by selector.
 	 */
-	public static <T> Cursor<T> blend(
+	public static <T> KnittingCursor<T> blend(
 			Cursor<Integer> selector,
 			final Tuple<Cursor<T>> sources ) {
-		return new Cursor<T>( ) {
+		return wrap(new Cursor<T>( ) {
 
 			@Override
 			public T next( )
@@ -891,7 +906,7 @@ public class KnittingCursor<I> implements
 				Cursor<T> iterator = sources.get( index );
 				return iterator.next( );
 			}
-		};
+		});
 	}
 
 	@SafeVarargs

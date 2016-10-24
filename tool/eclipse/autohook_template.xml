@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Try with resources with a new AutoHook" enabled="true" name="autohook">${:import(org.github.evenjn.yarn.AutoHook,org.github.evenjn.knit.BasicAutoHook)}
+try ( AutoHook hook = new BasicAutoHook( ) ) {
+  ${cursor}
+}</template></templates>
