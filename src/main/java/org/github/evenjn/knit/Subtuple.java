@@ -22,36 +22,40 @@ import org.github.evenjn.yarn.Tuple;
 class Subtuple<K> implements
 		Tuple<K> {
 
-	private final Tuple<K> fequence;
+	private final Tuple<K> tuple;
 
 	private final int start;
 
 	private final int length;
 
-	private final int max;
-
-	public Subtuple(Tuple<K> fequence, int start, int length) {
+	public Subtuple(Tuple<K> tuple, int start, int length) {
 		if ( length < 0 || start < 0 ) {
 			throw new IllegalArgumentException( );
 		}
-		this.fequence = fequence;
-		this.start = start;
-		this.length = length;
-		max = fequence.size( );
+		this.tuple = tuple;
+		int max = tuple.size( );
+		if ( start >= max ) {
+			this.start = 0;
+			this.length = 0;
+		} else {
+			this.start = start;
+			if ( max < start + length ) {
+				this.length = max - start;
+			} else {
+				this.length = length;
+			}
+		}
 	}
 
 	@Override
 	public K get( int t ) {
 		if ( t < 0 || t >= length )
 			throw new IllegalArgumentException( );
-		return fequence.get( start + t );
+		return tuple.get( start + t );
 	}
 
 	@Override
 	public int size( ) {
-		if ( start + length > max )
-			return max - start;
 		return length;
 	}
-
 }

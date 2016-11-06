@@ -20,28 +20,27 @@ package org.github.evenjn.knit;
 import java.util.LinkedList;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
-import org.github.evenjn.yarn.Bi;
-import org.github.evenjn.yarn.Itterator;
+import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
 public class DiffIterator<K> implements
-		Itterator<Bi<K, K>> {
+		Itterator<Di<K, K>> {
 
-	private final KnittingItterator<Diff> kd;
+	private final KnittingCursor<Diff> kd;
 
 	private final KnittingCursor<K> ka;
 
 	private final KnittingCursor<K> kb;
 
 	public DiffIterator(Tuple<K> a, Tuple<K> b) {
-		ka = KnittingTuple.wrap( a ).pull( );
-		kb = KnittingTuple.wrap( b ).pull( );
+		ka = KnittingCursor.wrap( a );
+		kb = KnittingCursor.wrap( b );
 		DiffPatch dmp = new DiffPatch( );
 		LinkedList<Diff> diffs =
 				dmp.diff_main( KnittingTuple.wrap( a ).map( x -> x ), KnittingTuple
 						.wrap( b ).map( x -> x ) );
-		kd = KnittingItterator.wrap( diffs.iterator( ) );
+		kd = KnittingCursor.wrap( diffs.iterator( ) );
 	}
 
 	private Diff current = null;

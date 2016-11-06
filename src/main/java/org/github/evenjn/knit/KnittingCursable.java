@@ -18,6 +18,7 @@
 package org.github.evenjn.knit;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Vector;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -27,7 +28,6 @@ import java.util.function.Predicate;
 import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.ArrayUnfoldFactory;
 import org.github.evenjn.yarn.AutoHook;
-import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
 import org.github.evenjn.yarn.CursableMapH;
@@ -38,6 +38,7 @@ import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.CursorUnfoldFactory;
 import org.github.evenjn.yarn.CursorUnfoldHFactory;
+import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
@@ -93,17 +94,11 @@ public class KnittingCursable<I> implements
 		}
 	}
 
-	public <K extends Consumer<? super I>> K consume( K consumer ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			return pull( hook ).consume( consumer );
-		}
-	}
-
-	public <K extends Consumer<? super I>> void consumeHook(
+	public <K extends Consumer<? super I>> void consume(
 			Function<Hook, K> hook_consumer ) {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			K consumer = hook_consumer.apply( hook );
-			pull( hook ).consume( consumer );
+			pull( hook ).tap( consumer ).consume( );
 		}
 	}
 
@@ -133,7 +128,8 @@ public class KnittingCursable<I> implements
 	 * @return A cursable to access the only the elements of this cursable that
 	 *         are not discarded by the predicate.
 	 */
-	public KnittingCursable<I> filter( Predicate<? super I> stateless_predicate ) {
+	public KnittingCursable<I>
+			filter( Predicate<? super I> stateless_predicate ) {
 		return wrap( new Cursable<I>( ) {
 
 			@Override
@@ -265,6 +261,7 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
+	@Deprecated
 	public KnittingCursable<I> head( int limit ) {
 		return wrap( new Cursable<I>( ) {
 
@@ -319,27 +316,23 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public KnittingCursable<Bi<Integer, I>> numbered( ) {
+	public KnittingCursable<Di<Integer, I>> numbered( ) {
 		KnittingCursable<I> outer_this = this;
-		return wrap( new Cursable<Bi<Integer, I>>( ) {
+		return wrap( new Cursable<Di<Integer, I>>( ) {
 
 			@Override
-			public Cursor<Bi<Integer, I>> pull( Hook hook ) {
+			public Cursor<Di<Integer, I>> pull( Hook hook ) {
 				return outer_this.pull( hook ).numbered( );
 			}
 		} );
 	}
 
-	public Iterable<I> once( Hook hook ) {
-		return pull( hook ).once( );
-	}
-
 	/**
-	 * throws IllegalStateException when it it not the case that there is exactly
-	 * one element.
+	 * throws IllegalStateException when it not the case that there is exactly one
+	 * element.
 	 */
-	public I one( ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+	public I one( Hook hook ) {
+		try {
 			KnittingCursor<I> pulled = pull( hook );
 			I result = pulled.next( );
 			if ( pulled.hasNext( ) ) {
@@ -349,6 +342,26 @@ public class KnittingCursable<I> implements
 		}
 		catch ( PastTheEndException e ) {
 			throw new IllegalStateException( );
+		}
+	}
+
+	/**
+	 * This is a terminal operation.
+	 * 
+	 * returns an empty optionsl when it not the case that there is exactly one
+	 * element.
+	 */
+	public Optional<I> optionalOne( Hook hook ) {
+		try {
+			KnittingCursor<I> pulled = pull( hook );
+			I result = pulled.next( );
+			if ( pulled.hasNext( ) ) {
+				return Optional.empty( );
+			}
+			return Optional.of( result );
+		}
+		catch ( PastTheEndException e ) {
+			return Optional.empty( );
 		}
 	}
 
@@ -426,8 +439,12 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
+	public KnittingCursable<KnittingCursor<I>> split( Predicate<I> predicate ) {
+		return KnittingCursable.wrap( h -> pull( h ).split( predicate ) );
+	}
+
 	/**
-	 * Use head(start, length) 
+	 * Use head(start, length)
 	 */
 	@Deprecated
 	public KnittingCursable<I> sub( int start, int length ) {
@@ -465,7 +482,8 @@ public class KnittingCursable<I> implements
 				if ( length > size ) {
 					return wrapped.pull( hook );
 				}
-				return Subcursor.sub( wrapped.pull( hook ), size - ( length + skip ), length );
+				return Subcursor.sub( wrapped.pull( hook ), size - ( length + skip ),
+						length );
 			}
 		} );
 	}
@@ -482,6 +500,18 @@ public class KnittingCursable<I> implements
 				}
 				return Subcursor.sub( wrapped.pull( hook ), 0, len );
 			}
+		} );
+	}
+
+	public KnittingCursable<I> tap( Consumer<? super I> consumer ) {
+		KnittingCursable<I> outer_this = this;
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return outer_this.pull( hook ).tap( consumer );
+			}
+
 		} );
 	}
 
@@ -631,7 +661,7 @@ public class KnittingCursable<I> implements
 	 */
 	public static <T> KnittingCursable<T> blend( Cursable<Integer> selector,
 			final Tuple<Cursable<T>> sources ) {
-		return wrap(new Cursable<T>( ) {
+		return wrap( new Cursable<T>( ) {
 
 			@Override
 			public Cursor<T> pull( Hook hook ) {
@@ -654,7 +684,7 @@ public class KnittingCursable<I> implements
 				};
 				return result;
 			}
-		});
+		} );
 	}
 
 	@SafeVarargs
@@ -663,7 +693,7 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<K> pull( Hook hook ) {
-				return new ArrayItterator<K>( elements );
+				return new ArrayCursor<K>( elements );
 			}
 		};
 		return wrap( cursable );

@@ -23,18 +23,17 @@ import java.util.NoSuchElementException;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.Hook;
-import org.github.evenjn.yarn.Itterator;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
-class ArrayItterator<T> implements
-		Itterator<T> {
+class ArrayCursor<T> implements
+		Cursor<T> {
 
 	private T[] array;
 
 	private int i = 0;
 
-	public ArrayItterator(T[] array) {
+	public ArrayCursor(T[] array) {
 		this.array = array;
 	}
 
@@ -59,7 +58,7 @@ class ArrayItterable<T> implements
 
 	@Override
 	public Cursor<T> pull( Hook hook ) {
-		return new ArrayItterator<>( array );
+		return new ArrayCursor<>( array );
 	}
 }
 

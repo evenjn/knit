@@ -17,23 +17,20 @@
  */
 package org.github.evenjn.knit;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
-import org.github.evenjn.yarn.Bi;
-import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
 public class KnittingTuple<I> implements
-		Tuple<I>,
-		Cursable<I> {
+		Tuple<I> {
 
 	private final Tuple<I> wrapped;
 
@@ -61,8 +58,9 @@ public class KnittingTuple<I> implements
 		this.wrapped = tuple;
 	}
 
-	public KnittingItterable<Bi<I, I>> diff( Tuple<I> other ) {
-		return KnittingItterable.wrap( ( ) -> new DiffIterator<I>( this, other ) );
+	public Iterable<Di<I, I>> diff( Tuple<I> other ) {
+		return ( ) -> KnittingCursor.wrap( new DiffIterator<I>( this, other ) )
+				.once( ).iterator( );
 	}
 
 	/**
@@ -71,12 +69,9 @@ public class KnittingTuple<I> implements
 	public int distance( Tuple<?> other ) {
 		DiffPatch dmp = new DiffPatch( );
 		LinkedList<Diff> diffs =
-				dmp.diff_main( map( x -> x ), KnittingTuple.wrap( other ).map( x -> x ) );
+				dmp.diff_main( map( x -> x ),
+						KnittingTuple.wrap( other ).map( x -> x ) );
 		return dmp.diff_levenshtein( diffs );
-	}
-
-	public <K extends Consumer<I>> K consume( K consumer ) {
-		return pull( ).consume( consumer );
 	}
 
 	@Override
@@ -89,8 +84,8 @@ public class KnittingTuple<I> implements
 		return wrapped.size( );
 	}
 
-	public KnittingCursor<I> pull( ) {
-		return KnittingCursor.wrap( new Cursor<I>( ) {
+	private Cursor<I> pull( ) {
+		return new Cursor<I>( ) {
 
 			final int size = wrapped.size( );
 
@@ -103,55 +98,43 @@ public class KnittingTuple<I> implements
 					throw PastTheEndException.neo;
 				return wrapped.get( i++ );
 			}
-		} );
+		};
 	}
 
-	@Override
-	public KnittingCursor<I> pull( Hook hook ) {
-		return pull( );
+	public KnittingCursable<I> asCursable( ) {
+		return KnittingCursable.wrap( x -> pull( ) );
 	}
 
-	public Optional<Integer> findElement( Object object ) {
-		return findElement( object, 0 );
+	public KnittingCursor<I> asCursor( ) {
+		return KnittingCursor.wrap( pull( ) );
 	}
 
-	public Optional<Integer> findElement( Object object, int skip ) {
-		final int size = size( );
-		for ( int i = skip; i < size; i++ ) {
-			I e = wrapped.get( i );
-			if ( e == null ? object == null : object.equals( e ) ) {
-				return Optional.of( i );
+	public Iterable<I> asIterable( ) {
+		return ( ) -> asIterator( );
+	}
+
+	public Iterator<I> asIterator( ) {
+		return new Iterator<I>( ) {
+
+			final int size = wrapped.size( );
+
+			int i = 0;
+
+			@Override
+			public boolean hasNext( ) {
+				return i < size;
 			}
-		}
-		return Optional.empty( );
-	}
 
-	/*
-	 * Formally computes whether the object is in the image. Bear in mind
-	 * that there may be mulitiple elements in the domain of this function that
-	 * are mapped to the argument object.
-	 */
-	public boolean contains( Object object ) {
-		final int size = size( );
-		for ( int i = 0; i < size; i++ ) {
-			I e = wrapped.get( i );
-			if ( e == null ? object == null : object.equals( e ) ) {
-				return true;
+			@Override
+			public I next( ) {
+				return wrapped.get( i++ );
 			}
-		}
-		return false;
-	}
-
-	/**
-	 * Use head(start, length). 
-	 */
-	@Deprecated
-	public KnittingTuple<I> sub( final int start, final int length ) {
-		return wrap( new Subtuple<>( wrapped, start, length ) );
+		};
 	}
 
 	public KnittingTuple<I> headless( int start ) {
-		return wrap( new Subtuple<>( wrapped, start, wrapped.size( ) ) );
+		return wrap( new Subtuple<>( wrapped, start,
+				/* no problem with full size */wrapped.size( ) ) );
 	}
 
 	public KnittingTuple<I> head( int limit ) {
@@ -206,14 +189,6 @@ public class KnittingTuple<I> implements
 		return sb.toString( );
 	}
 
-	KnittingTuple<? extends I> blurType( ) {
-		return this;
-	}
-
-	public Iterable<I> once( ) {
-		return pull( ).once( );
-	}
-
 	public <O> KnittingTuple<O> map( Function<? super I, O> function ) {
 		return wrap( new Tuple<O>( ) {
 
@@ -235,14 +210,6 @@ public class KnittingTuple<I> implements
 		if ( first == null || second == null )
 			return false;
 		return first.equals( second );
-	}
-
-	/**
-	 * Returns the index within this tuple of the first occurrence of the
-	 * specified tuple.
-	 */
-	public Optional<Integer> findSubtuple( KnittingTuple<I> target ) {
-		return findSubtuple( target, 0 );
 	}
 
 	public boolean startsWith( KnittingTuple<I> target ) {
@@ -286,7 +253,7 @@ public class KnittingTuple<I> implements
 		}
 		int target_size = target.size( );
 		if ( target_size == 0 ) {
-			return Optional.of(skip);
+			return Optional.of( skip );
 		}
 		if ( skip == size ) {
 			return Optional.empty( );
@@ -306,7 +273,7 @@ public class KnittingTuple<I> implements
 					k++;
 				}
 				if ( j == end ) {
-					return Optional.of(i);
+					return Optional.of( i );
 				}
 			}
 		}

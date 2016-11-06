@@ -39,9 +39,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.github.evenjn.knit.DiffPatch.Diff;
+
+import junit.framework.TestCase;
 
 public class DiffTest
 		extends TestCase {

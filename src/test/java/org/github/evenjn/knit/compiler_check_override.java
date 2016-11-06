@@ -78,7 +78,7 @@ public class compiler_check_override {
 	}
 
 	public static void main( String[] args ) {
-		KnittingCursable<String> cursable = null;
+		KnittingCursable<String> cursable = KnittingCursable.on(  );
 
 		cursable.map( function );
 		cursable.filter( predicate );
@@ -95,7 +95,7 @@ public class compiler_check_override {
 
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<String> pull = cursable.pull( hook );
-			pull.consume( System.out::println );
+			pull.tap( System.out::println ).consume( );
 			pull.consumeHook( ff1 );
 			pull.consumeHook( ff2 );
 		}

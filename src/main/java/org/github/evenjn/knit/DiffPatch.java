@@ -233,7 +233,7 @@ public class DiffPatch {
 
     KnittingTuple<Object> longtext = text1.size() > text2.size() ? text1 : text2;
     KnittingTuple<Object> shorttext = text1.size() > text2.size() ? text2 : text1;
-    Optional<Integer> i = longtext.findSubtuple(shorttext);
+    Optional<Integer> i = longtext.findSubtuple(shorttext, 0);
     if (i.isPresent( )) {
     	int i_value = i.get( );
       // Shorter text is inside the longer text (speedup).
@@ -521,7 +521,7 @@ public class DiffPatch {
     int length = 1;
     while (true) {
       KnittingTuple<Object> pattern = text1.headless(text_length - length);
-      Optional<Integer> found = text2.findSubtuple(pattern);
+      Optional<Integer> found = text2.findSubtuple(pattern, 0);
       if (!found.isPresent( )) {
         return best;
       }
@@ -536,7 +536,7 @@ public class DiffPatch {
 	
 	private static String codepointTupleToString( KnittingTuple<?>codePoints ) {
 		StringBuilder sb = new StringBuilder( );
-		for ( Object codePoint : codePoints.once( ) ) {
+		for ( Object codePoint : codePoints.asIterable( ) ) {
 			if ( codePoint instanceof Integer ) {
 				char[] chars = Character.toChars( (Integer) codePoint );
 				sb.append( chars );

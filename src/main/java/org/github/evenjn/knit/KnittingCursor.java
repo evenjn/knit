@@ -20,6 +20,7 @@ package org.github.evenjn.knit;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -29,7 +30,6 @@ import java.util.stream.Stream;
 import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.ArrayUnfold;
 import org.github.evenjn.yarn.AutoHook;
-import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
 import org.github.evenjn.yarn.CursableMapH;
@@ -40,6 +40,7 @@ import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.CursorUnfold;
 import org.github.evenjn.yarn.CursorUnfoldH;
+import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
@@ -53,7 +54,9 @@ import org.github.evenjn.yarn.IteratorUnfoldH;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.SkipException;
 import org.github.evenjn.yarn.SkipFold;
+import org.github.evenjn.yarn.SkipFoldFactory;
 import org.github.evenjn.yarn.SkipFoldH;
+import org.github.evenjn.yarn.SkipFoldHFactory;
 import org.github.evenjn.yarn.SkipMap;
 import org.github.evenjn.yarn.SkipMapH;
 import org.github.evenjn.yarn.StreamMapH;
@@ -85,10 +88,11 @@ public class KnittingCursor<I> implements
 	 * @return the concatenation of this cursor an the argument cursor.
 	 */
 	public KnittingCursor<I> chain( Cursor<I> other ) {
+		final KnittingCursor<I> outer_this = this;
 
 		Cursor<I> chained = new Cursor<I>( ) {
 
-			Cursor<I> current = wrapped;
+			Cursor<I> current = outer_this;
 
 			@Override
 			public I next( )
@@ -100,11 +104,10 @@ public class KnittingCursor<I> implements
 					return current.next( );
 				}
 				catch ( PastTheEndException t ) {
-					if ( current == wrapped ) {
+					if ( current == outer_this ) {
 						current = other;
 						return current.next( );
-					}
-					else {
+					} else {
 						current = null;
 						throw PastTheEndException.neo;
 					}
@@ -122,7 +125,7 @@ public class KnittingCursor<I> implements
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			try {
 				for ( ;; ) {
-					collection.add( wrapped.next( ) );
+					collection.add( next( ) );
 				}
 			}
 			catch ( PastTheEndException e ) {
@@ -138,23 +141,24 @@ public class KnittingCursor<I> implements
 		failWhenDirty( );
 		try {
 			for ( ;; ) {
-				wrapped.next( );
+				next( );
 			}
 		}
 		catch ( PastTheEndException e ) {
 		}
 	}
 
-	public <K extends Consumer<? super I>> K consume( K consumer ) {
+	public <K extends Consumer<? super I>> void consume(
+			Function<Hook, K> hook_consumer ) {
 		failWhenDirty( );
-		try {
-			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
-				consumer.accept( next );
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			K consumer = hook_consumer.apply( hook );
+			for ( ;; ) {
+				consumer.accept( next( ) );
 			}
 		}
 		catch ( PastTheEndException e ) {
 		}
-		return consumer;
 	}
 
 	public <K extends Consumer<? super I>> void consumeHook(
@@ -162,8 +166,8 @@ public class KnittingCursor<I> implements
 		failWhenDirty( );
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			K consumer = hook_consumer.apply( hook );
-			for ( I next = wrapped.next( );; next = wrapped.next( ) ) {
-				consumer.accept( next );
+			for ( ;; ) {
+				consumer.accept( next( ) );
 			}
 		}
 		catch ( PastTheEndException e ) {
@@ -179,13 +183,13 @@ public class KnittingCursor<I> implements
 	public <R, M> KnittingCursor<M> entwine(
 			Cursor<R> other,
 			BiFunction<I, R, M> bifunction ) {
-		Cursor<I> outer = this;
+		final KnittingCursor<I> outer_this = this;
 		Cursor<M> result = new Cursor<M>( ) {
 
 			@Override
 			public M next( )
 					throws PastTheEndException {
-				return bifunction.apply( outer.next( ), other.next( ) );
+				return bifunction.apply( outer_this.next( ), other.next( ) );
 			}
 		};
 		return wrap( result );
@@ -202,160 +206,151 @@ public class KnittingCursor<I> implements
 
 			@Override
 			public Cursor<I> next( Hook hook, I input ) {
-				if ( predicate.test( input ) ) {
-					return new SingletonCursor<I>( input );
-				}
-				return null;
+				return predicate.test( input ) ? new SingletonCursor<I>( input ) : null;
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, I>(
-				wrapped,
-				stitch ) );
-	}
-
-	public <O> KnittingCursor<O> flatmapArray( ArrayMap<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
-
-			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				O[] nextArray = stitch.get( input );
-				return nextArray == null ? null : new ArrayItterator<>( nextArray );
-			}
-		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, I>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O>
-			flatmapCursable( CursableMap<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			flatmapArray( ArrayMap<? super I, O> array_map ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				Cursable<O> cursable = stitch.get( input );
+				O[] nextArray = array_map.get( input );
+				return nextArray == null ? null : new ArrayCursor<>( nextArray );
+			}
+		};
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
+	}
+
+	public <O> KnittingCursor<O> flatmapCursable(
+			CursableMap<? super I, O> cursable_map ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
+
+			@Override
+			public Cursor<O> next( Hook hook, I input ) {
+				Cursable<O> cursable = cursable_map.get( input );
 				return cursable == null ? null : cursable.pull( hook );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> flatmapCursable(
 			Hook hook,
-			CursableMapH<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			CursableMapH<? super I, O> cursable_map_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				Cursable<O> cursable = stitch.get( hook, input );
+				Cursable<O> cursable = cursable_map_h.get( hook, input );
 				return cursable == null ? null : cursable.pull( hook );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
-	public <O> KnittingCursor<O> flatmapCursor( CursorMap<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+	public <O> KnittingCursor<O> flatmapCursor(
+			CursorMap<? super I, O> cursor_map ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				return stitch.get( input );
+				return cursor_map.get( input );
 			}
-
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> flatmapCursor(
 			Hook hook,
-			CursorMapH<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			CursorMapH<? super I, O> cursor_map_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				return stitch.get( hook, input );
+				return cursor_map_h.get( hook, input );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> flatmapIterable(
 			Hook hook,
-			IterableMapH<? super I, O> maph ) {
+			IterableMapH<? super I, O> iterable_map_h ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				Iterable<O> nextIterable = maph.get( hook, input );
+				Iterable<O> nextIterable = iterable_map_h.get( hook, input );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
-	public <O> KnittingCursor<O> flatmapIterable( IterableMap<? super I, O> map ) {
+	public <O> KnittingCursor<O> flatmapIterable(
+			IterableMap<? super I, O> iterable_map ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				Iterable<O> nextIterable = map.get( input );
+				Iterable<O> nextIterable = iterable_map.get( input );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
-
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> flatmapIterator(
 			Hook hook,
-			IteratorMapH<? super I, O> maph ) {
+			IteratorMapH<? super I, O> iterator_map_h ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				Iterator<O> nextIterator = maph.get( hook, input );
+				Iterator<O> nextIterator = iterator_map_h.get( hook, input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
-	public <O> KnittingCursor<O> flatmapIterator( IteratorMap<? super I, O> map ) {
+	public <O> KnittingCursor<O>
+			flatmapIterator( IteratorMap<? super I, O> iterator_map ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				Iterator<O> nextIterator = map.get( input );
+				Iterator<O> nextIterator = iterator_map.get( input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> flatmapStream(
 			Hook hook,
-			StreamMapH<? super I, O> maph
-			) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			StreamMapH<? super I, O> stream_map_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Stream<O> nextStream = maph.get( hook, input );
+				final Stream<O> nextStream = stream_map_h.get( hook, input );
 				return nextStream == null ? null : new IteratorCursor<>(
 						nextStream.iterator( ) );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	public boolean hasNext( ) {
@@ -375,22 +370,23 @@ public class KnittingCursor<I> implements
 	/**
 	 * Keep the head, discard the rest.
 	 */
+	@Deprecated
 	public KnittingCursor<I> head( int length ) {
-		return wrap( Subcursor.sub( wrapped, 0, length ) );
+		return wrap( Subcursor.sub( this, 0, length ) );
 	}
 
 	/**
-	 * Takes a secion of the head, skipping some elements.
+	 * Takes a section of the head, skipping some elements.
 	 */
 	public KnittingCursor<I> head( int start, int length ) {
-		return wrap( Subcursor.sub( wrapped, start, length ) );
+		return wrap( Subcursor.sub( this, start, length ) );
 	}
 
 	/**
 	 * Discard the head, keep the rest.
 	 */
 	public KnittingCursor<I> headless( int skip ) {
-		return wrap( Subcursor.skip( wrapped, skip ) );
+		return wrap( Subcursor.skip( this, skip ) );
 	}
 
 	public <O> KnittingCursor<O> map( Function<? super I, O> function ) {
@@ -402,9 +398,7 @@ public class KnittingCursor<I> implements
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O>
@@ -417,10 +411,7 @@ public class KnittingCursor<I> implements
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	@Override
@@ -430,21 +421,20 @@ public class KnittingCursor<I> implements
 		if ( is_cached ) {
 			is_cached = false;
 			result = cached;
-		}
-		else {
+		} else {
 			result = wrapped.next( );
 		}
 		so_far++;
 		return result;
 	}
 
-	public KnittingCursor<Bi<Integer, I>> numbered( ) {
-		KnittingCursor<I> outer_this = this;
+	public KnittingCursor<Di<Integer, I>> numbered( ) {
+		final KnittingCursor<I> outer_this = this;
 		Bi<Integer, I> bi = Bi.nu( null, null );
-		return wrap( new Cursor<Bi<Integer, I>>( ) {
+		return wrap( new Cursor<Di<Integer, I>>( ) {
 
 			@Override
-			public Bi<Integer, I> next( )
+			public Di<Integer, I> next( )
 					throws PastTheEndException {
 				return bi.set( soFar( ), outer_this.next( ) );
 			}
@@ -452,8 +442,8 @@ public class KnittingCursor<I> implements
 	}
 
 	public Iterable<I> once( ) {
+		final KnittingCursor<I> outer_this = this;
 		failWhenDirty( );
-		KnittingCursor<I> outer_this = this;
 		return new Iterable<I>( ) {
 
 			boolean once = true;
@@ -462,8 +452,7 @@ public class KnittingCursor<I> implements
 			public Iterator<I> iterator( ) {
 				if ( once ) {
 					once = false;
-				}
-				else {
+				} else {
 					throw new IllegalStateException(
 							"This method cannot be invoked more than once." );
 				}
@@ -491,8 +480,8 @@ public class KnittingCursor<I> implements
 	/**
 	 * This is a terminal operation.
 	 * 
-	 * throws IllegalStateException when it it not the case that there is exactly
-	 * one element.
+	 * throws IllegalStateException when it not the case that there is exactly one
+	 * element.
 	 */
 	public I one( ) {
 		failWhenDirty( );
@@ -505,6 +494,26 @@ public class KnittingCursor<I> implements
 		}
 		catch ( PastTheEndException e ) {
 			throw new IllegalStateException( );
+		}
+	}
+
+	/**
+	 * This is a terminal operation.
+	 * 
+	 * returns an empty optionsl when it not the case that there is exactly one
+	 * element.
+	 */
+	public Optional<I> optionalOne( ) {
+		failWhenDirty( );
+		try {
+			I result = next( );
+			if ( hasNext( ) ) {
+				return Optional.empty( );
+			}
+			return Optional.of( result );
+		}
+		catch ( PastTheEndException e ) {
+			return Optional.empty( );
 		}
 	}
 
@@ -522,26 +531,17 @@ public class KnittingCursor<I> implements
 	}
 
 	public int size( ) {
-		failWhenDirty( );
-		int size = 0;
-		try {
-			for ( ;; ) {
-				wrapped.next( );
-				size++;
-			}
-		}
-		catch ( PastTheEndException e ) {
-		}
-		return size;
+		consume( );
+		return so_far;
 	}
 
-	public <O> KnittingCursor<O> skipfold( SkipFold<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+	public <O> KnittingCursor<O> skipfold( SkipFold<? super I, O> skip_fold ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				try {
-					return new SingletonCursor<O>( stitch.next( input ) );
+					return new SingletonCursor<O>( skip_fold.next( input ) );
 				}
 				catch ( SkipException e ) {
 					return null;
@@ -551,26 +551,24 @@ public class KnittingCursor<I> implements
 			@Override
 			public Cursor<O> end( Hook hook ) {
 				try {
-					return new SingletonCursor<O>( stitch.end( ) );
+					return new SingletonCursor<O>( skip_fold.end( ) );
 				}
 				catch ( SkipException e ) {
 					return null;
 				}
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> skipfold( Hook hook,
-			SkipFoldH<? super I, O> stitch ) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			SkipFoldH<? super I, O> skip_fold_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				try {
-					return new SingletonCursor<O>( stitch.next( hook, input ) );
+					return new SingletonCursor<O>( skip_fold_h.next( hook, input ) );
 				}
 				catch ( SkipException e ) {
 					return null;
@@ -580,27 +578,33 @@ public class KnittingCursor<I> implements
 			@Override
 			public Cursor<O> end( Hook hook ) {
 				try {
-					return new SingletonCursor<O>( stitch.end( hook ) );
+					return new SingletonCursor<O>( skip_fold_h.end( hook ) );
 				}
 				catch ( SkipException e ) {
 					return null;
 				}
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
-	public <O> KnittingCursor<O> skipmap(
-			SkipMap<? super I, O> skipmapping ) {
+	public <O> KnittingCursor<O>
+			skipfold( SkipFoldFactory<? super I, O> factory ) {
+		return skipfold( factory.create( ) );
+	}
+
+	public <O> KnittingCursor<O> skipfold( Hook hook,
+			SkipFoldHFactory<? super I, O> factory ) {
+		return skipfold( hook, factory.create( ) );
+	}
+
+	public <O> KnittingCursor<O> skipmap( SkipMap<? super I, O> skip_map ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				try {
-					return new SingletonCursor<O>( skipmapping.get( input ) );
+					return new SingletonCursor<O>( skip_map.get( input ) );
 				}
 				catch ( SkipException e ) {
 					return null;
@@ -608,19 +612,17 @@ public class KnittingCursor<I> implements
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> skipmap( Hook hook,
-			SkipMapH<? super I, O> skipmapping ) {
+			SkipMapH<? super I, O> skip_map_h ) {
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
 				try {
-					return new SingletonCursor<O>( skipmapping.get( hook, input ) );
+					return new SingletonCursor<O>( skip_map_h.get( hook, input ) );
 				}
 				catch ( SkipException e ) {
 					return null;
@@ -628,14 +630,15 @@ public class KnittingCursor<I> implements
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	public int soFar( ) {
 		return so_far;
+	}
+
+	public KnittingCursor<KnittingCursor<I>> split( Predicate<I> predicate ) {
+		return KnittingCursor.wrap( new SplitCursor<>( this, predicate ) );
 	}
 
 	/**
@@ -643,235 +646,211 @@ public class KnittingCursor<I> implements
 	 */
 	@Deprecated
 	public KnittingCursor<I> sub( int start, int length ) {
-		return wrap( Subcursor.sub( wrapped, start, length ) );
+		return wrap( Subcursor.sub( this, start, length ) );
+	}
+
+	public KnittingCursor<I> tap( Consumer<? super I> consumer ) {
+		KnittingCursor<I> outer_this = this;
+		return wrap( new Cursor<I>( ) {
+
+			@Override
+			public I next( )
+					throws PastTheEndException {
+				I next = outer_this.next( );
+				consumer.accept( next );
+				return next;
+			}
+		} );
 	}
 
 	public <O> KnittingCursor<O> unfoldArray(
-			ArrayUnfold<? super I, O> stitch
-			) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			ArrayUnfold<? super I, O> array_unfold ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				O[] array = stitch.next( input );
-				return array == null ? null : new ArrayItterator<>( array );
+				O[] array = array_unfold.next( input );
+				return array == null ? null : new ArrayCursor<>( array );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				O[] array = stitch.end( );
-				return array == null ? null : new ArrayItterator<>( array );
+				O[] array = array_unfold.end( );
+				return array == null ? null : new ArrayCursor<>( array );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldCursable(
-			CursableUnfold<? super I, O> stitch
-			) {
+			CursableUnfold<? super I, O> cursable_unfold ) {
 
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Cursable<O> nextCursable = stitch.next( input );
+				final Cursable<O> nextCursable = cursable_unfold.next( input );
 				return nextCursable == null ? null : nextCursable.pull( hook );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				final Cursable<O> nextCursable = stitch.end( );
+				final Cursable<O> nextCursable = cursable_unfold.end( );
 				return nextCursable == null ? null : nextCursable.pull( hook );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldCursable(
 			Hook hook,
-			CursableUnfoldH<? super I, O> stitch
-			) {
-
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			CursableUnfoldH<? super I, O> cursable_unfold_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Cursable<O> nextCursable = stitch.next( hook, input );
+				final Cursable<O> nextCursable = cursable_unfold_h.next( hook, input );
 				return nextCursable == null ? null : nextCursable.pull( hook );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				final Cursable<O> nextCursable = stitch.end( hook );
+				final Cursable<O> nextCursable = cursable_unfold_h.end( hook );
 				return nextCursable == null ? null : nextCursable.pull( hook );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldCursor(
-			CursorUnfold<? super I, O> stitch
-			) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			CursorUnfold<? super I, O> cursor_unfold ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				return stitch.next( input );
+				return cursor_unfold.next( input );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				return stitch.end( );
+				return cursor_unfold.end( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldCursor(
 			Hook hook,
-			CursorUnfoldH<? super I, O> stitch
-			) {
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				stitch ) );
+			CursorUnfoldH<? super I, O> cursor_unfold_h ) {
+		return wrap(
+				new CursorStitchProcessor<I, O>( hook, this, cursor_unfold_h ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldIterable(
-			IterableUnfold<? super I, O> stitch
-			) {
+			IterableUnfold<? super I, O> iterable_unfold ) {
 
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Iterable<O> nextIterable = stitch.next( input );
+				final Iterable<O> nextIterable = iterable_unfold.next( input );
 				return new IteratorCursor<>( nextIterable.iterator( ) );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				final Iterable<O> nextIterable = stitch.end( );
+				final Iterable<O> nextIterable = iterable_unfold.end( );
 				return new IteratorCursor<>( nextIterable.iterator( ) );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldIterable(
 			Hook hook,
-			IterableUnfoldH<? super I, O> stitch
-			) {
-
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			IterableUnfoldH<? super I, O> iterable_unfold_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Iterable<O> nextIterable = stitch.next( hook, input );
+				final Iterable<O> nextIterable = iterable_unfold_h.next( hook, input );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 
 			public Cursor<O> end( Hook hook ) {
-				final Iterable<O> nextIterable = stitch.end( hook );
+				final Iterable<O> nextIterable = iterable_unfold_h.end( hook );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldIterator(
-			IteratorUnfold<? super I, O> stitch
-			) {
-
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			IteratorUnfold<? super I, O> iterator_unfold ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Iterator<O> nextIterator = stitch.next( input );
+				final Iterator<O> nextIterator = iterator_unfold.next( input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				final Iterator<O> nextIterator = stitch.end( );
+				final Iterator<O> nextIterator = iterator_unfold.end( );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldIterator(
 			Hook hook,
-			IteratorUnfoldH<? super I, O> stitch
-			) {
-
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			IteratorUnfoldH<? super I, O> iterator_unfold_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Iterator<O> nextIterator = stitch.next( hook, input );
+				final Iterator<O> nextIterator = iterator_unfold_h.next( hook, input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				final Iterator<O> nextIterator = stitch.end( hook );
+				final Iterator<O> nextIterator = iterator_unfold_h.end( hook );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	public <O> KnittingCursor<O> unfoldStream(
 			Hook hook,
-			StreamUnfoldH<? super I, O> stitch
-			) {
-		CursorUnfoldH<I, O> internal_stitch = new CursorUnfoldH<I, O>( ) {
+			StreamUnfoldH<? super I, O> stream_unfold_h ) {
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
 			public Cursor<O> next( Hook hook, I input ) {
-				final Stream<O> nextStream = stitch.next( hook, input );
+				final Stream<O> nextStream = stream_unfold_h.next( hook, input );
 				return nextStream == null ? null : new IteratorCursor<>(
 						nextStream.iterator( ) );
 			}
 
 			@Override
 			public Cursor<O> end( Hook hook ) {
-				final Stream<O> nextStream = stitch.end( hook );
+				final Stream<O> nextStream = stream_unfold_h.end( hook );
 				return nextStream == null ? null : new IteratorCursor<>(
 						nextStream.iterator( ) );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>(
-				hook,
-				wrapped,
-				internal_stitch ) );
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -897,7 +876,7 @@ public class KnittingCursor<I> implements
 	public static <T> KnittingCursor<T> blend(
 			Cursor<Integer> selector,
 			final Tuple<Cursor<T>> sources ) {
-		return wrap(new Cursor<T>( ) {
+		return wrap( new Cursor<T>( ) {
 
 			@Override
 			public T next( )
@@ -906,12 +885,28 @@ public class KnittingCursor<I> implements
 				Cursor<T> iterator = sources.get( index );
 				return iterator.next( );
 			}
-		});
+		} );
 	}
 
 	@SafeVarargs
 	public static <K> KnittingCursor<K> on( K ... elements ) {
-		return wrap( new ArrayItterator<K>( elements ) );
+		return wrap( new ArrayCursor<K>( elements ) );
+	}
+
+	public static <K> KnittingCursor<K> wrap( Tuple<K> tuple ) {
+		return new KnittingCursor<>( new Cursor<K>( ) {
+
+			private int i = 0;
+
+			@Override
+			public K next( )
+					throws PastTheEndException {
+				if ( i >= tuple.size( ) ) {
+					throw PastTheEndException.neo;
+				}
+				return tuple.get( i++ );
+			}
+		} );
 	}
 
 	public static <K> KnittingCursor<K> wrap( Cursor<K> cursor ) {
