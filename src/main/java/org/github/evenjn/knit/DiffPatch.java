@@ -179,15 +179,15 @@ public class DiffPatch {
 
     // Trim off common prefix (speedup).
     int commonlength = diff_commonPrefix(text1, text2);
-    KnittingTuple<Object> commonprefix = text1.head(commonlength);
+    KnittingTuple<Object> commonprefix = text1.head(0, commonlength);
     text1 = text1.headless(commonlength);
     text2 = text2.headless(commonlength);
 
     // Trim off common suffix (speedup).
     commonlength = diff_commonSuffix(text1, text2);
     KnittingTuple<Object> commonsuffix = text1.headless(text1.size() - commonlength);
-    text1 = text1.head(text1.size() - commonlength);
-    text2 = text2.head(text2.size() - commonlength);
+    text1 = text1.head(0, text1.size() - commonlength);
+    text2 = text2.head(0, text2.size() - commonlength);
 
     // Compute the diff on the middle block.
     diffs = diff_compute(text1, text2, deadline);
@@ -239,7 +239,7 @@ public class DiffPatch {
       // Shorter text is inside the longer text (speedup).
       Operation op = (text1.size() > text2.size()) ?
                      Operation.DELETE : Operation.INSERT;
-      diffs.add(new Diff(op, longtext.head(i_value)));
+      diffs.add(new Diff(op, longtext.head(0, i_value)));
       diffs.add(new Diff(Operation.EQUAL, shorttext));
       diffs.add(new Diff(op, longtext.headless(i_value + shorttext.size())));
       return diffs;
@@ -417,8 +417,8 @@ public class DiffPatch {
    */
   private LinkedList<Diff> diff_bisectSplit(KnittingTuple<Object> text1, KnittingTuple<Object> text2,
                                             int x, int y, long deadline) {
-  	KnittingTuple<Object> text1a = text1.head(x);
-  	KnittingTuple<Object> text2a = text2.head(y);
+  	KnittingTuple<Object> text1a = text1.head(0, x);
+  	KnittingTuple<Object> text2a = text2.head(0, y);
   	KnittingTuple<Object> text1b = text1.headless(x);
   	KnittingTuple<Object> text2b = text2.headless(y);
 
@@ -506,7 +506,7 @@ public class DiffPatch {
     if (text1_length > text2_length) {
       text1 = text1.headless(text1_length - text2_length);
     } else if (text1_length < text2_length) {
-      text2 = text2.head(text1_length);
+      text2 = text2.head(0, text1_length);
     }
     int text_length = Math.min(text1_length, text2_length);
     // Quick check for the worst case.
@@ -527,7 +527,7 @@ public class DiffPatch {
       }
       length += found.get( );
       if (found.get( ) == 0 || text1.headless(text_length - length).equals(
-          text2.head(length))) {
+          text2.head(0, length))) {
         best = length;
         length++;
       }
@@ -629,14 +629,14 @@ public class DiffPatch {
     while ((j = shorttext.findSubtuple(seed, j + 1).orElse( -1 )) != -1) {
       int prefixLength = diff_commonPrefix(longtext.headless(i),
                                            shorttext.headless(j));
-      int suffixLength = diff_commonSuffix(longtext.head(i),
-                                           shorttext.head(j));
+      int suffixLength = diff_commonSuffix(longtext.head(0, i),
+                                           shorttext.head(0, j));
       if (best_common.size() < suffixLength + prefixLength) {
         best_common = shorttext.head(j - suffixLength, (j) - (j - suffixLength)).chain(
             shorttext.head(j, (j + prefixLength) - (j)));
-        best_longtext_a = longtext.head(i - suffixLength);
+        best_longtext_a = longtext.head(0, i - suffixLength);
         best_longtext_b = longtext.headless(i + prefixLength);
-        best_shorttext_a = shorttext.head(j - suffixLength);
+        best_shorttext_a = shorttext.head(0, j - suffixLength);
         best_shorttext_b = shorttext.headless(j + prefixLength);
       }
     }
@@ -763,9 +763,9 @@ public class DiffPatch {
             // Overlap found. Insert an equality and trim the surrounding edits.
             pointer.previous();
             pointer.add(new Diff(Operation.EQUAL,
-                                 insertion.head(overlap_length1)));
+                                 insertion.head(0, overlap_length1)));
             prevDiff.text =
-                deletion.head(deletion.size() - overlap_length1);
+                deletion.head(0, deletion.size() - overlap_length1);
             thisDiff.text = insertion.headless(overlap_length1);
             // pointer.add inserts the element before the cursor, so there is
             // no need to step past the new element.
@@ -777,10 +777,10 @@ public class DiffPatch {
             // Insert an equality and swap and trim the surrounding edits.
             pointer.previous();
             pointer.add(new Diff(Operation.EQUAL,
-                                 deletion.head(overlap_length2)));
+                                 deletion.head(0, overlap_length2)));
             prevDiff.operation = Operation.INSERT;
             prevDiff.text =
-              insertion.head(insertion.size() - overlap_length2);
+              insertion.head(0, insertion.size() - overlap_length2);
             thisDiff.operation = Operation.DELETE;
             thisDiff.text = deletion.headless(overlap_length2);
             // pointer.add inserts the element before the cursor, so there is
@@ -949,11 +949,11 @@ public class DiffPatch {
                 thisDiff = pointer.previous();
                 assert thisDiff.operation == Operation.EQUAL
                        : "Previous diff should have been an equality.";
-                thisDiff.text = thisDiff.text.chain( text_insert.head(commonlength));
+                thisDiff.text = thisDiff.text.chain( text_insert.head(0, commonlength));
                 pointer.next();
               } else {
                 pointer.add(new Diff(Operation.EQUAL,
-                    text_insert.head(commonlength)));
+                    text_insert.head(0, commonlength)));
               }
               text_insert = text_insert.headless(commonlength);
               text_delete = text_delete.headless(commonlength);
@@ -964,9 +964,9 @@ public class DiffPatch {
               thisDiff = pointer.next();
               thisDiff.text = text_insert.headless(text_insert.size()
                   - commonlength).chain( thisDiff.text );
-              text_insert = text_insert.head(text_insert.size()
+              text_insert = text_insert.head(0, text_insert.size()
                   - commonlength);
-              text_delete = text_delete.head(text_delete.size()
+              text_delete = text_delete.head(0, text_delete.size()
                   - commonlength);
               pointer.previous();
             }
@@ -1020,7 +1020,7 @@ public class DiffPatch {
         if (thisDiff.text.endsWith(prevDiff.text)) {
           // Shift the edit over the previous equality.
           thisDiff.text = prevDiff.text.chain(
-              thisDiff.text.head(thisDiff.text.size()
+              thisDiff.text.head(0, thisDiff.text.size()
                                            - prevDiff.text.size()));
           nextDiff.text = prevDiff.text.chain( nextDiff.text );
           pointer.previous(); // Walk past nextDiff.

@@ -96,8 +96,8 @@ public class compiler_check_override {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<String> pull = cursable.pull( hook );
 			pull.tap( System.out::println ).consume( );
-			pull.consumeHook( ff1 );
-			pull.consumeHook( ff2 );
+			pull.consume( ff1 );
+			pull.consume( ff2 );
 		}
 
 	}

@@ -161,18 +161,6 @@ public class KnittingCursor<I> implements
 		}
 	}
 
-	public <K extends Consumer<? super I>> void consumeHook(
-			Function<Hook, K> hook_consumer ) {
-		failWhenDirty( );
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			K consumer = hook_consumer.apply( hook );
-			for ( ;; ) {
-				consumer.accept( next( ) );
-			}
-		}
-		catch ( PastTheEndException e ) {
-		}
-	}
 
 	/**
 	 * 

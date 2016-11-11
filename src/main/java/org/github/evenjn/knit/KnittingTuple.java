@@ -137,6 +137,7 @@ public class KnittingTuple<I> implements
 				/* no problem with full size */wrapped.size( ) ) );
 	}
 
+	@Deprecated
 	public KnittingTuple<I> head( int limit ) {
 		return wrap( new Subtuple<>( wrapped, 0, limit ) );
 	}

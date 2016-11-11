@@ -713,4 +713,50 @@ public class KnittingCursable<I> implements
 	public static <K> KnittingCursable<K> wrap( K[] array ) {
 		return wrap( new ArrayItterable<K>( array ) );
 	}
+	
+	public boolean equals( Object other ) {
+		if ( other == this )
+			return true;
+		if ( !( other instanceof Cursable ) )
+			return false;
+		Cursable<?> o = (Cursable<?>) other;
+		
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			KnittingCursor<I> pull1 = this.pull( hook );
+			KnittingCursor<?> pull2 = KnittingCursor.wrap(o.pull( hook ));
+			
+			for (;;) {
+				boolean hasNext1 = pull1.hasNext( );
+				boolean hasNext2 = pull2.hasNext( );
+				if (hasNext1 != hasNext2) {
+					return false;
+				}
+				if (!hasNext1) {
+					return true;
+				}
+				I next1 = pull1.next( );
+				Object next2 = pull2.next( );
+				if ( !( next1 == null ? next2 == null : next1.equals( next2 ) ) ) {
+					return false;
+				}
+			}
+		}
+		catch ( PastTheEndException e ) {
+			throw new IllegalStateException( e );
+		}
+	}
+
+	public int hashCode( ) {
+		int hashCode = 1;
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			KnittingCursor<I> pull = pull( hook );
+			for (;;) {
+				I next = pull.next( );
+				hashCode = 31 * hashCode + ( next == null ? 0 : next.hashCode( ) );
+			}
+		}
+		catch ( PastTheEndException e ) {
+		}
+		return hashCode;
+	}
 }
