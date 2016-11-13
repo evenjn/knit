@@ -57,16 +57,6 @@ class DummyProgress implements
 	}
 
 	@Override
-	public RuntimeException quit( Throwable t ) {
-		return Suppressor.quit( t );
-	}
-
-	@Override
-	public void log( Throwable t ) {
-		Suppressor.log( t );
-	}
-
-	@Override
 	public Progress spawn( Hook hook, String name ) {
 		return this;
 	}
