@@ -17,29 +17,40 @@
  */
 package org.github.evenjn.knit;
 
+import java.io.Serializable;
+
+import org.github.evenjn.yarn.Di;
+
 /*
- * Bi objects are not invariant, and we recommend to use them as a carrier.
+ * Bis objects are invariant.
  */
-public final class Bi<A, B> {
+public final class Bis<A extends Serializable, B extends Serializable>
+		implements
+		Di<A, B> {
 
-	public static <A, B> Bi<A, B> nu( A first, B second ) {
-		return new Bi<A, B>( ).set( first, second );
-	}
+	private static final long serialVersionUID = -7055068816119952085L;
 
-	public A first;
-
-	public B second;
-
-	public Bi<A, B> set( A first, B second ) {
+	private Bis(A first, B second) {
 		this.first = first;
 		this.second = second;
-		return this;
 	}
 
+	public static <A extends Serializable, B extends Serializable> Bis<A, B>
+			nu( A first,
+					B second ) {
+		return new Bis<A, B>( first, second );
+	}
+
+	private final A first;
+
+	private final B second;
+
+	@Override
 	public A front( ) {
 		return first;
 	}
 
+	@Override
 	public B back( ) {
 		return second;
 	}

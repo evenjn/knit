@@ -20,12 +20,11 @@ package org.github.evenjn.knit;
 import java.util.LinkedList;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
-import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
 public class DiffIterator<K> implements
-		Itterator<Di<K, K>> {
+		Itterator<Bi<K, K>> {
 
 	private final KnittingCursor<Diff> kd;
 

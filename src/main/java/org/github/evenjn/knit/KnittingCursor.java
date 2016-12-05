@@ -40,7 +40,6 @@ import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.CursorUnfold;
 import org.github.evenjn.yarn.CursorUnfoldH;
-import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
@@ -416,13 +415,13 @@ public class KnittingCursor<I> implements
 		return result;
 	}
 
-	public KnittingCursor<Di<Integer, I>> numbered( ) {
+	public KnittingCursor<Bi<Integer, I>> numbered( ) {
 		final KnittingCursor<I> outer_this = this;
 		Bi<Integer, I> bi = Bi.nu( null, null );
-		return wrap( new Cursor<Di<Integer, I>>( ) {
+		return wrap( new Cursor<Bi<Integer, I>>( ) {
 
 			@Override
-			public Di<Integer, I> next( )
+			public Bi<Integer, I> next( )
 					throws PastTheEndException {
 				return bi.set( soFar( ), outer_this.next( ) );
 			}

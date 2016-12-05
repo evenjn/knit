@@ -38,7 +38,6 @@ import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.CursorUnfoldFactory;
 import org.github.evenjn.yarn.CursorUnfoldHFactory;
-import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
@@ -261,17 +260,6 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	@Deprecated
-	public KnittingCursable<I> head( int limit ) {
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.sub( wrapped.pull( hook ), 0, limit );
-			}
-		} );
-	}
-
 	public KnittingCursable<I> head( int start, int limit ) {
 		return wrap( new Cursable<I>( ) {
 
@@ -316,12 +304,12 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public KnittingCursable<Di<Integer, I>> numbered( ) {
+	public KnittingCursable<Bi<Integer, I>> numbered( ) {
 		KnittingCursable<I> outer_this = this;
-		return wrap( new Cursable<Di<Integer, I>>( ) {
+		return wrap( new Cursable<Bi<Integer, I>>( ) {
 
 			@Override
-			public Cursor<Di<Integer, I>> pull( Hook hook ) {
+			public Cursor<Bi<Integer, I>> pull( Hook hook ) {
 				return outer_this.pull( hook ).numbered( );
 			}
 		} );
@@ -441,35 +429,6 @@ public class KnittingCursable<I> implements
 
 	public KnittingCursable<KnittingCursor<I>> split( Predicate<I> predicate ) {
 		return KnittingCursable.wrap( h -> pull( h ).split( predicate ) );
-	}
-
-	/**
-	 * Use head(start, length)
-	 */
-	@Deprecated
-	public KnittingCursable<I> sub( int start, int length ) {
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.sub( wrapped.pull( hook ), start, length );
-			}
-		} );
-	}
-
-	public KnittingCursable<I> tail( int length ) {
-		KnittingCursable<I> outer = this;
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				int size = outer.size( );
-				if ( length > size ) {
-					return wrapped.pull( hook );
-				}
-				return Subcursor.skip( wrapped.pull( hook ), size - length );
-			}
-		} );
 	}
 
 	public KnittingCursable<I> tail( int skip, int length ) {

@@ -25,7 +25,6 @@ import java.util.function.Function;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.Di;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
@@ -58,7 +57,7 @@ public class KnittingTuple<I> implements
 		this.wrapped = tuple;
 	}
 
-	public Iterable<Di<I, I>> diff( Tuple<I> other ) {
+	public Iterable<Bi<I, I>> diff( Tuple<I> other ) {
 		return ( ) -> KnittingCursor.wrap( new DiffIterator<I>( this, other ) )
 				.once( ).iterator( );
 	}
