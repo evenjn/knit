@@ -73,11 +73,38 @@ public class KnittingTuple<I> implements
 		return dmp.diff_levenshtein( diffs );
 	}
 
+	/**
+	 * <p>
+	 * Returns the element mapped to {@code index} by this tuple.
+	 * </p>
+	 * 
+	 * @param index
+	 *          A natural number. A negative numbers counts as zero.
+	 * @return The element mapped to {@code index} by this tuple.
+	 * @throws IllegalArgumentException
+	 *           when {@code index} is larger than or equal to the size of this
+	 *           tuple.
+	 * 
+	 * @since 1.0
+	 */
 	@Override
 	public I get( int index ) {
-		return wrapped.get( index );
+		int final_index = index < 0 ? 0 : index;
+		if (final_index >= size( )) {
+			throw new IllegalArgumentException( );
+		}
+		return wrapped.get( final_index );
 	}
 
+	/**
+	 * <p>
+	 * Returns the size of this tuple.
+	 * </p>
+	 * 
+	 * @return The size of this tuple.
+	 * 
+	 * @since 1.0
+	 */
 	@Override
 	public int size( ) {
 		return wrapped.size( );
@@ -131,20 +158,60 @@ public class KnittingTuple<I> implements
 		};
 	}
 
-	public KnittingTuple<I> headless( int start ) {
-		return wrap( new Subtuple<>( wrapped, start,
-				/* no problem with full size */wrapped.size( ) ) );
+	/**
+	 * <p>
+	 * Returns a view hiding the first
+	 * {@code hide} elements.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this tuple's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @return A view hiding the first
+	 *         {@code hide} elements.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> headless( int hide ) {
+		int final_hide = hide < 0 ? 0 : hide;
+		return wrap( new Subtuple<>( wrapped, final_hide, wrapped.size( ) ) );
 	}
 
-	@Deprecated
-	public KnittingTuple<I> head( int limit ) {
-		return wrap( new Subtuple<>( wrapped, 0, limit ) );
+	/**
+	 * <p>
+	 * Returns a view of the first {@code show} elements visible after
+	 * hiding the first {@code hide} elements in this tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this tuple's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may contain less than {@code show} elements. This happens
+	 * when this tuple's size is smaller than {@code hide + show}.
+	 * </p>
+	 * 
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view of the first {@code show} elements visible after
+	 *         hiding the first {@code hide} elements in this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> head( int hide, int show ) {
+		int final_show = show < 0 ? 0 : show;
+		int final_hide = hide < 0 ? 0 : hide;
+		return wrap( new Subtuple<>( wrapped, final_hide, final_show ) );
 	}
 
-	public KnittingTuple<I> head( int skip, int limit ) {
-		return wrap( new Subtuple<>( wrapped, skip, limit ) );
-	}
-
+	@Override
 	public boolean equals( Object other ) {
 		if ( other == this )
 			return true;
@@ -166,6 +233,7 @@ public class KnittingTuple<I> implements
 		return true;
 	}
 
+	@Override
 	public int hashCode( ) {
 		int hashCode = 1;
 		final int size = wrapped.size( );
@@ -176,6 +244,7 @@ public class KnittingTuple<I> implements
 		return hashCode;
 	}
 
+	@Override
 	public String toString( ) {
 		StringBuilder sb = new StringBuilder( );
 		sb.append( "[ " );
@@ -215,7 +284,7 @@ public class KnittingTuple<I> implements
 	public boolean startsWith( KnittingTuple<I> target ) {
 		if ( size( ) < target.size( ) )
 			return false;
-		return head( target.size( ) ).equals( target );
+		return head( 0, target.size( ) ).equals( target );
 	}
 
 	public boolean endsWith( KnittingTuple<I> target ) {
@@ -279,9 +348,90 @@ public class KnittingTuple<I> implements
 		}
 		return Optional.empty( );
 	}
+	
+	/**
+	 * <p>
+	 * Returns a view of the last {@code show} elements visible after hiding the
+	 * last {@code hide} elements in this tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this tuple's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may contain less than {@code show} elements. This happens
+	 * when this tuple's size is smaller than {@code hide + show}.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view of the last {@code show} elements visible after hiding the
+	 *         last {@code hide} elements in this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> tail( int hide, int show) {
+		int final_show = show < 0 ? 0 : show;
+		int final_hide = hide < 0 ? 0 : hide;
+		int len = size( ) - final_hide;
+		if ( len > final_show ) {
+			len = final_show;
+		}
+		int skip = size( ) - ( final_hide + len );
+		if ( skip < 0 ) {
+			skip = 0;
+		}
+		int final_len = len;
+		int final_skip = skip;
+		return wrap( new Subtuple<>( wrapped, final_skip, final_len ) );
+	}
+
+
+	/**
+	 * <p>
+	 * Returns a view hiding the last {@code hide} elements in this tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this tuple's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @return A view hiding the last {@code hide} elements in this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> tailless( int hide ) {
+		int final_hide = hide < 0 ? 0 : hide;
+		int len = size( ) - final_hide;
+		if ( len < 0 ) {
+			len = 0;
+		}
+		int final_len = len;
+		return wrap( new Subtuple<>( wrapped, 0, final_len ) );
+	}
+
+	/**
+	 * <p>
+	 * Returns an empty tuple.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the empty tuple.
+	 * @return An empty tuple.
+	 * 
+	 * @since 1.0
+	 */
+	public static <K> KnittingTuple<K> empty( ) {
+		return private_empty( );
+	}
 
 	@SuppressWarnings("unchecked")
-	public static <K> KnittingTuple<K> empty( ) {
+	private static <K> KnittingTuple<K> private_empty( ) {
 		return (KnittingTuple<K>) neo;
 	}
 

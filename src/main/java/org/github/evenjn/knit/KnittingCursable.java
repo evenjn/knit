@@ -66,16 +66,22 @@ public class KnittingCursable<I> implements
 		this.wrapped = cursable;
 	}
 
+
 	/**
-	 * @return the concatenation of this cursable an the argument cursable.
+	 * Returns a view of the concatenation of the argument cursable after this cursable.
+	 * 
+	 * @param tail
+	 *          The cursor to concatenate after this.
+	 * @return A view of the concatenation of the argument cursable after this cursable.
+	 * @since 1.0
 	 */
-	public KnittingCursable<I> chain( final Cursable<I> other ) {
+	public KnittingCursable<I> chain( final Cursable<I> tail ) {
 		KnittingCursable<I> outer_cursable = this;
 		Cursable<I> result = new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return outer_cursable.pull( hook ).chain( other.pull( hook ) );
+				return outer_cursable.pull( hook ).chain( tail.pull( hook ) );
 			}
 		};
 		return wrap( result );
@@ -260,22 +266,65 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public KnittingCursable<I> head( int start, int limit ) {
+	/**
+	 * <p>
+	 * Returns a view showing the first {@code show} elements visible after hiding
+	 * the first {@code hide} elements in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this cursable's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may contain less than {@code show} elements. This happens
+	 * when this cursable's size is smaller than {@code hide + show}.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view showing the first {@code show} elements visible after hiding
+	 *         the first {@code hide} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> head( int hide, int show ) {
+		int final_show = show < 0 ? 0 : show;
+		int final_hide = hide < 0 ? 0 : hide;
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.sub( wrapped.pull( hook ), start, limit );
+				return Subcursor.sub( wrapped.pull( hook ), final_hide, final_show );
 			}
 		} );
 	}
 
-	public KnittingCursable<I> headless( int start ) {
+	/**
+	 * <p>
+	 * Returns a view of the elements visible after hiding the first {@code hide}
+	 * elements in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this cursable's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @return A view hiding the first {@code hide} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> headless( int hide ) {
+		int final_hide = hide < 0 ? 0 : hide;
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.skip( wrapped.pull( hook ), start );
+				return Subcursor.skip( wrapped.pull( hook ), final_hide );
 			}
 		} );
 	}
@@ -431,33 +480,92 @@ public class KnittingCursable<I> implements
 		return KnittingCursable.wrap( h -> pull( h ).split( predicate ) );
 	}
 
-	public KnittingCursable<I> tail( int skip, int length ) {
-		KnittingCursable<I> outer = this;
+
+	/**
+	 * <p>
+	 * Returns a view of the last {@code show} elements visible after hiding the
+	 * last {@code hide} elements in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this cursable's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may contain less than {@code show} elements. This happens
+	 * when this cursable's size is smaller than {@code hide + show}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This operation relies on {@code size()}. Therefore, it has a one-time
+	 * computational time cost linear to the size of this cursable.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view of the last {@code show} elements visible after hiding the
+	 *         last {@code hide} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> tail( int hide, int show) {
+		int final_show = show < 0 ? 0 : show;
+		int final_hide = hide < 0 ? 0 : hide;
+		int len = size( ) - final_hide;
+		if ( len > final_show ) {
+			len = final_show;
+		}
+		int skip = size( ) - ( final_hide + len );
+		if (skip < 0) {
+			skip = 0;
+		}
+		int final_len = len;
+		int final_skip = skip;
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				int size = outer.size( );
-				if ( length > size ) {
-					return wrapped.pull( hook );
-				}
-				return Subcursor.sub( wrapped.pull( hook ), size - ( length + skip ),
-						length );
+				return Subcursor.sub( wrapped.pull( hook ), final_skip, final_len );
 			}
 		} );
 	}
 
-	public KnittingCursable<I> tailless( int skip ) {
-		KnittingCursable<I> outer = this;
+
+
+	/**
+	 * <p>
+	 * Returns a view hiding the last {@code hide} elements in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this cursable's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This operation relies on {@code size()}. Therefore, it has a one-time
+	 * computational time cost linear to the size of this cursable.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @return A view hiding the last {@code hide} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> tailless( int hide ) {
+		int final_hide = hide < 0 ? 0 : hide;
+		int len = size( ) - final_hide;
+		if ( len < 0 ) {
+			len = 0;
+		}
+		int final_len = len;
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				int len = outer.size( ) - skip;
-				if ( skip < 0 ) {
-					len = 0;
-				}
-				return Subcursor.sub( wrapped.pull( hook ), 0, len );
+				return Subcursor.sub( wrapped.pull( hook ), 0, final_len );
 			}
 		} );
 	}
@@ -598,8 +706,23 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * <p>
+	 * Returns an empty cursable.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the empty cursable.
+	 * @return An empty cursable.
+	 * 
+	 * @since 1.0
+	 */
 	public static <K> KnittingCursable<K> empty( ) {
+		return private_empty( );
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <K> KnittingCursable<K> private_empty( ) {
 		return (KnittingCursable<K>) neo;
 	}
 
