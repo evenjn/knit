@@ -21,8 +21,10 @@ import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.Progress;
 import org.github.evenjn.yarn.ProgressSpawner;
 
+@Deprecated
 public class ProgressManager {
 
+	@Deprecated
 	public static Progress safeSpawn( Hook hook, ProgressSpawner master,
 			String name ) {
 		if ( master == null ) {

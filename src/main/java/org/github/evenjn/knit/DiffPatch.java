@@ -55,7 +55,7 @@ import java.util.Vector;
  * Class containing the diff, match and patch methods.
  * Also contains the behaviour settings.
  */
-public class DiffPatch {
+class DiffPatch {
 
   // Defaults.
   // Set these on your DiffMatchPatch instance to override the defaults.

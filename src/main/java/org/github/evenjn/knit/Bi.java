@@ -17,8 +17,10 @@
  */
 package org.github.evenjn.knit;
 
-/*
- * Bi objects are not invariant, and we recommend to use them as a carrier.
+/**
+ * A Bi object provides a view of two non-value objects. It is designed for
+ * scenarios where a {@link org.github.evenjn.yarn.Di Di} cannot be used.
+ * 
  */
 public final class Bi<A, B> {
 

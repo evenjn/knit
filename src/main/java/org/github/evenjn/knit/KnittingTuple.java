@@ -28,6 +28,13 @@ import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
+/**
+ * 
+ * <h1>KnittingTuple</h1>
+ *
+ * @param <I>
+ *          The type of elements accessible via this tuple.
+ */
 public class KnittingTuple<I> implements
 		Tuple<I> {
 
@@ -90,7 +97,7 @@ public class KnittingTuple<I> implements
 	@Override
 	public I get( int index ) {
 		int final_index = index < 0 ? 0 : index;
-		if (final_index >= size( )) {
+		if ( final_index >= size( ) ) {
 			throw new IllegalArgumentException( );
 		}
 		return wrapped.get( final_index );
@@ -160,8 +167,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view hiding the first
-	 * {@code hide} elements.
+	 * Returns a view hiding the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
@@ -171,8 +177,7 @@ public class KnittingTuple<I> implements
 	 * 
 	 * @param hide
 	 *          The number of elements to hide. A negative numbers counts as zero.
-	 * @return A view hiding the first
-	 *         {@code hide} elements.
+	 * @return A view hiding the first {@code hide} elements.
 	 * @since 1.0
 	 */
 	public KnittingTuple<I> headless( int hide ) {
@@ -182,8 +187,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the first {@code show} elements visible after
-	 * hiding the first {@code hide} elements in this tuple.
+	 * Returns a view of the first {@code show} elements visible after hiding the
+	 * first {@code hide} elements in this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -201,8 +206,8 @@ public class KnittingTuple<I> implements
 	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view of the first {@code show} elements visible after
-	 *         hiding the first {@code hide} elements in this tuple.
+	 * @return A view of the first {@code show} elements visible after hiding the
+	 *         first {@code hide} elements in this tuple.
 	 * @since 1.0
 	 */
 	public KnittingTuple<I> head( int hide, int show ) {
@@ -348,7 +353,24 @@ public class KnittingTuple<I> implements
 		}
 		return Optional.empty( );
 	}
-	
+
+	public KnittingTuple<I> reverse( ) {
+		int len = size( );
+		KnittingTuple<I> outer_this = this;
+		return wrap( new Tuple<I>( ) {
+
+			@Override
+			public I get( int index ) {
+				return outer_this.get( len - ( index + 1 ) );
+			}
+
+			@Override
+			public int size( ) {
+				return len;
+			}
+		} );
+	}
+
 	/**
 	 * <p>
 	 * Returns a view of the last {@code show} elements visible after hiding the
@@ -373,7 +395,7 @@ public class KnittingTuple<I> implements
 	 *         last {@code hide} elements in this tuple.
 	 * @since 1.0
 	 */
-	public KnittingTuple<I> tail( int hide, int show) {
+	public KnittingTuple<I> tail( int hide, int show ) {
 		int final_show = show < 0 ? 0 : show;
 		int final_hide = hide < 0 ? 0 : hide;
 		int len = size( ) - final_hide;
@@ -388,7 +410,6 @@ public class KnittingTuple<I> implements
 		int final_skip = skip;
 		return wrap( new Subtuple<>( wrapped, final_skip, final_len ) );
 	}
-
 
 	/**
 	 * <p>

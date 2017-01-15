@@ -24,6 +24,14 @@ import java.util.LinkedList;
 
 import org.github.evenjn.yarn.AutoHook;
 
+
+/**
+ * 
+ * An implementation of {@link org.github.evenjn.yarn.AutoHook AutoHook} that
+ * prints a warning on standard error resource leak.
+ *
+ * @since 1.0
+ */
 public final class DebuggingAutoHook implements
 		AutoHook {
 
@@ -34,10 +42,13 @@ public final class DebuggingAutoHook implements
 
 	private final IllegalStateException ise;
 
+	/**
+	 * Constructor.
+	 */
 	public DebuggingAutoHook() {
 		try {
 			throw new IllegalStateException(
-					"This exception may help to identify the owner of this claudenda." );
+					"This exception may help to identify the owner of this hook." );
 		}
 		catch ( IllegalStateException ise ) {
 			this.ise = ise;
@@ -48,8 +59,9 @@ public final class DebuggingAutoHook implements
 	public void close( ) {
 		if ( closed ) {
 			StringBuilder sb = new StringBuilder( );
-			sb.append( "This must be closed only once. No more, no less.\n" );
-			sb.append( "The following stacktrace may help to find where this Hook was created.\n" );
+			sb.append( "This hook must be closed only once. No more, no less.\n" );
+			sb.append(
+					"The following stacktrace may help to find where this hook was created.\n" );
 			throw new IllegalStateException( sb.toString( ), ise );
 		}
 		closed = true;
@@ -69,9 +81,11 @@ public final class DebuggingAutoHook implements
 	public void finalize( ) {
 		if ( !closed ) {
 			StringBuilder sb = new StringBuilder( );
-			sb.append( "This Hook is undergoing garbage-collection but it has never been closed. \n" );
+			sb.append(
+					"This hook is undergoing garbage-collection but it has never been closed. \n" );
 			sb.append( "This may result in a resource leak.\n" );
-			sb.append( "The following stacktrace may help to find where this Hook was created.\n" );
+			sb.append(
+					"The following stacktrace may help to find where this hook was created.\n" );
 			ise.printStackTrace( new PrintStream( new OutputStream( ) {
 
 				@Override

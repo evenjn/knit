@@ -66,15 +66,22 @@ import org.github.evenjn.yarn.StreamUnfoldH;
 import org.github.evenjn.yarn.Tuple;
 
 /**
+ * <h1>KnittingCursor</h1>
+ * <p>
+ * A KnittingCursor wraps a cursor and provides utility methods to access its
+ * contents.
+ * </p>
+ * 
+ * 
  * 
  * <h2>Pristine state</h2>
  * 
  * <p>
  * Every cursor is in pristine state when created, and remains in pristine state
- * until the first invocation of {@code next()}, {@code hasNext()} or any terminal
- * operations carried out on it or on its views. Moreover, an invocation of
- * {@code iterator()} on the object returned by {@code once()} also causes the
- * cursor to leave the pristine state.
+ * until the first invocation of {@code next()}, {@code hasNext()} or any
+ * terminal operations carried out on it or on its views. Moreover, an
+ * invocation of {@code iterator()} on the object returned by {@code once()}
+ * also causes the cursor to leave the pristine state.
  * </p>
  * 
  * </p>
@@ -92,6 +99,8 @@ import org.github.evenjn.yarn.Tuple;
  *
  * @param <I>
  *          The type of elements accessible via this cursor.
+ * @see org.github.evenjn.knit
+ * @since 1.0
  */
 public class KnittingCursor<I> implements
 		Cursor<I> {
@@ -114,6 +123,11 @@ public class KnittingCursor<I> implements
 		if ( !once || so_far != 0 ) {
 			throw new IllegalStateException( "This cursor has already been used." );
 		}
+	}
+
+	@Override
+	public String toString( ) {
+		return "A knitting cursor.";
 	}
 
 	/**
@@ -224,12 +238,33 @@ public class KnittingCursor<I> implements
 		}
 	}
 
+	/**
+	 * <p>
+	 * Feeds a consumer with the elements of this cursor.
+	 * </p>
+	 * <p>
+	 * Obtains a consumer from the argument {@code consumer_provider}, hooking it
+	 * to a local, temporary hook. Then invokes {@link #next() next()} until a
+	 * {@link org.github.evenjn.yarn.PastTheEndException PastTheEndException} is
+	 * thrown, passing each resulting object to the consumer.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a terminal operation.
+	 * </p>
+	 * 
+	 * @param consumer_provider
+	 *          A system that provides hooked consumers.
+	 * @throws IllegalStateException
+	 *           when the cursor is not in pristine state.
+	 * @since 1.0
+	 */
 	public <K extends Consumer<? super I>> void consume(
-			Function<Hook, K> hook_consumer )
+			Function<Hook, K> consumer_provider )
 			throws IllegalStateException {
 		failWhenDirty( );
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			K consumer = hook_consumer.apply( hook );
+			K consumer = consumer_provider.apply( hook );
 			for ( ;; ) {
 				consumer.accept( next( ) );
 			}
@@ -237,7 +272,6 @@ public class KnittingCursor<I> implements
 		catch ( PastTheEndException e ) {
 		}
 	}
-
 
 	/**
 	 * 
@@ -263,10 +297,22 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
+	 * <p>
+	 * Returns a view hiding the elements which do not satisfy the argument
+	 * {@code predicate} in this cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This operation preserves the pristine state.
+	 * </p>
+	 * 
 	 * @param predicate
-	 *          A system that decides to keep or to discard elements.
-	 * @return A cursor to access the only the elements of this cursor that are
-	 *         not discarded by the predicate.
+	 *          A system that decides to show or hide elements.
+	 * @return A view hiding the elements which do not satisfy the argument
+	 *         {@code stateless_predicate} in this cursor.
+	 * @throws IllegalStateException
+	 *           when the cursor is not in pristine state.
+	 * @since 1.0
 	 */
 	public KnittingCursor<I> filter( Predicate<? super I> predicate )
 			throws IllegalStateException {
@@ -494,8 +540,8 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view showing the first {@code show} elements visible after
-	 * hiding the first {@code hide} elements.
+	 * Returns a view showing the first {@code show} elements visible after hiding
+	 * the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
@@ -516,8 +562,8 @@ public class KnittingCursor<I> implements
 	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements visible after
-	 *         hiding the first {@code hide} elements in this cursor.
+	 * @return A view showing the first {@code show} elements visible after hiding
+	 *         the first {@code hide} elements in this cursor.
 	 * @throws IllegalStateException
 	 *           when the cursor is not in pristine state.
 	 * @since 1.0
@@ -594,7 +640,8 @@ public class KnittingCursor<I> implements
 		if ( is_cached ) {
 			is_cached = false;
 			result = cached;
-		} else {
+		}
+		else {
 			result = wrapped.next( );
 		}
 		so_far++;
@@ -616,7 +663,7 @@ public class KnittingCursor<I> implements
 		} );
 	}
 
-	public Iterable<I> once( ) 
+	public Iterable<I> once( )
 			throws IllegalStateException {
 		failWhenDirty( );
 		final KnittingCursor<I> outer_this = this;
@@ -626,7 +673,8 @@ public class KnittingCursor<I> implements
 			public Iterator<I> iterator( ) {
 				if ( once ) {
 					once = false;
-				} else {
+				}
+				else {
 					throw new IllegalStateException(
 							"This method cannot be invoked more than once." );
 				}
@@ -657,7 +705,7 @@ public class KnittingCursor<I> implements
 	 * throws IllegalStateException when it not the case that there is exactly one
 	 * element.
 	 */
-	public I one( ) 
+	public I one( )
 			throws IllegalStateException {
 		failWhenDirty( );
 		failWhenDirty( );
@@ -679,7 +727,7 @@ public class KnittingCursor<I> implements
 	 * returns an empty optionsl when it not the case that there is exactly one
 	 * element.
 	 */
-	public Optional<I> optionalOne( ) 
+	public Optional<I> optionalOne( )
 			throws IllegalStateException {
 		failWhenDirty( );
 		try {
@@ -741,9 +789,9 @@ public class KnittingCursor<I> implements
 	}
 
 	public <O> KnittingCursor<O> skipfold( Hook hook,
-			SkipFoldH<? super I, O> skip_fold_h ) 
-					throws IllegalStateException {
-				failWhenDirty( );
+			SkipFoldH<? super I, O> skip_fold_h )
+			throws IllegalStateException {
+		failWhenDirty( );
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -770,20 +818,20 @@ public class KnittingCursor<I> implements
 	}
 
 	public <O> KnittingCursor<O>
-			skipfold( SkipFoldFactory<? super I, O> factory ) 
+			skipfold( SkipFoldFactory<? super I, O> factory )
 					throws IllegalStateException {
-				failWhenDirty( );
+		failWhenDirty( );
 		return skipfold( factory.create( ) );
 	}
 
 	public <O> KnittingCursor<O> skipfold( Hook hook,
-			SkipFoldHFactory<? super I, O> factory ) 
-					throws IllegalStateException {
-				failWhenDirty( );
+			SkipFoldHFactory<? super I, O> factory )
+			throws IllegalStateException {
+		failWhenDirty( );
 		return skipfold( hook, factory.create( ) );
 	}
 
-	public <O> KnittingCursor<O> skipmap( SkipMap<? super I, O> skip_map ) 
+	public <O> KnittingCursor<O> skipmap( SkipMap<? super I, O> skip_map )
 			throws IllegalStateException {
 		failWhenDirty( );
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
@@ -803,9 +851,9 @@ public class KnittingCursor<I> implements
 	}
 
 	public <O> KnittingCursor<O> skipmap( Hook hook,
-			SkipMapH<? super I, O> skip_map_h ) 
-					throws IllegalStateException {
-				failWhenDirty( );
+			SkipMapH<? super I, O> skip_map_h )
+			throws IllegalStateException {
+		failWhenDirty( );
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -849,9 +897,9 @@ public class KnittingCursor<I> implements
 	}
 
 	public <O> KnittingCursor<O> unfoldArray(
-			ArrayUnfold<? super I, O> array_unfold ) 
-					throws IllegalStateException {
-				failWhenDirty( );
+			ArrayUnfold<? super I, O> array_unfold )
+			throws IllegalStateException {
+		failWhenDirty( );
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
 			@Override
@@ -871,8 +919,8 @@ public class KnittingCursor<I> implements
 
 	public <O> KnittingCursor<O> unfoldCursable(
 			CursableUnfold<? super I, O> cursable_unfold )
-					throws IllegalStateException {
-				failWhenDirty( );
+			throws IllegalStateException {
+		failWhenDirty( );
 
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
 
@@ -1097,8 +1145,8 @@ public class KnittingCursor<I> implements
 	public static <T> KnittingCursor<T> blend(
 			Cursor<Integer> selector,
 			Cursor<T> ... sources ) {
-		Vector<Cursor<T>> defensive_sources = new Vector<>();
-		for (int i = 0; i < sources.length; i++) {
+		Vector<Cursor<T>> defensive_sources = new Vector<>( );
+		for ( int i = 0; i < sources.length; i++ ) {
 			defensive_sources.add( sources[i] );
 		}
 		return wrap( new Cursor<T>( ) {

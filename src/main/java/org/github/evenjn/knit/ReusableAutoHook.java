@@ -22,6 +22,13 @@ import java.util.LinkedList;
 
 import org.github.evenjn.yarn.AutoHook;
 
+/**
+ * An implementation of AutoHook that returns to the initial state after
+ * invoking {@code close()}. In other words, a closed ReusableAutoHook is as
+ * good as a brand new one, and may be immediately re-used.
+ *
+ * @since 1.0
+ */
 public final class ReusableAutoHook implements
 		AutoHook {
 
@@ -31,9 +38,9 @@ public final class ReusableAutoHook implements
 	public void close( ) {
 		if ( objects_to_close != null ) {
 			Collections.reverse( objects_to_close );
-			for ( AutoCloseable c : objects_to_close ) {
+			for ( AutoCloseable ac : objects_to_close ) {
 				try {
-					c.close( );
+					ac.close( );
 				}
 				catch ( Exception e ) {
 					throw new IllegalStateException( e );

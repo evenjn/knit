@@ -56,7 +56,13 @@ import org.github.evenjn.yarn.SkipMapH;
 import org.github.evenjn.yarn.StreamMapH;
 import org.github.evenjn.yarn.StreamUnfoldHFactory;
 import org.github.evenjn.yarn.Tuple;
-
+/**
+ * 
+ * <h1>KnittingCursor</h1>
+ *
+ * @param <I>
+ *          The type of elements accessible via this cursable.
+ */
 public class KnittingCursable<I> implements
 		Cursable<I> {
 
@@ -66,6 +72,10 @@ public class KnittingCursable<I> implements
 		this.wrapped = cursable;
 	}
 
+	@Override
+	public String toString() {
+		return "A knitting cursable.";
+	}
 
 	/**
 	 * Returns a view of the concatenation of the argument cursable after this cursable.
@@ -128,10 +138,15 @@ public class KnittingCursable<I> implements
 	}
 
 	/**
+	 * <p>
+	 * Returns a view hiding the elements which do not satisfy the argument
+	 * {@code stateless_predicate} in this cursable.
+	 * </p>
+	 * 
 	 * @param stateless_predicate
-	 *          A stateless system that decides to keep or to discard elements.
-	 * @return A cursable to access the only the elements of this cursable that
-	 *         are not discarded by the predicate.
+	 *          A stateless system that decides to show or hide elements.
+	 * @return A view hiding the elements which do not satisfy the argument
+	 *         {@code stateless_predicate} in this cursable.
 	 */
 	public KnittingCursable<I>
 			filter( Predicate<? super I> stateless_predicate ) {
