@@ -88,7 +88,7 @@ import org.github.evenjn.yarn.Tuple;
  * also causes the cursor to leave the pristine state.
  * </p>
  * 
- * </p>
+ * <p>
  * Invocation of certain methods on a cursor that is not in pristine state will
  * throw an {@code IllegalStateException}.
  * </p>
@@ -185,7 +185,7 @@ public class KnittingCursor<I> implements
 		return wrap( chained );
 	}
 
-	/**
+	/*
 	 * <p>
 	 * Adds all elements of this cursor in the argument collection, then returns
 	 * it.
@@ -242,7 +242,7 @@ public class KnittingCursor<I> implements
 		}
 	}
 
-	/**
+	/*
 	 * <p>
 	 * Feeds a consumer with the elements of this cursor.
 	 * </p>
@@ -277,7 +277,7 @@ public class KnittingCursor<I> implements
 		}
 	}
 
-	/**
+	/*
 	 * 
 	 * @return a cursor that scrolls over this and the other in parallel, each
 	 *         time applying the bifunction on the result of the two elements, and
@@ -703,7 +703,7 @@ public class KnittingCursor<I> implements
 		};
 	}
 
-	/**
+	/*
 	 * This is a terminal operation.
 	 * 
 	 * throws IllegalStateException when it not the case that there is exactly one
@@ -793,7 +793,7 @@ public class KnittingCursor<I> implements
 		return optionfold( factory.create( ) );
 	}
 
-	/**
+	/*
 	 * This is a terminal operation.
 	 * 
 	 * returns an empty optionsl when it not the case that there is exactly one
@@ -1207,7 +1207,7 @@ public class KnittingCursor<I> implements
 		}
 	} );
 
-	/**
+	/*
 	 * Stops as soon as one of the sources is depleted.
 	 * 
 	 * @return an iterator that pulls the next element from the i-th iterator,

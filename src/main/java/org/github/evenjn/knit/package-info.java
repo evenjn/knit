@@ -8,7 +8,7 @@
  * <p>
  * The public interface of Knit consists of the following classes:
  * </p>
- * <p>
+ * 
  * <ul>
  * <li>{@link org.github.evenjn.knit.BasicAutoHook BasicAutoHook}</li>
  * <li>{@link org.github.evenjn.knit.Bi Bi}</li>
@@ -19,7 +19,6 @@
  * <li>{@link org.github.evenjn.knit.KnittingTuple KnittingTuple}</li>
  * <li>{@link org.github.evenjn.knit.ReusableAutoHook ReusableAutoHook}</li>
  * </ul>
- * </p>
  * 
  * @since 1.0
  */

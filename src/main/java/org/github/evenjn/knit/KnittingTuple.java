@@ -70,7 +70,7 @@ public class KnittingTuple<I> implements
 				.once( ).iterator( );
 	}
 
-	/**
+	/*
 	 * Computes Damerau-Levenshtein distance.
 	 */
 	public int distance( Tuple<?> other ) {
@@ -317,7 +317,7 @@ public class KnittingTuple<I> implements
 		return wrap( result );
 	}
 
-	/**
+	/*
 	 * Returns the index within this tuple of the first occurrence of the
 	 * specified tuple, starting at the specified index.
 	 */

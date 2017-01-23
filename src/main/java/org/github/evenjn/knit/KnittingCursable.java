@@ -119,7 +119,7 @@ public class KnittingCursable<I> implements
 		}
 	}
 
-	/**
+	/*
 	 * 
 	 * @return a cursable that scrolls over this and the other in parallel, each
 	 *         time applying the bifunction on the result of the two elements, and
@@ -406,7 +406,7 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	/**
+	/*
 	 * throws IllegalStateException when it not the case that there is exactly one
 	 * element.
 	 */
@@ -424,7 +424,7 @@ public class KnittingCursable<I> implements
 		}
 	}
 
-	/**
+	/*
 	 * This is a terminal operation.
 	 * 
 	 * returns an empty optionsl when it not the case that there is exactly one
@@ -777,7 +777,7 @@ public class KnittingCursable<I> implements
 				}
 			} );
 
-	/**
+	/*
 	 * Stops as soon as one of the sources is depleted.
 	 * 
 	 * @return an iterator that pulls the next element from the i-th iterator,

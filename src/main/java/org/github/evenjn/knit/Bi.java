@@ -41,6 +41,10 @@ public final class Bi<A, B> {
 	/**
 	 * Static factory method.
 	 * 
+	 * @param <A>
+	 *          The type of the object in the <em>front</em> slot.
+	 * @param <B>
+	 *          The type of the object in the <em>back</em> slot.
 	 * @param front
 	 *          the element to put in the <em>front</em> slot.
 	 * @param back
