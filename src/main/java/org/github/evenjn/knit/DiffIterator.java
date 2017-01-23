@@ -45,7 +45,7 @@ class DiffIterator<K> implements
 
 	private Diff current = null;
 
-	private Bi<K, K> tray = new Bi<>( );
+	private Bi<K, K> tray = Bi.nu( null, null );
 
 	private int original_start;
 

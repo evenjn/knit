@@ -48,6 +48,8 @@ import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorUnfoldFactory;
 import org.github.evenjn.yarn.IteratorUnfoldHFactory;
+import org.github.evenjn.yarn.OptionMap;
+import org.github.evenjn.yarn.OptionMapH;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.SkipFoldFactory;
 import org.github.evenjn.yarn.SkipFoldHFactory;
@@ -265,6 +267,31 @@ public class KnittingCursable<I> implements
 			public Cursor<O> pull( Hook hook ) {
 				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterator(
 						hook, stitch );
+			}
+		} );
+	}
+
+	public <O> KnittingCursable<O> flatmapOptional(
+			OptionMap<? super I, O> optional_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) )
+						.flatmapOptional( optional_map );
+			}
+		} );
+	}
+
+	public <O> KnittingCursable<O> flatmapOptional(
+			OptionMapH<? super I, O> optional_map_h )
+			throws IllegalStateException {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) )
+						.flatmapOptional( hook, optional_map_h );
 			}
 		} );
 	}

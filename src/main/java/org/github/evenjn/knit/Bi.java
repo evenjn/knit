@@ -18,31 +18,77 @@
 package org.github.evenjn.knit;
 
 /**
- * A Bi object provides a view of two non-value objects. It is designed for
- * scenarios where a {@link org.github.evenjn.yarn.Di Di} cannot be used.
+ * <p>
+ * A {@code Bi} object holds two references to objects, referred to as the
+ * <em>front</em> and the <em>back</em>. There are no restrictions on the
+ * references. One or both references may be null, and both references may point
+ * to the same object. The referred objects to need not be immutable or satisfy
+ * any particular constraint.
+ * </p>
+ *
+ * @param <A>
+ *          The type of the object in the <em>front</em> slot.
+ * @param <B>
+ *          The type of the object in the <em>back</em> slot.
  * 
+ * @since 1.0
  */
 public final class Bi<A, B> {
 
-	public static <A, B> Bi<A, B> nu( A first, B second ) {
-		return new Bi<A, B>( ).set( first, second );
+	private Bi() {
 	}
 
-	public A first;
+	/**
+	 * Static factory method.
+	 * 
+	 * @param front
+	 *          the element to put in the <em>front</em> slot.
+	 * @param back
+	 *          the element to put in the <em>back</em> slot.
+	 * @return a new {@code Bi} object providing access to the argument objects.
+	 * @since 1.0
+	 */
+	public static <A, B> Bi<A, B> nu( A front, B back ) {
+		return new Bi<A, B>( ).set( front, back );
+	}
 
-	public B second;
+	private A front;
 
-	public Bi<A, B> set( A first, B second ) {
-		this.first = first;
-		this.second = second;
+	private B back;
+
+	/**
+	 * Replaces the objects currently held in the <em>front</em> and <em>back</em>
+	 * slot with the argument objects.
+	 * 
+	 * @param front
+	 *          the element to put in the <em>front</em> slot.
+	 * @param back
+	 *          the element to put in the <em>back</em> slot.
+	 * @return this {@code Bi} object, modified to provide access to the argument
+	 *         objects.
+	 * @since 1.0
+	 */
+	public Bi<A, B> set( A front, B back ) {
+		this.front = front;
+		this.back = back;
 		return this;
 	}
 
+	/**
+	 * 
+	 * @return the object in the <em>front</em> slot.
+	 * @since 1.0
+	 */
 	public A front( ) {
-		return first;
+		return front;
 	}
 
+	/**
+	 * 
+	 * @return the object in the <em>back</em> slot.
+	 * @since 1.0
+	 */
 	public B back( ) {
-		return second;
+		return back;
 	}
 }

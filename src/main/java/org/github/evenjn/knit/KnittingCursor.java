@@ -51,8 +51,12 @@ import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorUnfold;
 import org.github.evenjn.yarn.IteratorUnfoldH;
-import org.github.evenjn.yarn.OptionalMap;
-import org.github.evenjn.yarn.OptionalMapH;
+import org.github.evenjn.yarn.OptionFold;
+import org.github.evenjn.yarn.OptionFoldFactory;
+import org.github.evenjn.yarn.OptionFoldH;
+import org.github.evenjn.yarn.OptionFoldHFactory;
+import org.github.evenjn.yarn.OptionMap;
+import org.github.evenjn.yarn.OptionMapH;
 import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.SkipException;
 import org.github.evenjn.yarn.SkipFold;
@@ -471,7 +475,7 @@ public class KnittingCursor<I> implements
 	}
 
 	public <O> KnittingCursor<O> flatmapOptional(
-			OptionalMap<? super I, O> optional_map )
+			OptionMap<? super I, O> optional_map )
 			throws IllegalStateException {
 		failWhenDirty( );
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
@@ -489,7 +493,7 @@ public class KnittingCursor<I> implements
 	}
 
 	public <O> KnittingCursor<O> flatmapOptional( Hook hook,
-			OptionalMapH<? super I, O> optional_map_h )
+			OptionMapH<? super I, O> optional_map_h )
 			throws IllegalStateException {
 		failWhenDirty( );
 		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
@@ -719,6 +723,74 @@ public class KnittingCursor<I> implements
 		catch ( PastTheEndException e ) {
 			throw new IllegalStateException( );
 		}
+	}
+
+	public <O> KnittingCursor<O> optionfold( Hook hook,
+			OptionFoldH<? super I, O> option_fold_h )
+			throws IllegalStateException {
+		failWhenDirty( );
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
+
+			@Override
+			public Cursor<O> next( Hook hook, I input ) {
+				Optional<O> next = option_fold_h.next( hook, input );
+				if ( next.isPresent( ) ) {
+					return new SingletonCursor<O>( next.get( ) );
+				}
+				return null;
+			}
+
+			@Override
+			public Cursor<O> end( Hook hook ) {
+				Optional<O> end = option_fold_h.end( hook );
+				if ( end.isPresent( ) ) {
+					return new SingletonCursor<O>( end.get( ) );
+				}
+				return null;
+			}
+		};
+		return wrap( new CursorStitchProcessor<I, O>( hook, this, stitch ) );
+	}
+
+	public <O> KnittingCursor<O> optionfold( Hook hook,
+			OptionFoldHFactory<? super I, O> factory )
+			throws IllegalStateException {
+		failWhenDirty( );
+		return optionfold( hook, factory.create( ) );
+	}
+
+	public <O> KnittingCursor<O> optionfold(
+			OptionFold<? super I, O> option_fold )
+			throws IllegalStateException {
+		failWhenDirty( );
+		CursorUnfoldH<I, O> stitch = new CursorUnfoldH<I, O>( ) {
+
+			@Override
+			public Cursor<O> next( Hook hook, I input ) {
+				Optional<O> next = option_fold.next( input );
+				if ( next.isPresent( ) ) {
+					return new SingletonCursor<O>( next.get( ) );
+				}
+				return null;
+			}
+
+			@Override
+			public Cursor<O> end( Hook hook ) {
+				Optional<O> end = option_fold.end( );
+				if ( end.isPresent( ) ) {
+					return new SingletonCursor<O>( end.get( ) );
+				}
+				return null;
+			}
+		};
+		return wrap( new CursorStitchProcessor<I, O>( this, stitch ) );
+	}
+
+	public <O> KnittingCursor<O> optionfold(
+			OptionFoldFactory<? super I, O> factory )
+			throws IllegalStateException {
+		failWhenDirty( );
+		return optionfold( factory.create( ) );
 	}
 
 	/**

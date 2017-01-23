@@ -19,7 +19,7 @@ package org.github.evenjn.knit;
 
 import java.util.Optional;
 
-public class Compare {
+class Compare {
 
 	public static Optional<Integer> compareNullFirst( Object o1, Object o2 ) {
 		if ( o1 == null ) {

@@ -34,6 +34,7 @@ import org.github.evenjn.yarn.Tuple;
  *
  * @param <I>
  *          The type of elements accessible via this tuple.
+ * @since 1.0
  */
 public class KnittingTuple<I> implements
 		Tuple<I> {
