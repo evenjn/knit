@@ -71,12 +71,11 @@ import org.github.evenjn.yarn.Tuple;
 
 /**
  * <h1>KnittingCursor</h1>
+ * 
  * <p>
  * A KnittingCursor wraps a cursor and provides utility methods to access its
  * contents.
  * </p>
- * 
- * 
  * 
  * <h2>Pristine state</h2>
  * 
@@ -95,12 +94,71 @@ import org.github.evenjn.yarn.Tuple;
  * 
  * <h2>Terminal operations</h2>
  * 
+ * <ul>
+ * <li>{@link #collect(Collection)}</li>
+ * <li>{@link #consume()}</li>
+ * <li>{@link #consume(Function)}</li>
+ * <li>{@link #one()}</li>
+ * <li>{@link #optionalOne()}</li>
+ * <li>{@link #reduce(Object, BiFunction)}</li>
+ * <li>{@link #size()}</li>
+ * </ul>
+ * 
  * <p>
  * Terminal operations are a group of methods that may be invoked only if the
- * cursor is in pristine state. Terminal operations are marked as such in the
- * documentation.
+ * cursor is in pristine state. Terminal operations do not preserve the pristine
+ * state. Instead, they repeatedly invoke the wrapped cursor until its end.
  * </p>
+ * 
+ * <h2>Transformations</h2>
  *
+ * <p>
+ * Transformations are a group of methods that may be invoked only if the cursor
+ * is in pristine state. Transformations preserve the pristine state.
+ * </p>
+ * <ul>
+ * <li>{@link #chain(Cursor)}</li>
+ * <li>{@link #entwine(Cursor, BiFunction)}</li>
+ * <li>{@link #filter(Predicate)}</li>
+ * <li>{@link #flatmapArray(ArrayMap)}</li>
+ * <li>{@link #flatmapCursable(CursableMap)}</li>
+ * <li>{@link #flatmapCursable(Hook, CursableMapH)}</li>
+ * <li>{@link #flatmapCursor(CursorMap)}</li>
+ * <li>{@link #flatmapCursor(Hook, CursorMapH)}</li>
+ * <li>{@link #flatmapIterable(IterableMap)}</li>
+ * <li>{@link #flatmapIterable(Hook, IterableMapH)}</li>
+ * <li>{@link #flatmapIterator(IteratorMap)}</li>
+ * <li>{@link #flatmapIterator(Hook, IteratorMapH)}</li>
+ * <li>{@link #flatmapOptional(OptionMap)}</li>
+ * <li>{@link #flatmapOptional(Hook, OptionMapH)}</li>
+ * <li>{@link #head(int, int)}</li>
+ * <li>{@link #headless(int)}</li>
+ * <li>{@link #map(Function)}</li>
+ * <li>{@link #map(Hook, FunctionH)}</li>
+ * <li>{@link #numbered()}</li>
+ * <li>{@link #optionfold(OptionFold)}</li>
+ * <li>{@link #optionfold(OptionFoldFactory)}</li>
+ * <li>{@link #optionfold(Hook, OptionFoldH)}</li>
+ * <li>{@link #optionfold(Hook, OptionFoldHFactory)}</li>
+ * <li>{@link #skipfold(SkipFold)}</li>
+ * <li>{@link #skipfold(SkipFoldFactory)}</li>
+ * <li>{@link #skipfold(Hook, SkipFoldH)}</li>
+ * <li>{@link #skipfold(Hook, SkipFoldHFactory)}</li>
+ * <li>{@link #skipmap(SkipMap)}</li>
+ * <li>{@link #skipmap(Hook, SkipMapH)}</li>
+ * <li>{@link #split(Predicate)}</li>
+ * <li>{@link #tap(Consumer)}</li>
+ * <li>{@link #unfoldArray(ArrayUnfold)}</li>
+ * <li>{@link #unfoldCursable(CursableUnfold)}</li>
+ * <li>{@link #unfoldCursable(Hook, CursableUnfoldH)}</li>
+ * <li>{@link #unfoldCursor(CursorUnfold))}</li>
+ * <li>{@link #unfoldCursor(Hook, CursorUnfoldH)}</li>
+ * <li>{@link #unfoldIterable(IterableUnfold)}</li>
+ * <li>{@link #unfoldIterable(Hook, IterableUnfoldH)}</li>
+ * <li>{@link #unfoldIterator(IteratorUnfold)}</li>
+ * <li>{@link #unfoldIterator(Hook, IteratorUnfoldH)}</li>
+ * </ul>
+ * 
  * @param <I>
  *          The type of elements accessible via this cursor.
  * @see org.github.evenjn.knit
@@ -145,7 +203,7 @@ public class KnittingCursor<I> implements
 	 * </p>
 	 * 
 	 * @param tail
-	 *          The cursor to concatenate after this.
+	 *          A cursor to concatenate after this.
 	 * @return A view of the concatenation of the argument cursor after this
 	 *         cursor.
 	 * @throws IllegalStateException
@@ -155,7 +213,7 @@ public class KnittingCursor<I> implements
 	public KnittingCursor<I> chain( Cursor<I> tail )
 			throws IllegalStateException {
 		failWhenDirty( );
-		final KnittingCursor<I> outer_this = this;
+		final Cursor<I> outer_this = wrapped;
 
 		Cursor<I> chained = new Cursor<I>( ) {
 
@@ -185,7 +243,7 @@ public class KnittingCursor<I> implements
 		return wrap( chained );
 	}
 
-	/*
+	/**
 	 * <p>
 	 * Adds all elements of this cursor in the argument collection, then returns
 	 * it.
@@ -195,11 +253,17 @@ public class KnittingCursor<I> implements
 	 * This is a terminal operation.
 	 * </p>
 	 * 
+	 * @param <K>
+	 *          The type the argument collection.
+	 * 
 	 * @param collection
 	 *          The collection to add elements to.
+	 * 
 	 * @return The argument collection.
+	 * 
 	 * @throws IllegalStateException
 	 *           when the cursor is not in pristine state.
+	 * 
 	 * @since 1.0
 	 */
 	public <K extends Collection<? super I>> K collect( K collection )
@@ -242,10 +306,11 @@ public class KnittingCursor<I> implements
 		}
 	}
 
-	/*
+	/**
 	 * <p>
 	 * Feeds a consumer with the elements of this cursor.
 	 * </p>
+	 * 
 	 * <p>
 	 * Obtains a consumer from the argument {@code consumer_provider}, hooking it
 	 * to a local, temporary hook. Then invokes {@link #next() next()} until a
@@ -257,6 +322,8 @@ public class KnittingCursor<I> implements
 	 * This is a terminal operation.
 	 * </p>
 	 * 
+	 * @param <K>
+	 *          The type of @{code Consumer} returned by the argument.
 	 * @param consumer_provider
 	 *          A system that provides hooked consumers.
 	 * @throws IllegalStateException
@@ -280,8 +347,8 @@ public class KnittingCursor<I> implements
 	/*
 	 * 
 	 * @return a cursor that scrolls over this and the other in parallel, each
-	 *         time applying the bifunction on the result of the two elements, and
-	 *         returning in output the application result.
+	 * time applying the bifunction on the result of the two elements, and
+	 * returning in output the application result.
 	 */
 	public <R, M> KnittingCursor<M> entwine(
 			Cursor<R> other,
@@ -655,16 +722,7 @@ public class KnittingCursor<I> implements
 	public KnittingCursor<Bi<Integer, I>> numbered( )
 			throws IllegalStateException {
 		failWhenDirty( );
-		final KnittingCursor<I> outer_this = this;
-		Bi<Integer, I> bi = Bi.nu( null, null );
-		return wrap( new Cursor<Bi<Integer, I>>( ) {
-
-			@Override
-			public Bi<Integer, I> next( )
-					throws PastTheEndException {
-				return bi.set( soFar( ), outer_this.next( ) );
-			}
-		} );
+		return wrap( new NumberedCursor<>( this ) );
 	}
 
 	public Iterable<I> once( )
@@ -703,15 +761,22 @@ public class KnittingCursor<I> implements
 		};
 	}
 
-	/*
-	 * This is a terminal operation.
+	/**
+	 * When the cursor provides access to one element only, this method returns
+	 * it.
 	 * 
-	 * throws IllegalStateException when it not the case that there is exactly one
-	 * element.
+	 * <p>
+	 * This is a terminal operation.
+	 * </p>
+	 * 
+	 * @return The only element accessible via this cursor.
+	 * @throws IllegalStateException
+	 *           when it not the case that there is exactly one element, when the
+	 *           cursor is not in pristine state.
+	 * @since 1.0
 	 */
 	public I one( )
 			throws IllegalStateException {
-		failWhenDirty( );
 		failWhenDirty( );
 		try {
 			I result = next( );
@@ -722,6 +787,42 @@ public class KnittingCursor<I> implements
 		}
 		catch ( PastTheEndException e ) {
 			throw new IllegalStateException( );
+		}
+	}
+
+	/**
+	 * <p>
+	 * When the cursor provides access to one non-null element, this method
+	 * returns it wrapped in an {@code Optional}.
+	 * </p>
+	 * 
+	 * <p>
+	 * When it not the case that there is exactly one element, or when the only
+	 * element accessible is {@code null}, this method returns an empty
+	 * {@code Optional}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a terminal operation.
+	 * </p>
+	 * 
+	 * @return The only element accessible via this cursor.
+	 * @throws IllegalStateException
+	 *           when the cursor is not in pristine state.
+	 * @since 1.0
+	 */
+	public Optional<I> optionalOne( )
+			throws IllegalStateException {
+		failWhenDirty( );
+		try {
+			I result = next( );
+			if ( hasNext( ) ) {
+				return Optional.empty( );
+			}
+			return Optional.ofNullable( result );
+		}
+		catch ( PastTheEndException e ) {
+			return Optional.empty( );
 		}
 	}
 
@@ -791,27 +892,6 @@ public class KnittingCursor<I> implements
 			throws IllegalStateException {
 		failWhenDirty( );
 		return optionfold( factory.create( ) );
-	}
-
-	/*
-	 * This is a terminal operation.
-	 * 
-	 * returns an empty optionsl when it not the case that there is exactly one
-	 * element.
-	 */
-	public Optional<I> optionalOne( )
-			throws IllegalStateException {
-		failWhenDirty( );
-		try {
-			I result = next( );
-			if ( hasNext( ) ) {
-				return Optional.empty( );
-			}
-			return Optional.of( result );
-		}
-		catch ( PastTheEndException e ) {
-			return Optional.empty( );
-		}
 	}
 
 	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
@@ -1185,6 +1265,7 @@ public class KnittingCursor<I> implements
 	 * 
 	 * @param <K>
 	 *          The type of elements in the empty cursor.
+	 * 
 	 * @return An empty cursor.
 	 * 
 	 * @since 1.0
@@ -1211,7 +1292,7 @@ public class KnittingCursor<I> implements
 	 * Stops as soon as one of the sources is depleted.
 	 * 
 	 * @return an iterator that pulls the next element from the i-th iterator,
-	 *         where i is the next integer pulled by selector.
+	 * where i is the next integer pulled by selector.
 	 */
 	@SafeVarargs
 	public static <T> KnittingCursor<T> blend(

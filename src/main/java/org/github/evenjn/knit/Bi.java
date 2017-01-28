@@ -22,7 +22,7 @@ package org.github.evenjn.knit;
  * A {@code Bi} object holds two references to objects, referred to as the
  * <em>front</em> and the <em>back</em>. There are no restrictions on the
  * references. One or both references may be null, and both references may point
- * to the same object. The referred objects to need not be immutable or satisfy
+ * to the same object. The referred objects need not be immutable or satisfy
  * any particular constraint.
  * </p>
  *
@@ -79,7 +79,6 @@ public final class Bi<A, B> {
 	}
 
 	/**
-	 * 
 	 * @return the object in the <em>front</em> slot.
 	 * @since 1.0
 	 */
@@ -88,7 +87,6 @@ public final class Bi<A, B> {
 	}
 
 	/**
-	 * 
 	 * @return the object in the <em>back</em> slot.
 	 * @since 1.0
 	 */

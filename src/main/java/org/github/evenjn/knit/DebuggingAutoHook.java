@@ -26,9 +26,8 @@ import org.github.evenjn.yarn.AutoHook;
 
 
 /**
- * 
  * An implementation of {@link org.github.evenjn.yarn.AutoHook AutoHook} that
- * prints a warning on standard error resource leak.
+ * prints a warning on standard error when a resource leak is detected.
  *
  * @since 1.0
  */

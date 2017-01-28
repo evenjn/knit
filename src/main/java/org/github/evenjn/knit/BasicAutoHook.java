@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import org.github.evenjn.yarn.AutoHook;
 
 /**
- * 
  * A simple implementation of {@link org.github.evenjn.yarn.AutoHook AutoHook}.
  *
  * @since 1.0

@@ -153,9 +153,6 @@ class DiffPatch {
    * stripping any common prefix or suffix off the texts before diffing.
    * @param text1 Old string to be diffed.
    * @param text2 New string to be diffed.
-   * @param checklines Speedup flag.  If false, then don't run a
-   *     line-level diff first to identify the changed areas.
-   *     If true, then run a faster slightly less optimal diff.
    * @param deadline Time when the diff should be complete by.  Used
    *     internally for recursive calls.  Users should set DiffTimeout instead.
    * @return Linked List of Diff objects.
@@ -209,9 +206,6 @@ class DiffPatch {
    * have any common prefix or suffix.
    * @param text1 Old string to be diffed.
    * @param text2 New string to be diffed.
-   * @param checklines Speedup flag.  If false, then don't run a
-   *     line-level diff first to identify the changed areas.
-   *     If true, then run a faster slightly less optimal diff.
    * @param deadline Time when the diff should be complete by.
    * @return Linked List of Diff objects.
    */
@@ -1182,20 +1176,6 @@ class DiffPatch {
     }
     // No origin string provided, compute our own.
     String text1 = diff_text1(diffs);
-    return patch_make(text1, diffs);
-  }
-
-  /**
-   * Compute a list of patches to turn text1 into text2.
-   * text2 is ignored, diffs are the delta between text1 and text2.
-   * @param text1 Old text
-   * @param text2 Ignored.
-   * @param diffs Array of Diff objects for text1 to text2.
-   * @return LinkedList of Patch objects.
-   * @deprecated Prefer patch_make(String text1, LinkedList_Diff_ diffs).
-   */
-  public LinkedList<Patch> patch_make(String text1, String text2,
-      LinkedList<Diff> diffs) {
     return patch_make(text1, diffs);
   }
 
