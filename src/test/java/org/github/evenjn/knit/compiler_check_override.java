@@ -94,7 +94,7 @@ public class compiler_check_override {
 		Function<Hook, Consumer<Object>> ff2 = null;
 
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<String> pull = cursable.pull( hook );
+			KnittingCursor<String> pull = KnittingCursor.wrap(cursable.pull( hook ));
 			pull.tap( System.out::println ).consume( );
 			pull.consume( ff1 );
 			pull.consume( ff2 );

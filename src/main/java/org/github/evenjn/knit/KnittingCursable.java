@@ -48,6 +48,8 @@ import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorUnfoldFactory;
 import org.github.evenjn.yarn.IteratorUnfoldHFactory;
+import org.github.evenjn.yarn.OptionFoldFactory;
+import org.github.evenjn.yarn.OptionFoldHFactory;
 import org.github.evenjn.yarn.OptionMap;
 import org.github.evenjn.yarn.OptionMapH;
 import org.github.evenjn.yarn.PastTheEndException;
@@ -156,8 +158,7 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) )
-						.filter( stateless_predicate );
+				return new FilterCursor<>(wrapped.pull( hook ), stateless_predicate );
 			}
 		} );
 	}
@@ -181,7 +182,7 @@ public class KnittingCursable<I> implements
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursable(
-						stitch );
+						hook, stitch );
 			}
 		} );
 	}
@@ -193,8 +194,7 @@ public class KnittingCursable<I> implements
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursable(
-						hook,
-						stitch );
+						hook, stitch );
 			}
 		} );
 	}
@@ -396,12 +396,11 @@ public class KnittingCursable<I> implements
 	}
 
 	public KnittingCursable<Bi<Integer, I>> numbered( ) {
-		KnittingCursable<I> outer_this = this;
 		return wrap( new Cursable<Bi<Integer, I>>( ) {
 
 			@Override
 			public Cursor<Bi<Integer, I>> pull( Hook hook ) {
-				return outer_this.pull( hook ).numbered( );
+				return new NumberedCursor<>( wrapped.pull( hook ) );
 			}
 		} );
 	}
@@ -444,6 +443,32 @@ public class KnittingCursable<I> implements
 		}
 	}
 
+	public <O> KnittingCursable<O> optionfold(
+			OptionFoldHFactory<? super I, O> factory )
+			throws IllegalStateException {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).optionfold( hook,
+						factory.create( ) );
+			}
+		} );
+	}
+
+	public <O> KnittingCursable<O> optionfold(
+			OptionFoldFactory<? super I, O> factory )
+			throws IllegalStateException {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).optionfold(
+						factory.create( ) );
+			}
+		} );
+	}
+
 	@Override
 	public KnittingCursor<I> pull( Hook hook ) {
 		return KnittingCursor.wrap( wrapped.pull( hook ) );
@@ -466,7 +491,7 @@ public class KnittingCursable<I> implements
 
 	public int size( ) {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			return pull( hook ).size( );
+			return pull( hook ).consume( );
 		}
 	}
 
@@ -613,12 +638,11 @@ public class KnittingCursable<I> implements
 	}
 
 	public KnittingCursable<I> tap( Consumer<? super I> consumer ) {
-		KnittingCursable<I> outer_this = this;
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return outer_this.pull( hook ).tap( consumer );
+				return new TapCursor<I>( wrapped.pull( hook ), consumer );
 			}
 
 		} );
@@ -838,11 +862,9 @@ public class KnittingCursable<I> implements
 		return wrap( new ArrayItterable<K>( array ) );
 	}
 	
-	public boolean equals( Object other ) {
+	public boolean contentEquals( Cursable<?> other ) {
 		if ( other == this )
 			return true;
-		if ( !( other instanceof Cursable ) )
-			return false;
 		Cursable<?> o = (Cursable<?>) other;
 		
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
@@ -868,19 +890,5 @@ public class KnittingCursable<I> implements
 		catch ( PastTheEndException e ) {
 			throw new IllegalStateException( e );
 		}
-	}
-
-	public int hashCode( ) {
-		int hashCode = 1;
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<I> pull = pull( hook );
-			for (;;) {
-				I next = pull.next( );
-				hashCode = 31 * hashCode + ( next == null ? 0 : next.hashCode( ) );
-			}
-		}
-		catch ( PastTheEndException e ) {
-		}
-		return hashCode;
 	}
 }

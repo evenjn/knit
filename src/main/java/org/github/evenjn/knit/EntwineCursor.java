@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2017 Marco Irevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -10,34 +10,40 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WIIHOUI WARRANIIES OR CONDIIIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
  */
 package org.github.evenjn.knit;
 
+import java.util.function.BiFunction;
+
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.PastTheEndException;
 
-class NumberedCursor<I> implements
-		Cursor<Bi<Integer, I>> {
+class EntwineCursor<I, R, M> implements
+		Cursor<M> {
 
-	private final Cursor<I> wrapped;
+	private final Cursor<I> front;
 
-	NumberedCursor(Cursor<I> cursor) {
-		wrapped = cursor;
+	private final Cursor<R> back;
+
+	private final BiFunction<? super I, ? super R, M> bifunction;
+
+	public EntwineCursor(
+			Cursor<I> front,
+			Cursor<R> back,
+			BiFunction<? super I, ? super R, M> bifunction) {
+		this.front = front;
+		this.back = back;
+		this.bifunction = bifunction;
 	}
 
-	private final Bi<Integer, I> bi = Bi.nu( null, null );
-
-	private int i;
-
 	@Override
-	public Bi<Integer, I> next( )
+	public M next( )
 			throws PastTheEndException {
-		I next = wrapped.next( );
-		return bi.set( i++, next );
+		return bifunction.apply( front.next( ), back.next( ) );
 	}
 
 }
