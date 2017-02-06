@@ -22,8 +22,8 @@ import java.util.NoSuchElementException;
 
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
+import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Hook;
-import org.github.evenjn.yarn.PastTheEndException;
 import org.github.evenjn.yarn.Tuple;
 
 class ArrayCursor<T> implements
@@ -39,11 +39,11 @@ class ArrayCursor<T> implements
 
 	@Override
 	public T next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		if ( i < array.length ) {
 			return array[i++];
 		}
-		throw PastTheEndException.neo;
+		throw EndOfCursorException.neo();
 	}
 }
 

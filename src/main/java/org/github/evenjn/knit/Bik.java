@@ -17,25 +17,12 @@
  */
 package org.github.evenjn.knit;
 
-/**
- * <p>
- * A {@code Bi} object holds two references to objects, referred to as the
- * <em>front</em> and the <em>back</em>. There are no restrictions on the
- * references. One or both references may be null, and both references may point
- * to the same object. The referred objects need not be immutable or satisfy
- * any particular constraint.
- * </p>
- *
- * @param <A>
- *          The type of the object in the <em>front</em> slot.
- * @param <B>
- *          The type of the object in the <em>back</em> slot.
- * 
- * @since 1.0
- */
-public final class Bi<A, B> {
+import org.github.evenjn.yarn.Bi;
 
-	private Bi() {
+public final class Bik<A, B> implements
+		Bi<A, B> {
+
+	private Bik() {
 	}
 
 	/**
@@ -52,8 +39,8 @@ public final class Bi<A, B> {
 	 * @return a new {@code Bi} object providing access to the argument objects.
 	 * @since 1.0
 	 */
-	public static <A, B> Bi<A, B> nu( A front, B back ) {
-		return new Bi<A, B>( ).set( front, back );
+	public static <A, B> Bik<A, B> nu( A front, B back ) {
+		return new Bik<A, B>( ).set( front, back );
 	}
 
 	private A front;
@@ -72,25 +59,23 @@ public final class Bi<A, B> {
 	 *         objects.
 	 * @since 1.0
 	 */
-	public Bi<A, B> set( A front, B back ) {
+	public Bik<A, B> set( A front, B back ) {
 		this.front = front;
 		this.back = back;
 		return this;
 	}
 
-	/**
-	 * @return the object in the <em>front</em> slot.
-	 * @since 1.0
-	 */
+	@Override
 	public A front( ) {
 		return front;
 	}
 
-	/**
-	 * @return the object in the <em>back</em> slot.
-	 * @since 1.0
-	 */
+	@Override
 	public B back( ) {
 		return back;
+	}
+
+	public Bi<A, B> asBi( ) {
+		return this;
 	}
 }

@@ -17,11 +17,12 @@
  */
 package org.github.evenjn.knit;
 
+import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class NumberedCursor<I> implements
-		Cursor<Bi<Integer, I>> {
+		Cursor<Bi<I, Integer>> {
 
 	private final Cursor<I> wrapped;
 
@@ -29,15 +30,15 @@ class NumberedCursor<I> implements
 		wrapped = cursor;
 	}
 
-	private final Bi<Integer, I> bi = Bi.nu( null, null );
+	private final Bik<I, Integer> bi = Bik.nu( null, null );
 
 	private int i;
 
 	@Override
-	public Bi<Integer, I> next( )
-			throws PastTheEndException {
+	public Bi<I, Integer> next( )
+			throws EndOfCursorException {
 		I next = wrapped.next( );
-		return bi.set( i++, next );
+		return bi.set( next, i++ );
 	}
 
 }

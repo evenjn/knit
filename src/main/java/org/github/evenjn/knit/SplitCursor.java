@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class SplitCursor<K> implements
 		Cursor<KnittingCursor<K>> {
@@ -40,7 +40,7 @@ class SplitCursor<K> implements
 
 	@Override
 	public KnittingCursor<K> next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		if ( mono != null ) {
 			while ( mono.hasNext( ) ) {
 				mono.next( );
@@ -49,7 +49,7 @@ class SplitCursor<K> implements
 			mono = null;
 			sc = null;
 			if ( !es && !kc.hasNext( ) ) {
-				throw PastTheEndException.neo;
+				throw EndOfCursorException.neo();
 			}
 		}
 		sc = new SegmentCursor<>( kc, predicate );
@@ -67,28 +67,28 @@ class SegmentCursor<K> implements
 
 	private boolean end_on_separator = false;
 
-	public SegmentCursor(Cursor<K> cursor, Predicate<K> predicate) {
+	public SegmentCursor(KnittingCursor<K> cursor, Predicate<K> predicate) {
 		this.predicate = predicate;
 		if ( cursor == null )
 			throw new IllegalArgumentException( );
 		if ( predicate == null )
 			throw new IllegalArgumentException( );
-		this.kc = KnittingCursor.wrap( cursor );
+		this.kc = cursor;
 	}
 
 	@Override
 	public K next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		if ( kc == null || !kc.hasNext( ) ) {
 			kc = null;
-			throw PastTheEndException.neo;
+			throw EndOfCursorException.neo();
 		}
 		K next = kc.next( );
 		boolean is_separator = predicate.test( next );
 		if ( is_separator ) {
 			kc = null;
 			end_on_separator = true;
-			throw PastTheEndException.neo;
+			throw EndOfCursorException.neo();
 		}
 		return next;
 	}

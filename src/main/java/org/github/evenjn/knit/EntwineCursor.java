@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import java.util.function.BiFunction;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class EntwineCursor<I, R, M> implements
 		Cursor<M> {
@@ -42,7 +42,7 @@ class EntwineCursor<I, R, M> implements
 
 	@Override
 	public M next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		return bifunction.apply( front.next( ), back.next( ) );
 	}
 

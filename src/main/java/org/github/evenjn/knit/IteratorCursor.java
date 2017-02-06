@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import java.util.Iterator;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class IteratorCursor<T> implements
 		Cursor<T> {
@@ -33,10 +33,10 @@ class IteratorCursor<T> implements
 
 	@Override
 	public T next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		if ( iterator.hasNext( ) ) {
 			return iterator.next( );
 		}
-		throw PastTheEndException.neo;
+		throw EndOfCursorException.neo();
 	}
 }

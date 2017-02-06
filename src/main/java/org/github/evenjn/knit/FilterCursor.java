@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 public class FilterCursor<I> implements
 		Cursor<I> {
@@ -36,7 +36,7 @@ public class FilterCursor<I> implements
 
 	@Override
 	public I next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		for ( ;; ) {
 			I next = wrapped.next( );
 			if ( predicate.test( next ) ) {

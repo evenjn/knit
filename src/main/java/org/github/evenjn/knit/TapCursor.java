@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import java.util.function.Consumer;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 public class TapCursor<I> implements
 		Cursor<I> {
@@ -36,7 +36,7 @@ public class TapCursor<I> implements
 
 	@Override
 	public I next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		I next = wrapped.next( );
 		consumer.accept( next );
 		return next;

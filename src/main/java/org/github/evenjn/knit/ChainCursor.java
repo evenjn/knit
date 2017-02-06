@@ -18,7 +18,7 @@
 package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class ChainCursor<I> implements
 		Cursor<I> {
@@ -35,12 +35,12 @@ class ChainCursor<I> implements
 
 	@Override
 	public I next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		if ( in_head ) {
 			try {
 				return head.next( );
 			}
-			catch ( PastTheEndException e ) {
+			catch ( EndOfCursorException e ) {
 				in_head = false;
 			}
 		}

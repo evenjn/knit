@@ -18,7 +18,7 @@
 package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class SingletonCursor<T> implements
 		Cursor<T> {
@@ -33,9 +33,9 @@ class SingletonCursor<T> implements
 
 	@Override
 	public T next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		if ( consumed ) {
-			throw PastTheEndException.neo;
+			throw EndOfCursorException.neo();
 		}
 		consumed = true;
 		return element;

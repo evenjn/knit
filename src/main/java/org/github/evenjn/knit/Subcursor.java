@@ -18,7 +18,7 @@
 package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 
 class Subcursor<T> implements
 		Cursor<T> {
@@ -47,13 +47,13 @@ class Subcursor<T> implements
 
 	@Override
 	public T next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		while ( i < start ) {
 			wrapped.next( );
 			i++;
 		}
 		if ( length >= 0 && i >= start + length ) {
-			throw PastTheEndException.neo;
+			throw EndOfCursorException.neo();
 		}
 		T next = wrapped.next( );
 		i++;

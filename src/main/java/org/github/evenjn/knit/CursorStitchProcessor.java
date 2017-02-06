@@ -19,8 +19,8 @@ package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorUnfoldH;
+import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Hook;
-import org.github.evenjn.yarn.PastTheEndException;
 
 class CursorStitchProcessor<I, O> implements
 		Cursor<O> {
@@ -65,14 +65,14 @@ class CursorStitchProcessor<I, O> implements
 
 	@Override
 	public O next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 		for ( ;; ) {
 			if ( current != null ) {
 				try {
 					O next = current.next( );
 					return next;
 				}
-				catch ( PastTheEndException t ) {
+				catch ( EndOfCursorException t ) {
 					current = null;
 				}
 			}
@@ -81,7 +81,7 @@ class CursorStitchProcessor<I, O> implements
 					internal_hook.close( );
 					internal_hook = null;
 				}
-				throw PastTheEndException.neo;
+				throw EndOfCursorException.neo();
 			}
 
 			try {
@@ -95,7 +95,7 @@ class CursorStitchProcessor<I, O> implements
 				}
 				current = knitting.next( internal_hook, next );
 			}
-			catch ( PastTheEndException t ) {
+			catch ( EndOfCursorException t ) {
 				end = true;
 				if ( use_internal_hook ) {
 					if (internal_hook != null) {

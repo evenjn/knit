@@ -20,8 +20,9 @@ package org.github.evenjn.knit;
 import java.util.LinkedList;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
+import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Tuple;
 
 class DiffIterator<K> implements
@@ -45,7 +46,7 @@ class DiffIterator<K> implements
 
 	private Diff current = null;
 
-	private Bi<K, K> tray = Bi.nu( null, null );
+	private Bik<K, K> tray = Bik.nu( null, null );
 
 	private int original_start;
 
@@ -57,7 +58,7 @@ class DiffIterator<K> implements
 
 	@Override
 	public Bi<K, K> next( )
-			throws PastTheEndException {
+			throws EndOfCursorException {
 
 		if ( current == null && kd.hasNext( ) ) {
 			current = kd.next( );
@@ -80,7 +81,7 @@ class DiffIterator<K> implements
 		if ( current != null ) {
 			switch ( current.operation ) {
 				case INSERT:
-					tray = Bi.nu( null, kb.next( ) );
+					tray = Bik.nu( null, kb.next( ) );
 					revised_length--;
 					if ( revised_length == 0 ) {
 						current = null;
@@ -88,7 +89,7 @@ class DiffIterator<K> implements
 					revised_start++;
 					break;
 				case EQUAL:
-					tray = Bi.nu( ka.next( ), kb.next( ) );
+					tray = Bik.nu( ka.next( ), kb.next( ) );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -101,7 +102,7 @@ class DiffIterator<K> implements
 					revised_start++;
 					break;
 				case DELETE:
-					tray = Bi.nu( ka.next( ), null );
+					tray = Bik.nu( ka.next( ), null );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -114,7 +115,7 @@ class DiffIterator<K> implements
 			return tray;
 
 		}
-		throw PastTheEndException.neo;
+		throw EndOfCursorException.neo();
 	}
 
 }

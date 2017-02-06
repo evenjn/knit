@@ -24,8 +24,9 @@ import java.util.Vector;
 import java.util.function.Function;
 
 import org.github.evenjn.knit.DiffPatch.Diff;
+import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.PastTheEndException;
+import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Tuple;
 
 /**
@@ -67,7 +68,7 @@ public class KnittingTuple<I> implements
 
 	public Iterable<Bi<I, I>> diff( Tuple<I> other ) {
 		return ( ) -> KnittingCursor.wrap( new DiffIterator<I>( this, other ) )
-				.once( ).iterator( );
+				.asIterator( );
 	}
 
 	/*
@@ -127,16 +128,16 @@ public class KnittingTuple<I> implements
 
 			@Override
 			public I next( )
-					throws PastTheEndException {
+					throws EndOfCursorException {
 				if ( i >= size )
-					throw PastTheEndException.neo;
+					throw EndOfCursorException.neo();
 				return wrapped.get( i++ );
 			}
 		};
 	}
 
 	public KnittingCursable<I> asCursable( ) {
-		return KnittingCursable.wrap( x -> pull( ) );
+		return KnittingCursable.wrap( h -> pull( ) );
 	}
 
 	public KnittingCursor<I> asCursor( ) {

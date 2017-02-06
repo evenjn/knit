@@ -78,12 +78,15 @@ public class compiler_check_override {
 	}
 
 	public static void main( String[] args ) {
-		KnittingCursable<String> cursable = KnittingCursable.on(  );
+		// Iterable<String> strings = new Vector<String>();
+		KnittingCursable<String> cursable = KnittingCursable.on( );
 
 		cursable.map( function );
 		cursable.filter( predicate );
 		cursable.skipmap( skipmap );
 		cursable.skipmap( skipmaph );
+		// cursable.flatmap( x->args );
+		// cursable.flatmap( x->strings );
 
 		cursable.map( x -> x.substring( 1 ) );
 		cursable.filter( x -> x.isEmpty( ) );
@@ -94,8 +97,9 @@ public class compiler_check_override {
 		Function<Hook, Consumer<Object>> ff2 = null;
 
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<String> pull = KnittingCursor.wrap(cursable.pull( hook ));
-			pull.tap( System.out::println ).consume( );
+			KnittingCursor<String> pull =
+					KnittingCursor.wrap( cursable.pull( hook ) );
+			pull.tap( System.out::println ).roll( );
 			pull.consume( ff1 );
 			pull.consume( ff2 );
 		}
