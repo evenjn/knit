@@ -11,9 +11,8 @@
  * 
  * <ul>
  * <li>{@link org.github.evenjn.knit.BasicAutoHook BasicAutoHook}</li>
- * <li>{@link org.github.evenjn.knit.Bi Bi}</li>
+ * <li>{@link org.github.evenjn.knit.Bik Bik}</li>
  * <li>{@link org.github.evenjn.knit.DebuggingAutoHook DebuggingAutoHook}</li>
- * <li>{@link org.github.evenjn.knit.Filter Filter}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursable KnittingCursable}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursor KnittingCursor}</li>
  * <li>{@link org.github.evenjn.knit.KnittingTuple KnittingTuple}</li>

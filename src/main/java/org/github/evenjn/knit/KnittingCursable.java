@@ -28,40 +28,40 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.github.evenjn.yarn.ArrayMap;
-import org.github.evenjn.yarn.ArrayUnfoldFactory;
+import org.github.evenjn.yarn.ArrayPurlFactory;
 import org.github.evenjn.yarn.AutoHook;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
 import org.github.evenjn.yarn.CursableMapH;
-import org.github.evenjn.yarn.CursableUnfoldFactory;
-import org.github.evenjn.yarn.CursableUnfoldHFactory;
+import org.github.evenjn.yarn.CursablePurlFactory;
+import org.github.evenjn.yarn.CursablePurlHFactory;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMapH;
-import org.github.evenjn.yarn.CursorUnfoldFactory;
-import org.github.evenjn.yarn.CursorUnfoldHFactory;
+import org.github.evenjn.yarn.CursorPurlFactory;
+import org.github.evenjn.yarn.CursorPurlHFactory;
 import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
 import org.github.evenjn.yarn.IterableMapH;
-import org.github.evenjn.yarn.IterableUnfoldFactory;
-import org.github.evenjn.yarn.IterableUnfoldHFactory;
+import org.github.evenjn.yarn.IterablePurlFactory;
+import org.github.evenjn.yarn.IterablePurlHFactory;
 import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorMapH;
-import org.github.evenjn.yarn.IteratorUnfoldFactory;
-import org.github.evenjn.yarn.IteratorUnfoldHFactory;
-import org.github.evenjn.yarn.OptionFoldFactory;
-import org.github.evenjn.yarn.OptionFoldHFactory;
+import org.github.evenjn.yarn.IteratorPurlFactory;
+import org.github.evenjn.yarn.IteratorPurlHFactory;
 import org.github.evenjn.yarn.OptionMap;
 import org.github.evenjn.yarn.OptionMapH;
+import org.github.evenjn.yarn.OptionalPurlFactory;
+import org.github.evenjn.yarn.OptionalPurlHFactory;
 import org.github.evenjn.yarn.SkipFoldFactory;
 import org.github.evenjn.yarn.SkipFoldHFactory;
 import org.github.evenjn.yarn.SkipMap;
 import org.github.evenjn.yarn.SkipMapH;
 import org.github.evenjn.yarn.StreamMapH;
-import org.github.evenjn.yarn.StreamUnfoldHFactory;
+import org.github.evenjn.yarn.StreamPurlHFactory;
 import org.github.evenjn.yarn.Tuple;
 /**
  * 
@@ -92,13 +92,13 @@ public class KnittingCursable<I> implements
 	 * @return A view of the concatenation of the argument cursable after this cursable.
 	 * @since 1.0
 	 */
-	public KnittingCursable<I> chain( final Cursable<I> tail ) {
+	public KnittingCursable<I> append( final Cursable<? extends I> tail ) {
 		KnittingCursable<I> outer_cursable = this;
 		Cursable<I> result = new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return outer_cursable.pull( hook ).chain( tail.pull( hook ) );
+				return outer_cursable.pull( hook ).append( tail.pull( hook ) );
 			}
 		};
 		return wrap( result );
@@ -459,28 +459,48 @@ public class KnittingCursable<I> implements
 		}
 	}
 
-	public <O> KnittingCursable<O> optionfold(
-			OptionFoldHFactory<? super I, O> factory )
+	/**
+	 * Returns a view of the concatenation of the argument cursable after this cursable.
+	 * 
+	 * @param tail
+	 *          The cursor to concatenate after this.
+	 * @return A view of the concatenation of the argument cursable after this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> prepend( final Cursable<? extends I> head ) {
+		KnittingCursable<I> outer_cursable = this;
+		Cursable<I> result = new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return outer_cursable.pull( hook ).prepend( head.pull( hook ) );
+			}
+		};
+		return wrap( result );
+	}
+
+	public <O> KnittingCursable<O> purlOptional(
+			OptionalPurlHFactory<? super I, O> factory )
 			throws IllegalStateException {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).optionfold( hook,
-						factory.create( ) );
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlOptional( hook,
+						factory.get( ) );
 			}
 		} );
 	}
 
-	public <O> KnittingCursable<O> optionfold(
-			OptionFoldFactory<? super I, O> factory )
+	public <O> KnittingCursable<O> purlOptional(
+			OptionalPurlFactory<? super I, O> factory )
 			throws IllegalStateException {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).optionfold(
-						factory.create( ) );
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlOptional(
+						factory.get( ) );
 			}
 		} );
 	}
@@ -535,7 +555,7 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public <O> KnittingCursable<O> skipmap(
+	<O> KnittingCursable<O> skipmap(
 			SkipMap<? super I, O> skipmap ) {
 		return wrap( new Cursable<O>( ) {
 
@@ -547,7 +567,7 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public <O> KnittingCursable<O> skipmap(
+	<O> KnittingCursable<O> skipmap(
 			SkipMapH<? super I, O> skipmap ) {
 		return wrap( new Cursable<O>( ) {
 
@@ -559,8 +579,8 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public KnittingCursable<KnittingCursor<I>> splat( Predicate<I> predicate ) {
-		return KnittingCursable.wrap( h -> pull( h ).splat( predicate ) );
+	public KnittingCursable<KnittingCursor<I>> crop( Predicate<I> predicate ) {
+		return KnittingCursable.wrap( h -> pull( h ).crop( predicate ) );
 	}
 
 
@@ -665,125 +685,122 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldArray( ArrayUnfoldFactory<? super I, O> factory ) {
+			purlArray( ArrayPurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldArray( factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlArray( factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldCursable( CursableUnfoldFactory<? super I, O> factory ) {
+			purlCursable( CursablePurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldCursable( factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlCursable( factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldCursable( CursableUnfoldHFactory<? super I, O> factory ) {
+			purlCursable( CursablePurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldCursable( hook,
-						factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlCursable( hook, factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldCursor( CursorUnfoldFactory<? super I, O> factory ) {
+			purlCursor( CursorPurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldCursor( factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlCursor( factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldCursor( CursorUnfoldHFactory<? super I, O> factory ) {
+			purlCursor( CursorPurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
 				return KnittingCursor.wrap( pull )
-						.unfoldCursor( hook, factory.create( ) );
+						.purlCursor( hook, factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterable( IterableUnfoldFactory<? super I, O> factory ) {
+			unfoldIterable( IterablePurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldIterable( factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlIterable( factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterable( IterableUnfoldHFactory<? super I, O> factory ) {
+			unfoldIterable( IterablePurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldIterable( hook,
-						factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlIterable( hook, factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterator( IteratorUnfoldFactory<? super I, O> factory ) {
+			unfoldIterator( IteratorPurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldIterator( factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlIterator( factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterator( IteratorUnfoldHFactory<? super I, O> factory ) {
+			unfoldIterator( IteratorPurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).unfoldIterator( hook,
-						factory.create( ) );
+				return KnittingCursor.wrap( pull ).purlIterator( hook, factory.get( ) );
 			}
 		} );
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldStream( StreamUnfoldHFactory<? super I, O> factory ) {
+			purlStream( StreamPurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).unfoldStream(
-						hook, factory.create( ) );
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlStream(
+						hook, factory.get( ) );
 			}
 		} );
 	}

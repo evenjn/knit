@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,34 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.SkipException;
+import org.github.evenjn.yarn.Cursor;
+import org.github.evenjn.yarn.EndOfCursorException;
 
-public class Filter {
+class ConcatenateCursor<I> implements
+		Cursor<I> {
 
-	public static <K> K pass( boolean condition, K result )
-			throws SkipException {
-		if ( condition ) {
-			return result;
-		}
-		throw SkipException.neo;
+	private final Cursor<? extends I> head;
+	private final Cursor<? extends I> tail;
+	
+	private boolean in_head = true;
+
+	public ConcatenateCursor(Cursor<? extends I> head, Cursor<? extends I> tail) {
+		this.head = head;
+		this.tail = tail;
 	}
 
-	public static <K> K block( boolean condition, K result )
-			throws SkipException {
-		if ( !condition ) {
-			return result;
+	@Override
+	public I next( )
+			throws EndOfCursorException {
+		if ( in_head ) {
+			try {
+				return head.next( );
+			}
+			catch ( EndOfCursorException e ) {
+				in_head = false;
+			}
 		}
-		throw SkipException.neo;
+		return tail.next( );
 	}
+
 }

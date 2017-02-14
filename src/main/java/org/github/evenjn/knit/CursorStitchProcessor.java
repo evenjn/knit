@@ -18,7 +18,7 @@
 package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.CursorUnfoldH;
+import org.github.evenjn.yarn.CursorPurlH;
 import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Hook;
 
@@ -27,7 +27,7 @@ class CursorStitchProcessor<I, O> implements
 
 	private final Cursor<? extends I> cursor;
 
-	private final CursorUnfoldH<? super I, O> knitting;
+	private final CursorPurlH<? super I, O> knitting;
 
 	private BasicAutoHook internal_hook;
 
@@ -35,7 +35,7 @@ class CursorStitchProcessor<I, O> implements
 
 	CursorStitchProcessor(
 			Cursor<I> cursor,
-			CursorUnfoldH<? super I, O> knitting) {
+			CursorPurlH<? super I, O> knitting) {
 		this.cursor = cursor;
 		this.knitting = knitting;
 		this.use_internal_hook = false;
@@ -44,7 +44,7 @@ class CursorStitchProcessor<I, O> implements
 	CursorStitchProcessor(
 			Hook hook,
 			Cursor<I> cursor,
-			CursorUnfoldH<? super I, O> knitting) {
+			CursorPurlH<? super I, O> knitting) {
 		this.use_internal_hook = true;
 		hook.hook( new AutoCloseable( ) {
 
