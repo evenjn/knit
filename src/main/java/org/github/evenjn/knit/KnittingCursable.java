@@ -20,7 +20,6 @@ package org.github.evenjn.knit;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.Vector;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -56,19 +55,48 @@ import org.github.evenjn.yarn.OptionMap;
 import org.github.evenjn.yarn.OptionMapH;
 import org.github.evenjn.yarn.OptionalPurlFactory;
 import org.github.evenjn.yarn.OptionalPurlHFactory;
-import org.github.evenjn.yarn.SkipFoldFactory;
-import org.github.evenjn.yarn.SkipFoldHFactory;
-import org.github.evenjn.yarn.SkipMap;
-import org.github.evenjn.yarn.SkipMapH;
 import org.github.evenjn.yarn.StreamMapH;
 import org.github.evenjn.yarn.StreamPurlHFactory;
-import org.github.evenjn.yarn.Tuple;
 /**
  * 
- * <h1>KnittingCursor</h1>
+ * <h1>KnittingCursable</h1>
+ * 
+ * <p>
+ * A {@code KnittingCursable} wraps a cursable and provides utility methods to
+ * access its contents.
+ * </p>
+ * 
+ * <h2>Methods of a KnittingCursor</h2>
+ * 
+ * <p>
+ * Non-static public methods of {@code KnittingCursor} fall into one of the
+ * following three categories:
+ * </p>
+ * 
+ * <ul>
+ * <li>Object methods (inherited from {@link java.lang.Object Object})</li>
+ * <li>Terminal methods (listed below)</li>
+ * <li>Transformation methods (listed below)</li>
+ * </ul>
  *
+ * <p>
+ * Terminal methods repeatedly invoke the wrapped cursor's
+ * {@link org.github.evenjn.yarn.Cursor#next() next()} until the end is reached.
+ * The following methods are terminal:
+ * </p>
+ * <ul>
+ * <li>{@link #collect(Collection)}</li>
+ * <li>{@link #consume(Function)}</li>
+ * <li>{@link #one()}</li>
+ * <li>{@link #optionalOne()}</li>
+ * <li>{@link #reduce(Object, BiFunction)}</li>
+ * <li>{@link #roll()}</li>
+ * </ul>
+ * 
  * @param <I>
  *          The type of elements accessible via this cursable.
+ * @see org.github.evenjn.knit
+ * @since 1.0
  */
 public class KnittingCursable<I> implements
 		Cursable<I> {
@@ -120,7 +148,7 @@ public class KnittingCursable<I> implements
 			Function<Hook, K> hook_consumer ) {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			K consumer = hook_consumer.apply( hook );
-			pull( hook ).tap( consumer ).roll( );
+			pull( hook ).peek( consumer ).roll( );
 		}
 	}
 
@@ -422,11 +450,13 @@ public class KnittingCursable<I> implements
 	}
 
 	/*
+	 * returned object may be dead when cursor does not guarantee objects
+	 * survive next() and/or the closing of hook. 
 	 * throws IllegalStateException when it not the case that there is exactly one
 	 * element.
 	 */
-	public I one( Hook hook ) {
-		try {
+	public I one( ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<I> pulled = pull( hook );
 			I result = pulled.next( );
 			if ( pulled.hasNext( ) ) {
@@ -444,9 +474,11 @@ public class KnittingCursable<I> implements
 	 * 
 	 * returns an empty optionsl when it not the case that there is exactly one
 	 * element.
+	 * returned object may be dead when cursor does not guarantee objects
+	 * survive next() and/or the closing of hook.
 	 */
-	public Optional<I> optionalOne( Hook hook ) {
-		try {
+	public Optional<I> optionalOne( ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<I> pulled = pull( hook );
 			I result = pulled.next( );
 			if ( pulled.hasNext( ) ) {
@@ -457,6 +489,17 @@ public class KnittingCursable<I> implements
 		catch ( EndOfCursorException e ) {
 			return Optional.empty( );
 		}
+	}
+
+	public KnittingCursable<I> peek( Consumer<? super I> consumer ) {
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return new TapCursor<I>( wrapped.pull( hook ), consumer );
+			}
+
+		} );
 	}
 
 	/**
@@ -529,54 +572,6 @@ public class KnittingCursable<I> implements
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			return pull( hook ).roll( );
 		}
-	}
-
-	public <O> KnittingCursable<O>
-			skipfold( SkipFoldFactory<? super I, O> factory ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).skipfold(
-						factory.create( ) );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O>
-			skipfold( SkipFoldHFactory<? super I, O> factory ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).skipfold( hook,
-						factory.create( ) );
-			}
-		} );
-	}
-
-	<O> KnittingCursable<O> skipmap(
-			SkipMap<? super I, O> skipmap ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).skipmap( skipmap );
-			}
-		} );
-	}
-
-	<O> KnittingCursable<O> skipmap(
-			SkipMapH<? super I, O> skipmap ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				Cursor<I> pull = wrapped.pull( hook );
-				return KnittingCursor.wrap( pull ).skipmap( hook, skipmap );
-			}
-		} );
 	}
 
 	public KnittingCursable<KnittingCursor<I>> crop( Predicate<I> predicate ) {
@@ -673,17 +668,6 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public KnittingCursable<I> tap( Consumer<? super I> consumer ) {
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return new TapCursor<I>( wrapped.pull( hook ), consumer );
-			}
-
-		} );
-	}
-
 	public <O> KnittingCursable<O>
 			purlArray( ArrayPurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
@@ -746,7 +730,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterable( IterablePurlFactory<? super I, O> factory ) {
+			purlIterable( IterablePurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -758,7 +742,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterable( IterablePurlHFactory<? super I, O> factory ) {
+			purlIterable( IterablePurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -770,7 +754,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterator( IteratorPurlFactory<? super I, O> factory ) {
+			purlIterator( IteratorPurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -782,7 +766,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public <O> KnittingCursable<O>
-			unfoldIterator( IteratorPurlHFactory<? super I, O> factory ) {
+			purlIterator( IteratorPurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -834,39 +818,6 @@ public class KnittingCursable<I> implements
 				}
 			} );
 
-	/*
-	 * Stops as soon as one of the sources is depleted.
-	 * 
-	 * @return an iterator that pulls the next element from the i-th iterator,
-	 *         where i is the next integer pulled by selector.
-	 */
-	public static <T> KnittingCursable<T> blend( Cursable<Integer> selector,
-			final Tuple<Cursable<T>> sources ) {
-		return wrap( new Cursable<T>( ) {
-
-			@Override
-			public Cursor<T> pull( Hook hook ) {
-				Cursor<Integer> selector_pulled = selector.pull( hook );
-				Vector<Cursor<T>> sources_vector = new Vector<>( );
-				int size = sources.size( );
-				for ( int i = 0; i < size; i++ ) {
-					sources_vector.add( sources.get( i ).pull( hook ) );
-				}
-
-				Cursor<T> result = new Cursor<T>( ) {
-
-					@Override
-					public T next( )
-							throws EndOfCursorException {
-						Integer index = selector_pulled.next( );
-						Cursor<T> iterator = sources_vector.get( index );
-						return iterator.next( );
-					}
-				};
-				return result;
-			}
-		} );
-	}
 
 	@SafeVarargs
 	public static <K> KnittingCursable<K> on( K ... elements ) {
@@ -892,7 +843,7 @@ public class KnittingCursable<I> implements
 	}
 
 	public static <K> KnittingCursable<K> wrap( K[] array ) {
-		return wrap( new ArrayItterable<K>( array ) );
+		return wrap( new ArrayCursable<K>( array ) );
 	}
 	
 	public boolean contentEquals( Cursable<?> other ) {

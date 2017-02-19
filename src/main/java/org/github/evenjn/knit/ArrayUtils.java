@@ -47,12 +47,12 @@ class ArrayCursor<T> implements
 	}
 }
 
-class ArrayItterable<T> implements
+class ArrayCursable<T> implements
 		Cursable<T> {
 
 	private T[] array;
 
-	public ArrayItterable(T[] array) {
+	public ArrayCursable(T[] array) {
 		this.array = array;
 	}
 

@@ -23,9 +23,6 @@ import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.AutoHook;
 import org.github.evenjn.yarn.Hook;
-import org.github.evenjn.yarn.SkipException;
-import org.github.evenjn.yarn.SkipMap;
-import org.github.evenjn.yarn.SkipMapH;
 
 public class compiler_check_override {
 
@@ -47,51 +44,17 @@ public class compiler_check_override {
 				}
 			};
 
-	private static final SkipMap<String, Integer> skipmap =
-			new SkipMap<String, Integer>( ) {
-
-				@Override
-				public Integer get( String object )
-						throws SkipException {
-					return 1;
-				}
-			};
-
-	private static final SkipMapH<String, Integer> skipmaph =
-			new SkipMapH<String, Integer>( ) {
-
-				@Override
-				public Integer get( Hook hook, String object )
-						throws SkipException {
-					return 2;
-				}
-			};
-
-	public static <K> K skip( K object )
-			throws SkipException {
-		throw SkipException.neo;
-	}
-
-	public static <K> K skip( Hook hook, K object )
-			throws SkipException {
-		throw SkipException.neo;
-	}
-
 	public static void main( String[] args ) {
 		// Iterable<String> strings = new Vector<String>();
 		KnittingCursable<String> cursable = KnittingCursable.on( );
 
 		cursable.map( function );
 		cursable.filter( predicate );
-		cursable.skipmap( skipmap );
-		cursable.skipmap( skipmaph );
 		// cursable.flatmap( x->args );
 		// cursable.flatmap( x->strings );
 
 		cursable.map( x -> x.substring( 1 ) );
 		cursable.filter( x -> x.isEmpty( ) );
-		cursable.skipmap( x -> skip( x ) );
-		cursable.skipmap( ( h, x ) -> skip( h, x ) );
 
 		Function<Hook, Consumer<String>> ff1 = null;
 		Function<Hook, Consumer<Object>> ff2 = null;
@@ -99,7 +62,7 @@ public class compiler_check_override {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<String> pull =
 					KnittingCursor.wrap( cursable.pull( hook ) );
-			pull.tap( System.out::println ).roll( );
+			pull.peek( System.out::println ).roll( );
 			pull.consume( ff1 );
 			pull.consume( ff2 );
 		}

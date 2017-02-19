@@ -6,7 +6,7 @@ public class test {
 
 		KnittingCursable.on( 1, 2, 3 )
 				.filter( x -> x - 2 > 0 )
-				.tap( System.out::println )
+				.peek( System.out::println )
 				.numbered( )
 				.roll( );
 
