@@ -502,14 +502,6 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	/**
-	 * Returns a view of the concatenation of the argument cursable after this cursable.
-	 * 
-	 * @param tail
-	 *          The cursor to concatenate after this.
-	 * @return A view of the concatenation of the argument cursable after this cursable.
-	 * @since 1.0
-	 */
 	public KnittingCursable<I> prepend( final Cursable<? extends I> head ) {
 		KnittingCursable<I> outer_cursable = this;
 		Cursable<I> result = new Cursable<I>( ) {

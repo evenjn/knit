@@ -137,7 +137,7 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #flatmap(CursorMap)}</li>
  * <li>{@link #flatmap(Hook, CursorMapH)}</li>
  * <li>{@link #flatmapArray(ArrayMap)}</li>
- * <li>{@link #flatmapCursable(CursableMap)}</li>
+ * <li>{@link #flatmapCursable(Hook, CursableMap)}</li>
  * <li>{@link #flatmapCursable(Hook, CursableMapH)}</li>
  * <li>{@link #flatmapCursor(CursorMap)}</li>
  * <li>{@link #flatmapCursor(Hook, CursorMapH)}</li>
@@ -147,6 +147,7 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #flatmapIterator(Hook, IteratorMapH)}</li>
  * <li>{@link #flatmapOptional(OptionMap)}</li>
  * <li>{@link #flatmapOptional(Hook, OptionMapH)}</li>
+ * <li>{@link #flatmapStream(Hook, StreamMapH)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -521,7 +522,7 @@ public class KnittingCursor<I> implements
 	 * This is a transformation method.
 	 * </p>
 	 * 
-	 * @param predicate
+	 * @param stateless_predicate
 	 *          A stateless system that selects elements to show.
 	 * @return A view showing only the elements which satisfy the argument
 	 *         {@code stateless_predicate} in this cursor.
@@ -752,8 +753,6 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the cursors returned by the argument
 	 *          {@code cursor_map}.
-	 * @param hook
-	 *          A hook.
 	 * @param cursor_map
 	 *          A stateless function that returns cursors.
 	 * @return A complex view.
@@ -1056,7 +1055,7 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the optionals returned by the argument
 	 *          {@code optional_map}.
-	 * @param iterator_map
+	 * @param optional_map
 	 *          A stateless function that returns optionals.
 	 * @return A complex view.
 	 * @throws IllegalStateException
@@ -1586,10 +1585,10 @@ public class KnittingCursor<I> implements
 	 * <p>
 	 * For each element {@code E} of this cursor, the view shows elements in the
 	 * cursor {@code C} returned when invoking
-	 * {@link org.github.evenjn.yarn.CursorPurl#next(I, Hook) next(I, Hook)} on
+	 * {@link org.github.evenjn.yarn.CursorPurl#next(Object) next(Object)} on
 	 * the argument {@code cursor_purl} with argument {@code E}. Moreover, the
 	 * view also includes all the elements in the cursor {@code C} returned when
-	 * invoking {@link org.github.evenjn.yarn.CursorPurl#end(Hook) end(Hook)} on
+	 * invoking {@link org.github.evenjn.yarn.CursorPurl#end() end()} on
 	 * the argument {@code cursor_purl} at the end of this cursor.
 	 * </p>
 	 * 
@@ -1622,7 +1621,7 @@ public class KnittingCursor<I> implements
 	 * <p>
 	 * For each element {@code E} of this cursor, the view shows elements in the
 	 * cursor {@code C} returned when invoking {@code cursor_purl_h}
-	 * {@link org.github.evenjn.yarn.CursorPurlH#next(I, Hook) next(I, Hook)} with
+	 * {@link org.github.evenjn.yarn.CursorPurlH#next(Hook, Object) next(Hook, Object)} with
 	 * argument {@code E} and a temporary {@link org.github.evenjn.yarn.Hook
 	 * hook}. Moreover, the view also includes all the elements in the cursor
 	 * {@code C} returned when invoking {@code cursor_purl_h}
@@ -1833,7 +1832,7 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * An alias of {@link #purl(Hook, CursorPurl)}.
+	 * An alias of {@link #purl(Hook, CursorPurlH)}.
 	 * </p>
 	 * 
 	 * <p>
@@ -2412,7 +2411,7 @@ public class KnittingCursor<I> implements
 	 * 
 	 * @param <K>
 	 *          The type of elements in the argument stream.
-	 * @param iterator
+	 * @param stream
 	 *          A stream of elements.
 	 * @return A view of the elements in the argument stream.
 	 * @since 1.0
