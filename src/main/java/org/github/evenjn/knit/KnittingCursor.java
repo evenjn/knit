@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Irevisan
+ * Copyright 2017 Marco Irevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -564,7 +564,6 @@ public class KnittingCursor<I> implements
 	public <O> KnittingCursor<O> flatmap(
 			CursorMap<? super I, O> cursor_map )
 			throws IllegalStateException {
-		lock( );
 		return flatmapCursor( cursor_map );
 	}
 
@@ -607,7 +606,6 @@ public class KnittingCursor<I> implements
 			Hook hook,
 			CursorMapH<? super I, O> cursor_map_h )
 			throws IllegalStateException {
-		lock( );
 		return flatmapCursor( hook, cursor_map_h );
 	}
 
@@ -1214,7 +1212,6 @@ public class KnittingCursor<I> implements
 	public KnittingCursor<I> head( int hide, int show )
 			throws IllegalStateException {
 		lock( );
-		locked = true;
 		int final_show = show < 0 ? 0 : show;
 		int final_hide = hide < 0 ? 0 : hide;
 		return wrap( Subcursor.sub( wrapped, final_hide, final_show ) );
@@ -1244,7 +1241,6 @@ public class KnittingCursor<I> implements
 	public KnittingCursor<I> headless( int hide )
 			throws IllegalStateException {
 		lock( );
-		locked = true;
 		int final_hide = hide < 0 ? 0 : hide;
 		return wrap( Subcursor.skip( wrapped, final_hide ) );
 	}
@@ -1273,7 +1269,6 @@ public class KnittingCursor<I> implements
 	public <O> KnittingCursor<O> map( Function<? super I, O> stateless_function )
 			throws IllegalStateException {
 		lock( );
-		locked = true;
 		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
 
 			@Override
@@ -1326,7 +1321,6 @@ public class KnittingCursor<I> implements
 			map( Hook hook, FunctionH<? super I, O> stateless_function_h )
 					throws IllegalStateException {
 		lock( );
-		locked = true;
 		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
 
 			@Override

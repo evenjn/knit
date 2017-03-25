@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.github.evenjn.yarn.Tuple;
 class DiffIterator<K> implements
 		Cursor<Bi<K, K>> {
 
-	private final KnittingCursor<Diff> kd;
+	private final KnittingCursor<Diff<K>> kd;
 
 	private final KnittingCursor<K> ka;
 
@@ -37,14 +37,14 @@ class DiffIterator<K> implements
 	public DiffIterator(Tuple<K> a, Tuple<K> b) {
 		ka = KnittingCursor.wrap( a );
 		kb = KnittingCursor.wrap( b );
-		DiffPatch dmp = new DiffPatch( );
-		LinkedList<Diff> diffs =
+		DiffPatch<K> dmp = new DiffPatch<K>( );
+		LinkedList<Diff<K>> diffs =
 				dmp.diff_main( KnittingTuple.wrap( a ).map( x -> x ), KnittingTuple
 						.wrap( b ).map( x -> x ) );
 		kd = KnittingCursor.wrap( diffs.iterator( ) );
 	}
 
-	private Diff current = null;
+	private Diff<K> current = null;
 
 	private Bik<K, K> tray = Bik.nu( null, null );
 

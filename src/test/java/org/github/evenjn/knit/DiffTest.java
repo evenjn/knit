@@ -46,7 +46,7 @@ import junit.framework.TestCase;
 public class DiffTest
 		extends TestCase {
 
-	private DiffPatch dmp;
+	private DiffPatch<Integer> dmp;
 
 	private DiffPatch.Operation DELETE = DiffPatch.Operation.DELETE;
 
@@ -56,7 +56,7 @@ public class DiffTest
 
 	protected void setUp( ) {
 		// Create an instance of the DiffMatchPatch object.
-		dmp = new DiffPatch( );
+		dmp = new DiffPatch<Integer>( );
 	}
 
 	// DIFF TEST FUNCTIONS
@@ -155,233 +155,233 @@ public class DiffTest
 
 	public void testDiffCleanupMerge( ) {
 		// Cleanup a messy diff.
-		LinkedList<Diff> diffs = diffList( );
+		LinkedList<Diff<Integer>> diffs = diffList( );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals( "diff_cleanupMerge: Null case.", diffList( ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "b" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
 						INSERT, "c" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals(
 				"diff_cleanupMerge: No change case.",
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "b" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
 						INSERT, "c" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( EQUAL, "b" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( EQUAL, "b" ), Diff.fromText(
 						EQUAL, "c" ) );
 		dmp.diff_cleanupMerge( diffs );
-		assertEquals( "diff_cleanupMerge: Merge equalities.", diffList( new Diff(
+		assertEquals( "diff_cleanupMerge: Merge equalities.", diffList( Diff.fromText(
 				EQUAL, "abc" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "a" ), new Diff( DELETE, "b" ), new Diff(
+				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
 						DELETE, "c" ) );
 		dmp.diff_cleanupMerge( diffs );
-		assertEquals( "diff_cleanupMerge: Merge deletions.", diffList( new Diff(
+		assertEquals( "diff_cleanupMerge: Merge deletions.", diffList( Diff.fromText(
 				DELETE, "abc" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( INSERT, "a" ), new Diff( INSERT, "b" ), new Diff(
+				diffList( Diff.fromText( INSERT, "a" ), Diff.fromText( INSERT, "b" ), Diff.fromText(
 						INSERT, "c" ) );
 		dmp.diff_cleanupMerge( diffs );
-		assertEquals( "diff_cleanupMerge: Merge insertions.", diffList( new Diff(
+		assertEquals( "diff_cleanupMerge: Merge insertions.", diffList( Diff.fromText(
 				INSERT, "abc" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "a" ), new Diff( INSERT, "b" ), new Diff(
-						DELETE, "c" ), new Diff( INSERT, "d" ), new Diff( EQUAL, "e" ),
-						new Diff( EQUAL, "f" ) );
+				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "b" ), Diff.fromText(
+						DELETE, "c" ), Diff.fromText( INSERT, "d" ), Diff.fromText( EQUAL, "e" ),
+						Diff.fromText( EQUAL, "f" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals(
 				"diff_cleanupMerge: Merge interweave.",
-				diffList( new Diff( DELETE, "ac" ), new Diff( INSERT, "bd" ), new Diff(
+				diffList( Diff.fromText( DELETE, "ac" ), Diff.fromText( INSERT, "bd" ), Diff.fromText(
 						EQUAL, "ef" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "a" ), new Diff( INSERT, "abc" ), new Diff(
+				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "abc" ), Diff.fromText(
 						DELETE, "dc" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals(
 				"diff_cleanupMerge: Prefix and suffix detection.",
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "d" ), new Diff(
-						INSERT, "b" ), new Diff( EQUAL, "c" ) ), diffs );
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "d" ), Diff.fromText(
+						INSERT, "b" ), Diff.fromText( EQUAL, "c" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "x" ), new Diff( DELETE, "a" ), new Diff(
-						INSERT, "abc" ), new Diff( DELETE, "dc" ), new Diff( EQUAL, "y" ) );
+				diffList( Diff.fromText( EQUAL, "x" ), Diff.fromText( DELETE, "a" ), Diff.fromText(
+						INSERT, "abc" ), Diff.fromText( DELETE, "dc" ), Diff.fromText( EQUAL, "y" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals(
 				"diff_cleanupMerge: Prefix and suffix detection with equalities.",
-				diffList( new Diff( EQUAL, "xa" ), new Diff( DELETE, "d" ), new Diff(
-						INSERT, "b" ), new Diff( EQUAL, "cy" ) ), diffs );
+				diffList( Diff.fromText( EQUAL, "xa" ), Diff.fromText( DELETE, "d" ), Diff.fromText(
+						INSERT, "b" ), Diff.fromText( EQUAL, "cy" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( INSERT, "ba" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( INSERT, "ba" ), Diff.fromText(
 						EQUAL, "c" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals( "diff_cleanupMerge: Slide edit left.",
-				diffList( new Diff( INSERT, "ab" ), new Diff( EQUAL, "ac" ) ), diffs );
+				diffList( Diff.fromText( INSERT, "ab" ), Diff.fromText( EQUAL, "ac" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "c" ), new Diff( INSERT, "ab" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "c" ), Diff.fromText( INSERT, "ab" ), Diff.fromText(
 						EQUAL, "a" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals( "diff_cleanupMerge: Slide edit right.",
-				diffList( new Diff( EQUAL, "ca" ), new Diff( INSERT, "ba" ) ), diffs );
+				diffList( Diff.fromText( EQUAL, "ca" ), Diff.fromText( INSERT, "ba" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "b" ), new Diff(
-						EQUAL, "c" ), new Diff( DELETE, "ac" ), new Diff( EQUAL, "x" ) );
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
+						EQUAL, "c" ), Diff.fromText( DELETE, "ac" ), Diff.fromText( EQUAL, "x" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals( "diff_cleanupMerge: Slide edit left recursive.",
-				diffList( new Diff( DELETE, "abc" ), new Diff( EQUAL, "acx" ) ), diffs );
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( EQUAL, "acx" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( EQUAL, "x" ), new Diff( DELETE, "ca" ), new Diff(
-						EQUAL, "c" ), new Diff( DELETE, "b" ), new Diff( EQUAL, "a" ) );
+				diffList( Diff.fromText( EQUAL, "x" ), Diff.fromText( DELETE, "ca" ), Diff.fromText(
+						EQUAL, "c" ), Diff.fromText( DELETE, "b" ), Diff.fromText( EQUAL, "a" ) );
 		dmp.diff_cleanupMerge( diffs );
 		assertEquals( "diff_cleanupMerge: Slide edit right recursive.",
-				diffList( new Diff( EQUAL, "xca" ), new Diff( DELETE, "cba" ) ), diffs );
+				diffList( Diff.fromText( EQUAL, "xca" ), Diff.fromText( DELETE, "cba" ) ), diffs );
 	}
 
 	public void testDiffCleanupSemantic( ) {
 		// Cleanup semantically trivial equalities.
-		LinkedList<Diff> diffs = diffList( );
+		LinkedList<Diff<Integer>> diffs = diffList( );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals( "diff_cleanupSemantic: Null case.", diffList( ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "cd" ), new Diff(
-						EQUAL, "12" ), new Diff( DELETE, "e" ) );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "cd" ), Diff.fromText(
+						EQUAL, "12" ), Diff.fromText( DELETE, "e" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals(
 				"diff_cleanupSemantic: No elimination #1.",
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "cd" ), new Diff(
-						EQUAL, "12" ), new Diff( DELETE, "e" ) ), diffs );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "cd" ), Diff.fromText(
+						EQUAL, "12" ), Diff.fromText( DELETE, "e" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "abc" ), new Diff( INSERT, "ABC" ),
-						new Diff( EQUAL, "1234" ), new Diff( DELETE, "wxyz" ) );
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "ABC" ),
+						Diff.fromText( EQUAL, "1234" ), Diff.fromText( DELETE, "wxyz" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals(
 				"diff_cleanupSemantic: No elimination #2.",
-				diffList( new Diff( DELETE, "abc" ), new Diff( INSERT, "ABC" ),
-						new Diff( EQUAL, "1234" ), new Diff( DELETE, "wxyz" ) ), diffs );
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "ABC" ),
+						Diff.fromText( EQUAL, "1234" ), Diff.fromText( DELETE, "wxyz" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "a" ), new Diff( EQUAL, "b" ), new Diff(
+				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( EQUAL, "b" ), Diff.fromText(
 						DELETE, "c" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals( "diff_cleanupSemantic: Simple elimination.",
-				diffList( new Diff( DELETE, "abc" ), new Diff( INSERT, "b" ) ), diffs );
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "b" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "ab" ), new Diff( EQUAL, "cd" ), new Diff(
-						DELETE, "e" ), new Diff( EQUAL, "f" ), new Diff( INSERT, "g" ) );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( EQUAL, "cd" ), Diff.fromText(
+						DELETE, "e" ), Diff.fromText( EQUAL, "f" ), Diff.fromText( INSERT, "g" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals( "diff_cleanupSemantic: Backpass elimination.",
-				diffList( new Diff( DELETE, "abcdef" ), new Diff( INSERT, "cdfg" ) ),
+				diffList( Diff.fromText( DELETE, "abcdef" ), Diff.fromText( INSERT, "cdfg" ) ),
 				diffs );
 
 		diffs =
-				diffList( new Diff( INSERT, "1" ), new Diff( EQUAL, "A" ), new Diff(
-						DELETE, "B" ), new Diff( INSERT, "2" ), new Diff( EQUAL, "_" ),
-						new Diff( INSERT, "1" ), new Diff( EQUAL, "A" ), new Diff( DELETE,
-								"B" ), new Diff( INSERT, "2" ) );
+				diffList( Diff.fromText( INSERT, "1" ), Diff.fromText( EQUAL, "A" ), Diff.fromText(
+						DELETE, "B" ), Diff.fromText( INSERT, "2" ), Diff.fromText( EQUAL, "_" ),
+						Diff.fromText( INSERT, "1" ), Diff.fromText( EQUAL, "A" ), Diff.fromText( DELETE,
+								"B" ), Diff.fromText( INSERT, "2" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals( "diff_cleanupSemantic: Multiple elimination.",
-				diffList( new Diff( DELETE, "AB_AB" ), new Diff( INSERT, "1A2_1A2" ) ),
+				diffList( Diff.fromText( DELETE, "AB_AB" ), Diff.fromText( INSERT, "1A2_1A2" ) ),
 				diffs );
 
-		diffs = diffList( new Diff( DELETE, "abcxx" ), new Diff( INSERT, "xxdef" ) );
+		diffs = diffList( Diff.fromText( DELETE, "abcxx" ), Diff.fromText( INSERT, "xxdef" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals( "diff_cleanupSemantic: No overlap elimination.",
-				diffList( new Diff( DELETE, "abcxx" ), new Diff( INSERT, "xxdef" ) ),
+				diffList( Diff.fromText( DELETE, "abcxx" ), Diff.fromText( INSERT, "xxdef" ) ),
 				diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "abcxxx" ), new Diff( INSERT, "xxxdef" ) );
+				diffList( Diff.fromText( DELETE, "abcxxx" ), Diff.fromText( INSERT, "xxxdef" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals(
 				"diff_cleanupSemantic: Overlap elimination.",
-				diffList( new Diff( DELETE, "abc" ), new Diff( EQUAL, "xxx" ),
-						new Diff( INSERT, "def" ) ), diffs );
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( EQUAL, "xxx" ),
+						Diff.fromText( INSERT, "def" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "xxxabc" ), new Diff( INSERT, "defxxx" ) );
+				diffList( Diff.fromText( DELETE, "xxxabc" ), Diff.fromText( INSERT, "defxxx" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals(
 				"diff_cleanupSemantic: Reverse overlap elimination.",
-				diffList( new Diff( INSERT, "def" ), new Diff( EQUAL, "xxx" ),
-						new Diff( DELETE, "abc" ) ), diffs );
+				diffList( Diff.fromText( INSERT, "def" ), Diff.fromText( EQUAL, "xxx" ),
+						Diff.fromText( DELETE, "abc" ) ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "abcd1212" ),
-						new Diff( INSERT, "1212efghi" ), new Diff( EQUAL, "----" ),
-						new Diff( DELETE, "A3" ), new Diff( INSERT, "3BC" ) );
+				diffList( Diff.fromText( DELETE, "abcd1212" ),
+						Diff.fromText( INSERT, "1212efghi" ), Diff.fromText( EQUAL, "----" ),
+						Diff.fromText( DELETE, "A3" ), Diff.fromText( INSERT, "3BC" ) );
 		dmp.diff_cleanupSemantic( diffs );
 		assertEquals(
 				"diff_cleanupSemantic: Two overlap eliminations.",
-				diffList( new Diff( DELETE, "abcd" ), new Diff( EQUAL, "1212" ),
-						new Diff( INSERT, "efghi" ), new Diff( EQUAL, "----" ), new Diff(
-								DELETE, "A" ), new Diff( EQUAL, "3" ), new Diff( INSERT, "BC" ) ),
+				diffList( Diff.fromText( DELETE, "abcd" ), Diff.fromText( EQUAL, "1212" ),
+						Diff.fromText( INSERT, "efghi" ), Diff.fromText( EQUAL, "----" ), Diff.fromText(
+								DELETE, "A" ), Diff.fromText( EQUAL, "3" ), Diff.fromText( INSERT, "BC" ) ),
 				diffs );
 	}
 
 	public void testDiffCleanupEfficiency( ) {
 		// Cleanup operationally trivial equalities.
 		dmp.Diff_EditCost = 4;
-		LinkedList<Diff> diffs = diffList( );
+		LinkedList<Diff<Integer>> diffs = diffList( );
 		dmp.diff_cleanupEfficiency( diffs );
 		assertEquals( "diff_cleanupEfficiency: Null case.", diffList( ), diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "12" ), new Diff(
-						EQUAL, "wxyz" ), new Diff( DELETE, "cd" ), new Diff( INSERT, "34" ) );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
+						EQUAL, "wxyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
 		dmp.diff_cleanupEfficiency( diffs );
 		assertEquals(
 				"diff_cleanupEfficiency: No elimination.",
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "12" ), new Diff(
-						EQUAL, "wxyz" ), new Diff( DELETE, "cd" ), new Diff( INSERT, "34" ) ),
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
+						EQUAL, "wxyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) ),
 				diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "12" ), new Diff(
-						EQUAL, "xyz" ), new Diff( DELETE, "cd" ), new Diff( INSERT, "34" ) );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
+						EQUAL, "xyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
 		dmp.diff_cleanupEfficiency( diffs );
 		assertEquals(
 				"diff_cleanupEfficiency: Four-edit elimination.",
-				diffList( new Diff( DELETE, "abxyzcd" ), new Diff( INSERT, "12xyz34" ) ),
+				diffList( Diff.fromText( DELETE, "abxyzcd" ), Diff.fromText( INSERT, "12xyz34" ) ),
 				diffs );
 
 		diffs =
-				diffList( new Diff( INSERT, "12" ), new Diff( EQUAL, "x" ), new Diff(
-						DELETE, "cd" ), new Diff( INSERT, "34" ) );
+				diffList( Diff.fromText( INSERT, "12" ), Diff.fromText( EQUAL, "x" ), Diff.fromText(
+						DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
 		dmp.diff_cleanupEfficiency( diffs );
 		assertEquals( "diff_cleanupEfficiency: Three-edit elimination.",
-				diffList( new Diff( DELETE, "xcd" ), new Diff( INSERT, "12x34" ) ),
+				diffList( Diff.fromText( DELETE, "xcd" ), Diff.fromText( INSERT, "12x34" ) ),
 				diffs );
 
 		diffs =
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "12" ), new Diff(
-						EQUAL, "xy" ), new Diff( INSERT, "34" ), new Diff( EQUAL, "z" ),
-						new Diff( DELETE, "cd" ), new Diff( INSERT, "56" ) );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
+						EQUAL, "xy" ), Diff.fromText( INSERT, "34" ), Diff.fromText( EQUAL, "z" ),
+						Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "56" ) );
 		dmp.diff_cleanupEfficiency( diffs );
 		assertEquals(
 				"diff_cleanupEfficiency: Backpass elimination.",
-				diffList( new Diff( DELETE, "abxyzcd" ), new Diff( INSERT, "12xy34z56" ) ),
+				diffList( Diff.fromText( DELETE, "abxyzcd" ), Diff.fromText( INSERT, "12xy34z56" ) ),
 				diffs );
 
 		dmp.Diff_EditCost = 5;
 		diffs =
-				diffList( new Diff( DELETE, "ab" ), new Diff( INSERT, "12" ), new Diff(
-						EQUAL, "wxyz" ), new Diff( DELETE, "cd" ), new Diff( INSERT, "34" ) );
+				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
+						EQUAL, "wxyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
 		dmp.diff_cleanupEfficiency( diffs );
 		assertEquals(
 				"diff_cleanupEfficiency: High cost elimination.",
-				diffList( new Diff( DELETE, "abwxyzcd" ), new Diff( INSERT, "12wxyz34" ) ),
+				diffList( Diff.fromText( DELETE, "abwxyzcd" ), Diff.fromText( INSERT, "12wxyz34" ) ),
 				diffs );
 		dmp.Diff_EditCost = 4;
 	}
@@ -389,10 +389,10 @@ public class DiffTest
 
 	public void testDiffText( ) {
 		// Compute the source and destination texts.
-		LinkedList<Diff> diffs =
-				diffList( new Diff( EQUAL, "jump" ), new Diff( DELETE, "s" ), new Diff(
-						INSERT, "ed" ), new Diff( EQUAL, " over " ), new Diff( DELETE,
-						"the" ), new Diff( INSERT, "a" ), new Diff( EQUAL, " lazy" ) );
+		LinkedList<Diff<Integer>> diffs =
+				diffList( Diff.fromText( EQUAL, "jump" ), Diff.fromText( DELETE, "s" ), Diff.fromText(
+						INSERT, "ed" ), Diff.fromText( EQUAL, " over " ), Diff.fromText( DELETE,
+						"the" ), Diff.fromText( INSERT, "a" ), Diff.fromText( EQUAL, " lazy" ) );
 		assertEquals( "diff_text1:", "jumps over the lazy", dmp.diff_text1( diffs ) );
 		assertEquals( "diff_text2:", "jumped over a lazy", dmp.diff_text2( diffs ) );
 	}
@@ -400,35 +400,35 @@ public class DiffTest
 
 	public void testDiffXIndex( ) {
 		// Translate a location in text1 to text2.
-		LinkedList<Diff> diffs =
-				diffList( new Diff( DELETE, "a" ), new Diff( INSERT, "1234" ),
-						new Diff( EQUAL, "xyz" ) );
+		LinkedList<Diff<Integer>> diffs =
+				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "1234" ),
+						Diff.fromText( EQUAL, "xyz" ) );
 		assertEquals( "diff_xIndex: Translation on equality.", 5,
 				dmp.diff_xIndex( diffs, 2 ) );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "1234" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "1234" ), Diff.fromText(
 						EQUAL, "xyz" ) );
 		assertEquals( "diff_xIndex: Translation on deletion.", 1,
 				dmp.diff_xIndex( diffs, 3 ) );
 	}
 
 	public void testDiffLevenshtein( ) {
-		LinkedList<Diff> diffs =
-				diffList( new Diff( DELETE, "abc" ), new Diff( INSERT, "1234" ),
-						new Diff( EQUAL, "xyz" ) );
+		LinkedList<Diff<Integer>> diffs =
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "1234" ),
+						Diff.fromText( EQUAL, "xyz" ) );
 		assertEquals( "Levenshtein with trailing equality.", 4,
 				dmp.diff_levenshtein( diffs ) );
 
 		diffs =
-				diffList( new Diff( EQUAL, "xyz" ), new Diff( DELETE, "abc" ),
-						new Diff( INSERT, "1234" ) );
+				diffList( Diff.fromText( EQUAL, "xyz" ), Diff.fromText( DELETE, "abc" ),
+						Diff.fromText( INSERT, "1234" ) );
 		assertEquals( "Levenshtein with leading equality.", 4,
 				dmp.diff_levenshtein( diffs ) );
 
 		diffs =
-				diffList( new Diff( DELETE, "abc" ), new Diff( EQUAL, "xyz" ),
-						new Diff( INSERT, "1234" ) );
+				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( EQUAL, "xyz" ),
+						Diff.fromText( INSERT, "1234" ) );
 		assertEquals( "Levenshtein with middle equality.", 7,
 				dmp.diff_levenshtein( diffs ) );
 	}
@@ -440,97 +440,97 @@ public class DiffTest
 		// Since the resulting diff hasn't been normalized, it would be ok if
 		// the insertion and deletion pairs are swapped.
 		// If the order changes, tweak this test as required.
-		LinkedList<Diff> diffs =
-				diffList( new Diff( DELETE, "c" ), new Diff( INSERT, "m" ), new Diff(
-						EQUAL, "a" ), new Diff( DELETE, "t" ), new Diff( INSERT, "p" ) );
+		LinkedList<Diff<Integer>> diffs =
+				diffList( Diff.fromText( DELETE, "c" ), Diff.fromText( INSERT, "m" ), Diff.fromText(
+						EQUAL, "a" ), Diff.fromText( DELETE, "t" ), Diff.fromText( INSERT, "p" ) );
 		assertEquals( "diff_bisect: Normal.", diffs,
 				dmp.diff_bisect( a, b, Long.MAX_VALUE ) );
 
 		// Timeout.
-		diffs = diffList( new Diff( DELETE, "cat" ), new Diff( INSERT, "map" ) );
+		diffs = diffList( Diff.fromText( DELETE, "cat" ), Diff.fromText( INSERT, "map" ) );
 		assertEquals( "diff_bisect: Timeout.", diffs, dmp.diff_bisect( a, b, 0 ) );
 	}
 
 	public void testDiffMain( ) {
 		// Perform a trivial diff.
-		LinkedList<Diff> diffs = diffList( );
+		LinkedList<Diff<Integer>> diffs = diffList( );
 		assertEquals( "diff_main: Null case.", diffs, dmp.diff_main( "", "", false ) );
 
-		diffs = diffList( new Diff( EQUAL, "abc" ) );
+		diffs = diffList( Diff.fromText( EQUAL, "abc" ) );
 		assertEquals( "diff_main: Equality.", diffs,
 				dmp.diff_main( "abc", "abc", false ) );
 
 		diffs =
-				diffList( new Diff( EQUAL, "ab" ), new Diff( INSERT, "123" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "ab" ), Diff.fromText( INSERT, "123" ), Diff.fromText(
 						EQUAL, "c" ) );
 		assertEquals( "diff_main: Simple insertion.", diffs,
 				dmp.diff_main( "abc", "ab123c", false ) );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "123" ), new Diff(
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "123" ), Diff.fromText(
 						EQUAL, "bc" ) );
 		assertEquals( "diff_main: Simple deletion.", diffs,
 				dmp.diff_main( "a123bc", "abc", false ) );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( INSERT, "123" ), new Diff(
-						EQUAL, "b" ), new Diff( INSERT, "456" ), new Diff( EQUAL, "c" ) );
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( INSERT, "123" ), Diff.fromText(
+						EQUAL, "b" ), Diff.fromText( INSERT, "456" ), Diff.fromText( EQUAL, "c" ) );
 		assertEquals( "diff_main: Two insertions.", diffs,
 				dmp.diff_main( "abc", "a123b456c", false ) );
 
 		diffs =
-				diffList( new Diff( EQUAL, "a" ), new Diff( DELETE, "123" ), new Diff(
-						EQUAL, "b" ), new Diff( DELETE, "456" ), new Diff( EQUAL, "c" ) );
+				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "123" ), Diff.fromText(
+						EQUAL, "b" ), Diff.fromText( DELETE, "456" ), Diff.fromText( EQUAL, "c" ) );
 		assertEquals( "diff_main: Two deletions.", diffs,
 				dmp.diff_main( "a123b456c", "abc", false ) );
 
 		// Perform a real diff.
 		// Switch off the timeout.
 		dmp.Diff_Timeout = 0;
-		diffs = diffList( new Diff( DELETE, "a" ), new Diff( INSERT, "b" ) );
+		diffs = diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "b" ) );
 		assertEquals( "diff_main: Simple case #1.", diffs,
 				dmp.diff_main( "a", "b", false ) );
 
 		diffs =
-				diffList( new Diff( DELETE, "Apple" ), new Diff( INSERT, "Banana" ),
-						new Diff( EQUAL, "s are a" ), new Diff( INSERT, "lso" ), new Diff(
+				diffList( Diff.fromText( DELETE, "Apple" ), Diff.fromText( INSERT, "Banana" ),
+						Diff.fromText( EQUAL, "s are a" ), Diff.fromText( INSERT, "lso" ), Diff.fromText(
 								EQUAL, " fruit." ) );
 		
 		assertEquals( "diff_main: Simple case #2.", diffs,
 				dmp.diff_main( "Apples are a fruit.", "Bananas are also fruit.", false ) );
 
 		diffs =
-				diffList( new Diff( DELETE, "a" ), new Diff( INSERT, "\u0680" ),
-						new Diff( EQUAL, "x" ), new Diff( DELETE, "\t" ), new Diff( INSERT,
+				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "\u0680" ),
+						Diff.fromText( EQUAL, "x" ), Diff.fromText( DELETE, "\t" ), Diff.fromText( INSERT,
 								"\000" ) );
 		assertEquals( "diff_main: Simple case #3.", diffs,
 				dmp.diff_main( "ax\t", "\u0680x\000", false ) );
 
 		diffs =
-				diffList( new Diff( DELETE, "1" ), new Diff( EQUAL, "a" ), new Diff(
-						DELETE, "y" ), new Diff( EQUAL, "b" ), new Diff( DELETE, "2" ),
-						new Diff( INSERT, "xab" ) );
+				diffList( Diff.fromText( DELETE, "1" ), Diff.fromText( EQUAL, "a" ), Diff.fromText(
+						DELETE, "y" ), Diff.fromText( EQUAL, "b" ), Diff.fromText( DELETE, "2" ),
+						Diff.fromText( INSERT, "xab" ) );
 		assertEquals( "diff_main: Overlap #1.", diffs,
 				dmp.diff_main( "1ayb2", "abxab", false ) );
 
 		diffs =
-				diffList( new Diff( INSERT, "xaxcx" ), new Diff( EQUAL, "abc" ),
-						new Diff( DELETE, "y" ) );
+				diffList( Diff.fromText( INSERT, "xaxcx" ), Diff.fromText( EQUAL, "abc" ),
+						Diff.fromText( DELETE, "y" ) );
 		assertEquals( "diff_main: Overlap #2.", diffs,
 				dmp.diff_main( "abcy", "xaxcxabc", false ) );
 
 		diffs =
-				diffList( new Diff( DELETE, "ABCD" ), new Diff( EQUAL, "a" ), new Diff(
-						DELETE, "=" ), new Diff( INSERT, "-" ), new Diff( EQUAL, "bcd" ),
-						new Diff( DELETE, "=" ), new Diff( INSERT, "-" ), new Diff( EQUAL,
-								"efghijklmnopqrs" ), new Diff( DELETE, "EFGHIJKLMNOefg" ) );
+				diffList( Diff.fromText( DELETE, "ABCD" ), Diff.fromText( EQUAL, "a" ), Diff.fromText(
+						DELETE, "=" ), Diff.fromText( INSERT, "-" ), Diff.fromText( EQUAL, "bcd" ),
+						Diff.fromText( DELETE, "=" ), Diff.fromText( INSERT, "-" ), Diff.fromText( EQUAL,
+								"efghijklmnopqrs" ), Diff.fromText( DELETE, "EFGHIJKLMNOefg" ) );
 		assertEquals( "diff_main: Overlap #3.", diffs, dmp.diff_main(
 				"ABCDa=bcd=efghijklmnopqrsEFGHIJKLMNOefg", "a-bcd-efghijklmnopqrs",
 				false ) );
 
 		diffs =
-				diffList( new Diff( INSERT, " " ), new Diff( EQUAL, "a" ), new Diff(
-						INSERT, "nd" ), new Diff( EQUAL, " [[Pennsylvania]]" ), new Diff(
+				diffList( Diff.fromText( INSERT, " " ), Diff.fromText( EQUAL, "a" ), Diff.fromText(
+						INSERT, "nd" ), Diff.fromText( EQUAL, " [[Pennsylvania]]" ), Diff.fromText(
 						DELETE, " and [[New" ) );
 		assertEquals( "diff_main: Large equality.", diffs, dmp.diff_main(
 				"a [[Pennsylvania]] and [[New", " and [[Pennsylvania]]", false ) );
@@ -576,9 +576,10 @@ public class DiffTest
 	}
 
 	// Private function for quickly building lists of diffs.
-	private static LinkedList<Diff> diffList( Diff ... diffs ) {
-		LinkedList<Diff> myDiffList = new LinkedList<Diff>( );
-		for ( Diff myDiff : diffs ) {
+	@SafeVarargs
+	private static LinkedList<Diff<Integer>> diffList( Diff<Integer> ... diffs ) {
+		LinkedList<Diff<Integer>> myDiffList = new LinkedList<Diff<Integer>>( );
+		for ( Diff<Integer> myDiff : diffs ) {
 			myDiffList.add( myDiff );
 		}
 		return myDiffList;

@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ import java.util.Vector;
  * Class containing the diff, match and patch methods.
  * Also contains the behaviour settings.
  */
-class DiffPatch {
+class DiffPatch<T> {
 
   // Defaults.
   // Set these on your DiffMatchPatch instance to override the defaults.
@@ -90,7 +90,7 @@ class DiffPatch {
    */
   public short Patch_Margin = 4;
 
-  private final KnittingTuple<Object> the_empty_tuple = KnittingTuple.on();
+  private final KnittingTuple<T> the_empty_tuple = KnittingTuple.on();
 
 
 
@@ -109,21 +109,21 @@ class DiffPatch {
 
 
 
-  public LinkedList<Diff> diff_main(String text1, String text2, boolean useless) {
-  	DiffPatch diffMatchPatch = new DiffPatch( );
+  public LinkedList<Diff<Integer>> diff_main(String text1, String text2, boolean useless) {
+  	DiffPatch<Integer> diffMatchPatch = new DiffPatch<Integer>( );
   	diffMatchPatch.Diff_Timeout = Diff_Timeout;
   	return diffMatchPatch.diff_main( tt(text1), tt(text2));
   }
 
-  public LinkedList<Diff> diff_main(String text1, String text2) {
-  	DiffPatch diffMatchPatch = new DiffPatch( );
+  public LinkedList<Diff<Integer>> diff_main(String text1, String text2) {
+  	DiffPatch<Integer> diffMatchPatch = new DiffPatch<Integer>( );
   	diffMatchPatch.Diff_Timeout = Diff_Timeout;
   	return diffMatchPatch.diff_main( tt(text1), tt(text2));
   }
   
-  public LinkedList<Diff> diff_main(String text1, String text2,
+  public LinkedList<Diff<Integer>> diff_main(String text1, String text2,
       long deadline) {
-  	DiffPatch diffMatchPatch = new DiffPatch( );
+  	DiffPatch<Integer> diffMatchPatch = new DiffPatch<Integer>( );
   	diffMatchPatch.Diff_Timeout = Diff_Timeout;
   	return diffMatchPatch.diff_main( tt(text1), tt(text2), deadline );
   }
@@ -137,7 +137,7 @@ class DiffPatch {
    * @param text2 New string to be diffed.
    * @return Linked List of Diff objects.
    */
-  public LinkedList<Diff> diff_main(KnittingTuple<Object> text1, KnittingTuple<Object> text2) {
+  public LinkedList<Diff<T>> diff_main(KnittingTuple<T> text1, KnittingTuple<T> text2) {
     // Set a deadline by which time the diff must be complete.
     long deadline;
     if (Diff_Timeout <= 0) {
@@ -157,7 +157,7 @@ class DiffPatch {
    *     internally for recursive calls.  Users should set DiffTimeout instead.
    * @return Linked List of Diff objects.
    */
-  private LinkedList<Diff> diff_main(KnittingTuple<Object> text1, KnittingTuple<Object> text2,
+  private LinkedList<Diff<T>> diff_main(KnittingTuple<T> text1, KnittingTuple<T> text2,
                                      long deadline) {
     // Check for null inputs.
     if (text1 == null || text2 == null) {
@@ -165,24 +165,24 @@ class DiffPatch {
     }
 
     // Check for equality (speedup).
-    LinkedList<Diff> diffs;
+    LinkedList<Diff<T>> diffs;
     if (text1.equals(text2)) {
-      diffs = new LinkedList<Diff>();
+      diffs = new LinkedList<Diff<T>>();
       if (text1.size() != 0) {
-        diffs.add(new Diff(Operation.EQUAL, text1));
+        diffs.add(new Diff<T>(Operation.EQUAL, text1));
       }
       return diffs;
     }
 
     // Trim off common prefix (speedup).
     int commonlength = diff_commonPrefix(text1, text2);
-    KnittingTuple<Object> commonprefix = text1.head(0, commonlength);
+    KnittingTuple<T> commonprefix = text1.head(0, commonlength);
     text1 = text1.headless(commonlength);
     text2 = text2.headless(commonlength);
 
     // Trim off common suffix (speedup).
     commonlength = diff_commonSuffix(text1, text2);
-    KnittingTuple<Object> commonsuffix = text1.headless(text1.size() - commonlength);
+    KnittingTuple<T> commonsuffix = text1.headless(text1.size() - commonlength);
     text1 = text1.head(0, text1.size() - commonlength);
     text2 = text2.head(0, text2.size() - commonlength);
 
@@ -191,10 +191,10 @@ class DiffPatch {
 
     // Restore the prefix and suffix.
     if (commonprefix.size() != 0) {
-      diffs.addFirst(new Diff(Operation.EQUAL, commonprefix));
+      diffs.addFirst(new Diff<T>(Operation.EQUAL, commonprefix));
     }
     if (commonsuffix.size() != 0) {
-      diffs.addLast(new Diff(Operation.EQUAL, commonsuffix));
+      diffs.addLast(new Diff<T>(Operation.EQUAL, commonsuffix));
     }
 
     diff_cleanupMerge(diffs);
@@ -209,61 +209,61 @@ class DiffPatch {
    * @param deadline Time when the diff should be complete by.
    * @return Linked List of Diff objects.
    */
-  private LinkedList<Diff> diff_compute(KnittingTuple<Object> text1, KnittingTuple<Object> text2,
+  private LinkedList<Diff<T>> diff_compute(KnittingTuple<T> text1, KnittingTuple<T> text2,
                                         long deadline) {
-    LinkedList<Diff> diffs = new LinkedList<Diff>();
+    LinkedList<Diff<T>> diffs = new LinkedList<Diff<T>>();
 
     if (text1.size() == 0) {
       // Just add some text (speedup).
-      diffs.add(new Diff(Operation.INSERT, text2));
+      diffs.add(new Diff<T>(Operation.INSERT, text2));
       return diffs;
     }
 
     if (text2.size() == 0) {
       // Just delete some text (speedup).
-      diffs.add(new Diff(Operation.DELETE, text1));
+      diffs.add(new Diff<T>(Operation.DELETE, text1));
       return diffs;
     }
 
-    KnittingTuple<Object> longtext = text1.size() > text2.size() ? text1 : text2;
-    KnittingTuple<Object> shorttext = text1.size() > text2.size() ? text2 : text1;
+    KnittingTuple<T> longtext = text1.size() > text2.size() ? text1 : text2;
+    KnittingTuple<T> shorttext = text1.size() > text2.size() ? text2 : text1;
     Optional<Integer> i = longtext.findSubtuple(shorttext, 0);
     if (i.isPresent( )) {
     	int i_value = i.get( );
       // Shorter text is inside the longer text (speedup).
       Operation op = (text1.size() > text2.size()) ?
                      Operation.DELETE : Operation.INSERT;
-      diffs.add(new Diff(op, longtext.head(0, i_value)));
-      diffs.add(new Diff(Operation.EQUAL, shorttext));
-      diffs.add(new Diff(op, longtext.headless(i_value + shorttext.size())));
+      diffs.add(new Diff<T>(op, longtext.head(0, i_value)));
+      diffs.add(new Diff<T>(Operation.EQUAL, shorttext));
+      diffs.add(new Diff<T>(op, longtext.headless(i_value + shorttext.size())));
       return diffs;
     }
 
     if (shorttext.size() == 1) {
       // Single character string.
       // After the previous speedup, the character can't be an equality.
-      diffs.add(new Diff(Operation.DELETE, text1));
-      diffs.add(new Diff(Operation.INSERT, text2));
+      diffs.add(new Diff<T>(Operation.DELETE, text1));
+      diffs.add(new Diff<T>(Operation.INSERT, text2));
       return diffs;
     }
 
     // Check to see if the problem can be split in two.
-    KnittingTuple<Object>[] hm = diff_halfMatch(text1, text2);
+    KnittingTuple<T>[] hm = diff_halfMatch(text1, text2);
     if (hm != null) {
       // A half-match was found, sort out the return data.
-    	KnittingTuple<Object> text1_a = hm[0];
-    	KnittingTuple<Object> text1_b = hm[1];
-    	KnittingTuple<Object> text2_a = hm[2];
-    	KnittingTuple<Object> text2_b = hm[3];
-    	KnittingTuple<Object> mid_common = hm[4];
+    	KnittingTuple<T> text1_a = hm[0];
+    	KnittingTuple<T> text1_b = hm[1];
+    	KnittingTuple<T> text2_a = hm[2];
+    	KnittingTuple<T> text2_b = hm[3];
+    	KnittingTuple<T> mid_common = hm[4];
       // Send both pairs off for separate processing.
-      LinkedList<Diff> diffs_a = diff_main(text1_a, text2_a,
+      LinkedList<Diff<T>> diffs_a = diff_main(text1_a, text2_a,
                                            deadline);
-      LinkedList<Diff> diffs_b = diff_main(text1_b, text2_b,
+      LinkedList<Diff<T>> diffs_b = diff_main(text1_b, text2_b,
                                            deadline);
       // Merge the results.
       diffs = diffs_a;
-      diffs.add(new Diff(Operation.EQUAL, mid_common));
+      diffs.add(new Diff<T>(Operation.EQUAL, mid_common));
       diffs.addAll(diffs_b);
       return diffs;
     }
@@ -272,9 +272,9 @@ class DiffPatch {
   }
 
 
-  public LinkedList<Diff> diff_bisect(String text1, String text2,
+  public LinkedList<Diff<Integer>> diff_bisect(String text1, String text2,
       long deadline) {
-  	return new DiffPatch( ).diff_bisect( tt(text1), tt(text2), deadline );
+  	return new DiffPatch<Integer>( ).diff_bisect( tt(text1), tt(text2), deadline );
   }
   
   /**
@@ -286,7 +286,7 @@ class DiffPatch {
    * @param deadline Time at which to bail if not yet complete.
    * @return LinkedList of Diff objects.
    */
-  protected LinkedList<Diff> diff_bisect(KnittingTuple<Object> text1, KnittingTuple<Object> text2,
+  protected LinkedList<Diff<T>> diff_bisect(KnittingTuple<T> text1, KnittingTuple<T> text2,
       long deadline) {
     // Cache the text lengths to prevent multiple calls.
     int text1_length = text1.size();
@@ -393,9 +393,9 @@ class DiffPatch {
     }
     // Diff took too long and hit the deadline or
     // number of diffs equals number of characters, no commonality at all.
-    LinkedList<Diff> diffs = new LinkedList<Diff>();
-    diffs.add(new Diff(Operation.DELETE, text1));
-    diffs.add(new Diff(Operation.INSERT, text2));
+    LinkedList<Diff<T>> diffs = new LinkedList<Diff<T>>();
+    diffs.add(new Diff<T>(Operation.DELETE, text1));
+    diffs.add(new Diff<T>(Operation.INSERT, text2));
     return diffs;
   }
 
@@ -409,31 +409,31 @@ class DiffPatch {
    * @param deadline Time at which to bail if not yet complete.
    * @return LinkedList of Diff objects.
    */
-  private LinkedList<Diff> diff_bisectSplit(KnittingTuple<Object> text1, KnittingTuple<Object> text2,
+  private LinkedList<Diff<T>> diff_bisectSplit(KnittingTuple<T> text1, KnittingTuple<T> text2,
                                             int x, int y, long deadline) {
-  	KnittingTuple<Object> text1a = text1.head(0, x);
-  	KnittingTuple<Object> text2a = text2.head(0, y);
-  	KnittingTuple<Object> text1b = text1.headless(x);
-  	KnittingTuple<Object> text2b = text2.headless(y);
+  	KnittingTuple<T> text1a = text1.head(0, x);
+  	KnittingTuple<T> text2a = text2.head(0, y);
+  	KnittingTuple<T> text1b = text1.headless(x);
+  	KnittingTuple<T> text2b = text2.headless(y);
 
     // Compute both diffs serially.
-    LinkedList<Diff> diffs = diff_main(text1a, text2a, deadline);
-    LinkedList<Diff> diffsb = diff_main(text1b, text2b, deadline);
+    LinkedList<Diff<T>> diffs = diff_main(text1a, text2a, deadline);
+    LinkedList<Diff<T>> diffsb = diff_main(text1b, text2b, deadline);
 
     diffs.addAll(diffsb);
     return diffs;
   }
 
   
-	private static KnittingTuple<Object> tt( String s ) {
+	private static KnittingTuple<Integer> tt( String s ) {
 		if (s == null) return null;
 		return KnittingTuple.wrap( KnittingCursor.wrap( s.codePoints( ).boxed( ) )
-				.collect( new Vector<Object>( ) ) );
+				.collect( new Vector<Integer>( ) ) );
   }
 
 
 	public int diff_commonPrefix(String text1, String text2) {
-  	return new DiffPatch().diff_commonPrefix( tt(text1), tt(text2));
+  	return new DiffPatch<Integer>().diff_commonPrefix( tt(text1), tt(text2));
   }
 
   /**
@@ -442,7 +442,7 @@ class DiffPatch {
    * @param text2 Second string.
    * @return The number of characters common to the start of each string.
    */
-  public int diff_commonPrefix(KnittingTuple<Object> text1, KnittingTuple<Object> text2) {
+  public int diff_commonPrefix(KnittingTuple<T> text1, KnittingTuple<T> text2) {
     // Performance analysis: http://neil.fraser.name/news/2007/10/09/
     int n = Math.min(text1.size(), text2.size());
     for (int i = 0; i < n; i++) {
@@ -454,7 +454,7 @@ class DiffPatch {
   }
   
 	public int diff_commonSuffix(String text1, String text2) {
-  	return new DiffPatch().diff_commonSuffix( tt(text1), tt(text2));
+  	return new DiffPatch<Integer>().diff_commonSuffix( tt(text1), tt(text2));
   }
 
   /**
@@ -463,7 +463,7 @@ class DiffPatch {
    * @param text2 Second string.
    * @return The number of characters common to the end of each string.
    */
-  public int diff_commonSuffix(KnittingTuple<Object> text1, KnittingTuple<Object> text2) {
+  public int diff_commonSuffix(KnittingTuple<T> text1, KnittingTuple<T> text2) {
     // Performance analysis: http://neil.fraser.name/news/2007/10/09/
     int text1_length = text1.size();
     int text2_length = text2.size();
@@ -478,7 +478,7 @@ class DiffPatch {
 
   
 	public int diff_commonOverlap(String text1, String text2) {
-  	return new DiffPatch().diff_commonOverlap( tt(text1), tt(text2));
+  	return new DiffPatch<Integer>().diff_commonOverlap( tt(text1), tt(text2));
   }
 	
   /**
@@ -488,7 +488,7 @@ class DiffPatch {
    * @return The number of characters common to the end of the first
    *     string and the start of the second string.
    */
-  protected int diff_commonOverlap(KnittingTuple<Object> text1, KnittingTuple<Object> text2) {
+  protected int diff_commonOverlap(KnittingTuple<T> text1, KnittingTuple<T> text2) {
     // Cache the text lengths to prevent multiple calls.
     int text1_length = text1.size();
     int text2_length = text2.size();
@@ -514,7 +514,7 @@ class DiffPatch {
     int best = 0;
     int length = 1;
     while (true) {
-      KnittingTuple<Object> pattern = text1.headless(text_length - length);
+      KnittingTuple<T> pattern = text1.headless(text_length - length);
       Optional<Integer> found = text2.findSubtuple(pattern, 0);
       if (!found.isPresent( )) {
         return best;
@@ -528,7 +528,7 @@ class DiffPatch {
     }
   }
 	
-	private static String codepointTupleToString( KnittingTuple<?>codePoints ) {
+	private static String codepointTupleToString( KnittingTuple<?> codePoints ) {
 		StringBuilder sb = new StringBuilder( );
 		for ( Object codePoint : codePoints.asIterable( ) ) {
 			if ( codePoint instanceof Integer ) {
@@ -540,9 +540,9 @@ class DiffPatch {
 	}
 	
 	public String[] diff_halfMatch(String text1, String text2) {
-		DiffPatch diffMatchPatch = new DiffPatch();
+		DiffPatch<Integer> diffMatchPatch = new DiffPatch<Integer>();
 		diffMatchPatch.Diff_Timeout = Diff_Timeout;
-		KnittingTuple<Object>[] diff_halfMatch = diffMatchPatch.diff_halfMatch( tt(text1), tt(text2));
+		KnittingTuple<Integer>[] diff_halfMatch = diffMatchPatch.diff_halfMatch( tt(text1), tt(text2));
 		
 		if (diff_halfMatch == null) return null;
 		ArrayList<String> result = new ArrayList<>();
@@ -563,24 +563,24 @@ class DiffPatch {
    *     common middle.  Or null if there was no match.
    */
   @SuppressWarnings("unchecked")
-	protected KnittingTuple<Object>[] diff_halfMatch(KnittingTuple<Object> text1, KnittingTuple<Object> text2) {
+	protected KnittingTuple<T>[] diff_halfMatch(KnittingTuple<T> text1, KnittingTuple<T> text2) {
     if (Diff_Timeout <= 0) {
       // Don't risk returning a non-optimal diff if we have unlimited time.
       return null;
     }
-    KnittingTuple<Object> longtext = text1.size() > text2.size() ? text1 : text2;
-    KnittingTuple<Object> shorttext = text1.size() > text2.size() ? text2 : text1;
+    KnittingTuple<T> longtext = text1.size() > text2.size() ? text1 : text2;
+    KnittingTuple<T> shorttext = text1.size() > text2.size() ? text2 : text1;
     if (longtext.size() < 4 || shorttext.size() * 2 < longtext.size()) {
       return null;  // Pointless.
     }
 
     // First check if the second quarter is the seed for a half-match.
-    KnittingTuple<Object>[] hm1 = diff_halfMatchI(longtext, shorttext,
+    KnittingTuple<T>[] hm1 = diff_halfMatchI(longtext, shorttext,
                                    (longtext.size() + 3) / 4);
     // Check again based on the third quarter.
-    KnittingTuple<Object>[] hm2 = diff_halfMatchI(longtext, shorttext,
+    KnittingTuple<T>[] hm2 = diff_halfMatchI(longtext, shorttext,
                                    (longtext.size() + 1) / 2);
-    KnittingTuple<Object>[] hm;
+    KnittingTuple<T>[] hm;
     if (hm1 == null && hm2 == null) {
       return null;
     } else if (hm2 == null) {
@@ -597,7 +597,7 @@ class DiffPatch {
       return hm;
       //return new String[]{hm[0], hm[1], hm[2], hm[3], hm[4]};
     } else {
-      return (KnittingTuple<Object>[]) new KnittingTuple[]{hm[2], hm[3], hm[0], hm[1], hm[4]};
+      return (KnittingTuple<T>[]) new KnittingTuple[]{hm[2], hm[3], hm[0], hm[1], hm[4]};
     }
   }
   
@@ -613,13 +613,13 @@ class DiffPatch {
    *     and the common middle.  Or null if there was no match.
    */
   @SuppressWarnings("unchecked")
-	private KnittingTuple<Object>[] diff_halfMatchI(KnittingTuple<Object> longtext, KnittingTuple<Object> shorttext, int i) {
+	private KnittingTuple<T>[] diff_halfMatchI(KnittingTuple<T> longtext, KnittingTuple<T> shorttext, int i) {
     // Start with a 1/4 length substring at position i as a seed.
-  	KnittingTuple<Object> seed = longtext.head(i, (i + longtext.size( ) / 4) - i);
+  	KnittingTuple<T> seed = longtext.head(i, (i + longtext.size( ) / 4) - i);
     int j = -1;
-    KnittingTuple<Object> best_common = the_empty_tuple;
-    KnittingTuple<Object> best_longtext_a = the_empty_tuple, best_longtext_b = the_empty_tuple;
-    KnittingTuple<Object> best_shorttext_a = the_empty_tuple, best_shorttext_b = the_empty_tuple;
+    KnittingTuple<T> best_common = the_empty_tuple;
+    KnittingTuple<T> best_longtext_a = the_empty_tuple, best_longtext_b = the_empty_tuple;
+    KnittingTuple<T> best_shorttext_a = the_empty_tuple, best_shorttext_b = the_empty_tuple;
     while ((j = shorttext.findSubtuple(seed, j + 1).orElse( -1 )) != -1) {
       int prefixLength = diff_commonPrefix(longtext.headless(i),
                                            shorttext.headless(j));
@@ -635,7 +635,7 @@ class DiffPatch {
       }
     }
     if (best_common.size() * 2 >= longtext.size()) {
-      return (KnittingTuple<Object>[]) new KnittingTuple[]{best_longtext_a, best_longtext_b,
+      return (KnittingTuple<T>[]) new KnittingTuple[]{best_longtext_a, best_longtext_b,
                           best_shorttext_a, best_shorttext_b, best_common};
     } else {
       return null;
@@ -646,21 +646,21 @@ class DiffPatch {
    * Reduce the number of edits by eliminating semantically trivial equalities.
    * @param diffs LinkedList of Diff objects.
    */
-  public void diff_cleanupSemantic(LinkedList<Diff> diffs) {
+  public void diff_cleanupSemantic(LinkedList<Diff<T>> diffs) {
     if (diffs.isEmpty()) {
       return;
     }
     boolean changes = false;
-    Stack<Diff> equalities = new Stack<Diff>();  // Stack of qualities.
-    KnittingTuple<Object> lastequality = null; // Always equal to equalities.lastElement().text
-    ListIterator<Diff> pointer = diffs.listIterator();
+    Stack<Diff<T>> equalities = new Stack<Diff<T>>();  // Stack of qualities.
+    KnittingTuple<T> lastequality = null; // Always equal to equalities.lastElement().text
+    ListIterator<Diff<T>> pointer = diffs.listIterator();
     // Number of characters that changed prior to the equality.
     int length_insertions1 = 0;
     int length_deletions1 = 0;
     // Number of characters that changed after the equality.
     int length_insertions2 = 0;
     int length_deletions2 = 0;
-    Diff thisDiff = pointer.next();
+    Diff<T> thisDiff = pointer.next();
     while (thisDiff != null) {
       if (thisDiff.operation == Operation.EQUAL) {
         // Equality found.
@@ -691,9 +691,9 @@ class DiffPatch {
           pointer.next();
 
           // Replace equality with a delete.
-          pointer.set(new Diff(Operation.DELETE, lastequality));
+          pointer.set(new Diff<T>(Operation.DELETE, lastequality));
           // Insert a corresponding an insert.
-          pointer.add(new Diff(Operation.INSERT, lastequality));
+          pointer.add(new Diff<T>(Operation.INSERT, lastequality));
 
           equalities.pop();  // Throw away the equality we just deleted.
           if (!equalities.empty()) {
@@ -736,7 +736,7 @@ class DiffPatch {
     //   -> <ins>def</ins>xxx<del>abc</del>
     // Only extract an overlap if it is as big as the edit ahead or behind it.
     pointer = diffs.listIterator();
-    Diff prevDiff = null;
+    Diff<T> prevDiff = null;
     thisDiff = null;
     if (pointer.hasNext()) {
       prevDiff = pointer.next();
@@ -747,8 +747,8 @@ class DiffPatch {
     while (thisDiff != null) {
       if (prevDiff.operation == Operation.DELETE &&
           thisDiff.operation == Operation.INSERT) {
-        KnittingTuple<Object> deletion = prevDiff.text;
-        KnittingTuple<Object> insertion = thisDiff.text;
+        KnittingTuple<T> deletion = prevDiff.text;
+        KnittingTuple<T> insertion = thisDiff.text;
         int overlap_length1 = this.diff_commonOverlap(deletion, insertion);
         int overlap_length2 = this.diff_commonOverlap(insertion, deletion);
         if (overlap_length1 >= overlap_length2) {
@@ -756,7 +756,7 @@ class DiffPatch {
               overlap_length1 >= insertion.size() / 2.0) {
             // Overlap found. Insert an equality and trim the surrounding edits.
             pointer.previous();
-            pointer.add(new Diff(Operation.EQUAL,
+            pointer.add(new Diff<T>(Operation.EQUAL,
                                  insertion.head(0, overlap_length1)));
             prevDiff.text =
                 deletion.head(0, deletion.size() - overlap_length1);
@@ -770,7 +770,7 @@ class DiffPatch {
             // Reverse overlap found.
             // Insert an equality and swap and trim the surrounding edits.
             pointer.previous();
-            pointer.add(new Diff(Operation.EQUAL,
+            pointer.add(new Diff<T>(Operation.EQUAL,
                                  deletion.head(0, overlap_length2)));
             prevDiff.operation = Operation.INSERT;
             prevDiff.text =
@@ -792,14 +792,14 @@ class DiffPatch {
    * Reduce the number of edits by eliminating operationally trivial equalities.
    * @param diffs LinkedList of Diff objects.
    */
-  public void diff_cleanupEfficiency(LinkedList<Diff> diffs) {
+  public void diff_cleanupEfficiency(LinkedList<Diff<T>> diffs) {
     if (diffs.isEmpty()) {
       return;
     }
     boolean changes = false;
-    Stack<Diff> equalities = new Stack<Diff>();  // Stack of equalities.
-    KnittingTuple<Object> lastequality = null; // Always equal to equalities.lastElement().text
-    ListIterator<Diff> pointer = diffs.listIterator();
+    Stack<Diff<T>> equalities = new Stack<Diff<T>>();  // Stack of equalities.
+    KnittingTuple<T> lastequality = null; // Always equal to equalities.lastElement().text
+    ListIterator<Diff<T>> pointer = diffs.listIterator();
     // Is there an insertion operation before the last equality.
     boolean pre_ins = false;
     // Is there a deletion operation before the last equality.
@@ -808,8 +808,8 @@ class DiffPatch {
     boolean post_ins = false;
     // Is there a deletion operation after the last equality.
     boolean post_del = false;
-    Diff thisDiff = pointer.next();
-    Diff safeDiff = thisDiff;  // The last Diff that is known to be unsplitable.
+    Diff<T> thisDiff = pointer.next();
+    Diff<T> safeDiff = thisDiff;  // The last Diff that is known to be unsplitable.
     while (thisDiff != null) {
       if (thisDiff.operation == Operation.EQUAL) {
         // Equality found.
@@ -854,9 +854,9 @@ class DiffPatch {
           pointer.next();
 
           // Replace equality with a delete.
-          pointer.set(new Diff(Operation.DELETE, lastequality));
+          pointer.set(new Diff<T>(Operation.DELETE, lastequality));
           // Insert a corresponding an insert.
-          pointer.add(thisDiff = new Diff(Operation.INSERT, lastequality));
+          pointer.add(thisDiff = new Diff<T>(Operation.INSERT, lastequality));
 
           equalities.pop();  // Throw away the equality we just deleted.
           lastequality = null;
@@ -900,15 +900,15 @@ class DiffPatch {
    * Any edit section can move as long as it doesn't cross an equality.
    * @param diffs LinkedList of Diff objects.
    */
-  public void diff_cleanupMerge(LinkedList<Diff> diffs) {
-    diffs.add(new Diff(Operation.EQUAL, the_empty_tuple));  // Add a dummy entry at the end.
-    ListIterator<Diff> pointer = diffs.listIterator();
+  public void diff_cleanupMerge(LinkedList<Diff<T>> diffs) {
+    diffs.add(new Diff<T>(Operation.EQUAL, the_empty_tuple));  // Add a dummy entry at the end.
+    ListIterator<Diff<T>> pointer = diffs.listIterator();
     int count_delete = 0;
     int count_insert = 0;
-    KnittingTuple<Object> text_delete = the_empty_tuple;
-    KnittingTuple<Object> text_insert = the_empty_tuple;
-    Diff thisDiff = pointer.next();
-    Diff prevEqual = null;
+    KnittingTuple<T> text_delete = the_empty_tuple;
+    KnittingTuple<T> text_insert = the_empty_tuple;
+    Diff<T> thisDiff = pointer.next();
+    Diff<T> prevEqual = null;
     int commonlength;
     while (thisDiff != null) {
       switch (thisDiff.operation) {
@@ -946,7 +946,7 @@ class DiffPatch {
                 thisDiff.text = thisDiff.text.chain( text_insert.head(0, commonlength));
                 pointer.next();
               } else {
-                pointer.add(new Diff(Operation.EQUAL,
+                pointer.add(new Diff<T>(Operation.EQUAL,
                     text_insert.head(0, commonlength)));
               }
               text_insert = text_insert.headless(commonlength);
@@ -967,10 +967,10 @@ class DiffPatch {
           }
           // Insert the merged records.
           if (text_delete.size() != 0) {
-            pointer.add(new Diff(Operation.DELETE, text_delete));
+            pointer.add(new Diff<T>(Operation.DELETE, text_delete));
           }
           if (text_insert.size() != 0) {
-            pointer.add(new Diff(Operation.INSERT, text_insert));
+            pointer.add(new Diff<T>(Operation.INSERT, text_insert));
           }
           // Step forward to the equality.
           thisDiff = pointer.hasNext() ? pointer.next() : null;
@@ -1003,9 +1003,9 @@ class DiffPatch {
     // Create a new iterator at the start.
     // (As opposed to walking the current one back.)
     pointer = diffs.listIterator();
-    Diff prevDiff = pointer.hasNext() ? pointer.next() : null;
+    Diff<T> prevDiff = pointer.hasNext() ? pointer.next() : null;
     thisDiff = pointer.hasNext() ? pointer.next() : null;
-    Diff nextDiff = pointer.hasNext() ? pointer.next() : null;
+    Diff<T> nextDiff = pointer.hasNext() ? pointer.next() : null;
     // Intentionally ignore the first and last element (don't need checking).
     while (nextDiff != null) {
       if (prevDiff.operation == Operation.EQUAL &&
@@ -1053,13 +1053,13 @@ class DiffPatch {
    * @param loc Location within text1.
    * @return Location within text2.
    */
-  public int diff_xIndex(LinkedList<Diff> diffs, int loc) {
+  public int diff_xIndex(LinkedList<Diff<T>> diffs, int loc) {
     int chars1 = 0;
     int chars2 = 0;
     int last_chars1 = 0;
     int last_chars2 = 0;
-    Diff lastDiff = null;
-    for (Diff aDiff : diffs) {
+    Diff<T> lastDiff = null;
+    for (Diff<T> aDiff : diffs) {
       if (aDiff.operation != Operation.INSERT) {
         // Equality or deletion.
         chars1 += aDiff.text.size();
@@ -1089,9 +1089,9 @@ class DiffPatch {
    * @param diffs LinkedList of Diff objects.
    * @return Source text.
    */
-  public String diff_text1(LinkedList<Diff> diffs) {
+  public String diff_text1(LinkedList<Diff<T>> diffs) {
     StringBuilder text = new StringBuilder();
-    for (Diff aDiff : diffs) {
+    for (Diff<T> aDiff : diffs) {
       if (aDiff.operation != Operation.INSERT) {
         text.append(codepointTupleToString( aDiff.text ));
       }
@@ -1104,9 +1104,9 @@ class DiffPatch {
    * @param diffs LinkedList of Diff objects.
    * @return Destination text.
    */
-  public String diff_text2(LinkedList<Diff> diffs) {
+  public String diff_text2(LinkedList<Diff<T>> diffs) {
     StringBuilder text = new StringBuilder();
-    for (Diff aDiff : diffs) {
+    for (Diff<T> aDiff : diffs) {
       if (aDiff.operation != Operation.DELETE) {
         text.append(codepointTupleToString( aDiff.text ));
       }
@@ -1120,11 +1120,11 @@ class DiffPatch {
    * @param diffs LinkedList of Diff objects.
    * @return Number of changes.
    */
-  public int diff_levenshtein(LinkedList<Diff> diffs) {
+  public int diff_levenshtein(LinkedList<Diff<T>> diffs) {
     int levenshtein = 0;
     int insertions = 0;
     int deletions = 0;
-    for (Diff aDiff : diffs) {
+    for (Diff<T> aDiff : diffs) {
       switch (aDiff.operation) {
       case INSERT:
         insertions += aDiff.text.size();
@@ -1144,141 +1144,16 @@ class DiffPatch {
     return levenshtein;
   }
 
-  /**
-   * Compute a list of patches to turn text1 into text2.
-   * A set of diffs will be computed.
-   * @param text1 Old text.
-   * @param text2 New text.
-   * @return LinkedList of Patch objects.
-   */
-  public LinkedList<Patch> patch_make(String text1, String text2) {
-    if (text1 == null || text2 == null) {
-      throw new IllegalArgumentException("Null inputs. (patch_make)");
-    }
-    // No diffs provided, compute our own.
-    LinkedList<Diff> diffs = diff_main(text1, text2, true);
-    if (diffs.size() > 2) {
-      diff_cleanupSemantic(diffs);
-      diff_cleanupEfficiency(diffs);
-    }
-    return patch_make(text1, diffs);
-  }
-
-  /**
-   * Compute a list of patches to turn text1 into text2.
-   * text1 will be derived from the provided diffs.
-   * @param diffs Array of Diff objects for text1 to text2.
-   * @return LinkedList of Patch objects.
-   */
-  public LinkedList<Patch> patch_make(LinkedList<Diff> diffs) {
-    if (diffs == null) {
-      throw new IllegalArgumentException("Null inputs. (patch_make)");
-    }
-    // No origin string provided, compute our own.
-    String text1 = diff_text1(diffs);
-    return patch_make(text1, diffs);
-  }
-
-  /**
-   * Compute a list of patches to turn text1 into text2.
-   * text2 is not provided, diffs are the delta between text1 and text2.
-   * @param text1 Old text.
-   * @param diffs Array of Diff objects for text1 to text2.
-   * @return LinkedList of Patch objects.
-   */
-  public LinkedList<Patch> patch_make(String text1, LinkedList<Diff> diffs) {
-    if (text1 == null || diffs == null) {
-      throw new IllegalArgumentException("Null inputs. (patch_make)");
-    }
-
-    LinkedList<Patch> patches = new LinkedList<Patch>();
-    if (diffs.isEmpty()) {
-      return patches;  // Get rid of the null case.
-    }
-    Patch patch = new Patch();
-    int char_count1 = 0;  // Number of characters into the text1 string.
-    int char_count2 = 0;  // Number of characters into the text2 string.
-    // Start with text1 (prepatch_text) and apply the diffs until we arrive at
-    // text2 (postpatch_text). We recreate the patches one by one to determine
-    // context info.
-//    String prepatch_text = text1;
-    String postpatch_text = text1;
-    for (Diff aDiff : diffs) {
-      if (patch.diffs.isEmpty() && aDiff.operation != Operation.EQUAL) {
-        // A new patch starts here.
-        patch.start1 = char_count1;
-        patch.start2 = char_count2;
-      }
-
-      switch (aDiff.operation) {
-      case INSERT:
-      	System.out.println( "INSERT " + aDiff.text );
-        patch.diffs.add(aDiff);
-        patch.length2 += aDiff.text.size();
-        postpatch_text = postpatch_text.substring(0, char_count2)
-            + aDiff.text + postpatch_text.substring(char_count2);
-        break;
-      case DELETE:
-      	System.out.println( "DELETE" + aDiff.text );
-        patch.length1 += aDiff.text.size();
-        patch.diffs.add(aDiff);
-        postpatch_text = postpatch_text.substring(0, char_count2)
-            + postpatch_text.substring(char_count2 + aDiff.text.size());
-        break;
-      case EQUAL:
-        if (aDiff.text.size() <= 2 * Patch_Margin
-            && !patch.diffs.isEmpty() && aDiff != diffs.getLast()) {
-          // Small equality inside a patch.
-          patch.diffs.add(aDiff);
-          patch.length1 += aDiff.text.size();
-          patch.length2 += aDiff.text.size();
-        }
-
-        if (aDiff.text.size() >= 2 * Patch_Margin) {
-          // Time for a new patch.
-          if (!patch.diffs.isEmpty()) {
-//            patch_addContext(patch, prepatch_text);
-            patches.add(patch);
-            patch = new Patch();
-            // Unlike Unidiff, our patch lists have a rolling context.
-            // http://code.google.com/p/google-diff-match-patch/wiki/Unidiff
-            // Update prepatch text & pos to reflect the application of the
-            // just completed patch.
-//            prepatch_text = postpatch_text;
-            char_count1 = char_count2;
-          }
-        }
-      	System.out.println( "EQUAL" + aDiff.text );
-        break;
-      }
-
-      // Update the current character count.
-      if (aDiff.operation != Operation.INSERT) {
-        char_count1 += aDiff.text.size();
-      }
-      if (aDiff.operation != Operation.DELETE) {
-        char_count2 += aDiff.text.size();
-      }
-    }
-    // Pick up the leftover patch if not empty.
-    if (!patch.diffs.isEmpty()) {
-//      patch_addContext(patch, prepatch_text);
-      patches.add(patch);
-    }
-
-    return patches;
-  }
-
 
   /**
    * Class representing one diff operation.
    */
-  public static class Diff {
+  public static class Diff<T> {
   	
-  	public Diff(Operation operation, String text) {
-  		this.operation = operation;
-  		this.text = tt(text);
-    }
+  	public static Diff<Integer> fromText(Operation operation, String text) {
+  		return new Diff<Integer>(operation, tt(text));
+  	}
+  	
     /**
      * One of: INSERT, DELETE or EQUAL.
      */
@@ -1286,14 +1161,14 @@ class DiffPatch {
     /**
      * The text associated with this diff operation.
      */
-    public KnittingTuple<Object> text;
+    public KnittingTuple<T> text;
 
     /**
      * Constructor.  Initializes the diff with the provided values.
      * @param operation One of INSERT, DELETE or EQUAL.
      * @param text The text being applied.
      */
-    public Diff(Operation operation, KnittingTuple<Object> text) {
+    public Diff(Operation operation, KnittingTuple<T> text) {
       // Construct a diff with the specified operation and text.
       this.operation = operation;
       this.text = text;
@@ -1338,7 +1213,7 @@ class DiffPatch {
       if (getClass() != obj.getClass()) {
         return false;
       }
-      Diff other = (Diff) obj;
+      Diff<?> other = (Diff<?>) obj;
       if (operation != other.operation) {
         return false;
       }
@@ -1354,24 +1229,6 @@ class DiffPatch {
   }
 
 
-
-  /**
-   * Class representing one patch operation.
-   */
-  public static class Patch {
-    public LinkedList<Diff> diffs;
-    public int start1;
-    public int start2;
-    public int length1;
-    public int length2;
-
-    /**
-     * Constructor.  Initializes with an empty list of diffs.
-     */
-    public Patch() {
-      this.diffs = new LinkedList<Diff>();
-    }
-  }
 
   private static <T> boolean equal_null(T first, T second) {
   	if (first == null && second == null) return true;

@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.github.evenjn.yarn.OptionalPurlFactory;
 import org.github.evenjn.yarn.OptionalPurlHFactory;
 import org.github.evenjn.yarn.StreamMapH;
 import org.github.evenjn.yarn.StreamPurlHFactory;
+
 /**
  * 
  * <h1>KnittingCursable</h1>
@@ -107,31 +108,41 @@ public class KnittingCursable<I> implements
 		this.wrapped = cursable;
 	}
 
-	@Override
-	public String toString() {
-		return "A knitting cursable.";
-	}
-
 	/**
-	 * Returns a view of the concatenation of the argument cursable after this cursable.
+	 * Returns a view of the concatenation of the argument cursable after this
+	 * cursable.
 	 * 
 	 * @param tail
-	 *          The cursor to concatenate after this.
-	 * @return A view of the concatenation of the argument cursable after this cursable.
+	 *          A cursable to concatenate after this cursable.
+	 * @return A view of the concatenation of the argument cursable after this
+	 *         cursable.
 	 * @since 1.0
 	 */
 	public KnittingCursable<I> append( final Cursable<? extends I> tail ) {
-		KnittingCursable<I> outer_cursable = this;
-		Cursable<I> result = new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return outer_cursable.pull( hook ).append( tail.pull( hook ) );
-			}
-		};
-		return wrap( result );
+		return wrap( new ConcatenateCursable<I>( wrapped, tail ) );
 	}
 
+	/**
+	 * <p>
+	 * Adds all elements of this cursable to the argument collection, then returns
+	 * it.
+	 * </p>
+	 * 
+	 * <p>
+	 * The objects collected may be dead. In general, cursors do not guarantee
+	 * that the objects they return survive subsequent invocations of
+	 * {@link #next()}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type the argument collection.
+	 * @param collection
+	 *          The collection to add elements to.
+	 * @return The argument collection.
+	 * @throws IllegalStateException
+	 *           when this cursor is not in pristine state.
+	 * @since 1.0
+	 */
 	public <K extends Collection<? super I>> K collect( K collection ) {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			return pull( hook ).collect( collection );
@@ -163,8 +174,8 @@ public class KnittingCursable<I> implements
 	/*
 	 * 
 	 * @return a cursable that rolls over this and the other in parallel, each
-	 *         time applying the bifunction on the result of the two elements, and
-	 *         returning in output the application result.
+	 * time applying the bifunction on the result of the two elements, and
+	 * returning in output the application result.
 	 */
 	public <R, M> KnittingCursable<M> entwine(
 			Cursable<R> other,
@@ -197,7 +208,7 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<I> pull( Hook hook ) {
-				return new FilterCursor<>(wrapped.pull( hook ), stateless_predicate );
+				return new FilterCursor<>( wrapped.pull( hook ), stateless_predicate );
 			}
 		} );
 	}
@@ -450,10 +461,9 @@ public class KnittingCursable<I> implements
 	}
 
 	/*
-	 * returned object may be dead when cursor does not guarantee objects
-	 * survive next() and/or the closing of hook. 
-	 * throws IllegalStateException when it not the case that there is exactly one
-	 * element.
+	 * returned object may be dead when cursor does not guarantee objects survive
+	 * next() and/or the closing of hook. throws IllegalStateException when it not
+	 * the case that there is exactly one element.
 	 */
 	public I one( ) {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
@@ -473,8 +483,7 @@ public class KnittingCursable<I> implements
 	 * This is a terminal operation.
 	 * 
 	 * returns an empty optionsl when it not the case that there is exactly one
-	 * element.
-	 * returned object may be dead when cursor does not guarantee objects
+	 * element. returned object may be dead when cursor does not guarantee objects
 	 * survive next() and/or the closing of hook.
 	 */
 	public Optional<I> optionalOne( ) {
@@ -570,7 +579,6 @@ public class KnittingCursable<I> implements
 		return KnittingCursable.wrap( h -> pull( h ).crop( predicate ) );
 	}
 
-
 	/**
 	 * <p>
 	 * Returns a view of the last {@code show} elements visible after hiding the
@@ -600,7 +608,7 @@ public class KnittingCursable<I> implements
 	 *         last {@code hide} elements in this cursable.
 	 * @since 1.0
 	 */
-	public KnittingCursable<I> tail( int hide, int show) {
+	public KnittingCursable<I> tail( int hide, int show ) {
 		int final_show = show < 0 ? 0 : show;
 		int final_hide = hide < 0 ? 0 : hide;
 		int len = size( ) - final_hide;
@@ -608,7 +616,7 @@ public class KnittingCursable<I> implements
 			len = final_show;
 		}
 		int skip = size( ) - ( final_hide + len );
-		if (skip < 0) {
+		if ( skip < 0 ) {
 			skip = 0;
 		}
 		int final_len = len;
@@ -621,8 +629,6 @@ public class KnittingCursable<I> implements
 			}
 		} );
 	}
-
-
 
 	/**
 	 * <p>
@@ -810,7 +816,6 @@ public class KnittingCursable<I> implements
 				}
 			} );
 
-
 	@SafeVarargs
 	public static <K> KnittingCursable<K> on( K ... elements ) {
 		Cursable<K> cursable = new Cursable<K>( ) {
@@ -837,23 +842,23 @@ public class KnittingCursable<I> implements
 	public static <K> KnittingCursable<K> wrap( K[] array ) {
 		return wrap( new ArrayCursable<K>( array ) );
 	}
-	
+
 	public boolean contentEquals( Cursable<?> other ) {
 		if ( other == this )
 			return true;
 		Cursable<?> o = (Cursable<?>) other;
-		
+
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<I> pull1 = this.pull( hook );
-			KnittingCursor<?> pull2 = KnittingCursor.wrap(o.pull( hook ));
-			
-			for (;;) {
+			KnittingCursor<?> pull2 = KnittingCursor.wrap( o.pull( hook ) );
+
+			for ( ;; ) {
 				boolean hasNext1 = pull1.hasNext( );
 				boolean hasNext2 = pull2.hasNext( );
-				if (hasNext1 != hasNext2) {
+				if ( hasNext1 != hasNext2 ) {
 					return false;
 				}
-				if (!hasNext1) {
+				if ( !hasNext1 ) {
 					return true;
 				}
 				I next1 = pull1.next( );

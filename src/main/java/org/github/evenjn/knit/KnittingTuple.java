@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,8 +75,8 @@ public class KnittingTuple<I> implements
 	 * Computes Damerau-Levenshtein distance.
 	 */
 	public int distance( Tuple<?> other ) {
-		DiffPatch dmp = new DiffPatch( );
-		LinkedList<Diff> diffs =
+		DiffPatch<Object> dmp = new DiffPatch<Object>( );
+		LinkedList<Diff<Object>> diffs =
 				dmp.diff_main( map( x -> x ),
 						KnittingTuple.wrap( other ).map( x -> x ) );
 		return dmp.diff_levenshtein( diffs );
