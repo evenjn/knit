@@ -34,13 +34,15 @@ class DiffIterator<K> implements
 
 	private final KnittingCursor<K> kb;
 
-	public DiffIterator(Tuple<K> a, Tuple<K> b) {
+	public DiffIterator(Tuple<K> a, Tuple<K> b, Equivalencer<K> equivalencer) {
 		ka = KnittingCursor.wrap( a );
 		kb = KnittingCursor.wrap( b );
 		DiffPatch<K> dmp = new DiffPatch<K>( );
 		LinkedList<Diff<K>> diffs =
-				dmp.diff_main( KnittingTuple.wrap( a ).map( x -> x ), KnittingTuple
-						.wrap( b ).map( x -> x ) );
+				dmp.diff_main(
+						KnittingTuple.wrap( a ).map( x -> x ),
+						KnittingTuple.wrap( b ).map( x -> x ),
+						equivalencer );
 		kd = KnittingCursor.wrap( diffs.iterator( ) );
 	}
 

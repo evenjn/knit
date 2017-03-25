@@ -156,13 +156,13 @@ public class DiffTest
 	public void testDiffCleanupMerge( ) {
 		// Cleanup a messy diff.
 		LinkedList<Diff<Integer>> diffs = diffList( );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Null case.", diffList( ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
 						INSERT, "c" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupMerge: No change case.",
 				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
@@ -171,21 +171,21 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( EQUAL, "b" ), Diff.fromText(
 						EQUAL, "c" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Merge equalities.", diffList( Diff.fromText(
 				EQUAL, "abc" ) ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
 						DELETE, "c" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Merge deletions.", diffList( Diff.fromText(
 				DELETE, "abc" ) ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( INSERT, "a" ), Diff.fromText( INSERT, "b" ), Diff.fromText(
 						INSERT, "c" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Merge insertions.", diffList( Diff.fromText(
 				INSERT, "abc" ) ), diffs );
 
@@ -193,7 +193,7 @@ public class DiffTest
 				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "b" ), Diff.fromText(
 						DELETE, "c" ), Diff.fromText( INSERT, "d" ), Diff.fromText( EQUAL, "e" ),
 						Diff.fromText( EQUAL, "f" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupMerge: Merge interweave.",
 				diffList( Diff.fromText( DELETE, "ac" ), Diff.fromText( INSERT, "bd" ), Diff.fromText(
@@ -202,7 +202,7 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( INSERT, "abc" ), Diff.fromText(
 						DELETE, "dc" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupMerge: Prefix and suffix detection.",
 				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "d" ), Diff.fromText(
@@ -211,7 +211,7 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( EQUAL, "x" ), Diff.fromText( DELETE, "a" ), Diff.fromText(
 						INSERT, "abc" ), Diff.fromText( DELETE, "dc" ), Diff.fromText( EQUAL, "y" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupMerge: Prefix and suffix detection with equalities.",
 				diffList( Diff.fromText( EQUAL, "xa" ), Diff.fromText( DELETE, "d" ), Diff.fromText(
@@ -220,28 +220,28 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( INSERT, "ba" ), Diff.fromText(
 						EQUAL, "c" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Slide edit left.",
 				diffList( Diff.fromText( INSERT, "ab" ), Diff.fromText( EQUAL, "ac" ) ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( EQUAL, "c" ), Diff.fromText( INSERT, "ab" ), Diff.fromText(
 						EQUAL, "a" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Slide edit right.",
 				diffList( Diff.fromText( EQUAL, "ca" ), Diff.fromText( INSERT, "ba" ) ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( EQUAL, "a" ), Diff.fromText( DELETE, "b" ), Diff.fromText(
 						EQUAL, "c" ), Diff.fromText( DELETE, "ac" ), Diff.fromText( EQUAL, "x" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Slide edit left recursive.",
 				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( EQUAL, "acx" ) ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( EQUAL, "x" ), Diff.fromText( DELETE, "ca" ), Diff.fromText(
 						EQUAL, "c" ), Diff.fromText( DELETE, "b" ), Diff.fromText( EQUAL, "a" ) );
-		dmp.diff_cleanupMerge( diffs );
+		dmp.diff_cleanupMerge( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupMerge: Slide edit right recursive.",
 				diffList( Diff.fromText( EQUAL, "xca" ), Diff.fromText( DELETE, "cba" ) ), diffs );
 	}
@@ -249,13 +249,13 @@ public class DiffTest
 	public void testDiffCleanupSemantic( ) {
 		// Cleanup semantically trivial equalities.
 		LinkedList<Diff<Integer>> diffs = diffList( );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupSemantic: Null case.", diffList( ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "cd" ), Diff.fromText(
 						EQUAL, "12" ), Diff.fromText( DELETE, "e" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupSemantic: No elimination #1.",
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "cd" ), Diff.fromText(
@@ -264,7 +264,7 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "ABC" ),
 						Diff.fromText( EQUAL, "1234" ), Diff.fromText( DELETE, "wxyz" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupSemantic: No elimination #2.",
 				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "ABC" ),
@@ -273,14 +273,14 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( DELETE, "a" ), Diff.fromText( EQUAL, "b" ), Diff.fromText(
 						DELETE, "c" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupSemantic: Simple elimination.",
 				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( INSERT, "b" ) ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( EQUAL, "cd" ), Diff.fromText(
 						DELETE, "e" ), Diff.fromText( EQUAL, "f" ), Diff.fromText( INSERT, "g" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupSemantic: Backpass elimination.",
 				diffList( Diff.fromText( DELETE, "abcdef" ), Diff.fromText( INSERT, "cdfg" ) ),
 				diffs );
@@ -290,20 +290,20 @@ public class DiffTest
 						DELETE, "B" ), Diff.fromText( INSERT, "2" ), Diff.fromText( EQUAL, "_" ),
 						Diff.fromText( INSERT, "1" ), Diff.fromText( EQUAL, "A" ), Diff.fromText( DELETE,
 								"B" ), Diff.fromText( INSERT, "2" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupSemantic: Multiple elimination.",
 				diffList( Diff.fromText( DELETE, "AB_AB" ), Diff.fromText( INSERT, "1A2_1A2" ) ),
 				diffs );
 
 		diffs = diffList( Diff.fromText( DELETE, "abcxx" ), Diff.fromText( INSERT, "xxdef" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupSemantic: No overlap elimination.",
 				diffList( Diff.fromText( DELETE, "abcxx" ), Diff.fromText( INSERT, "xxdef" ) ),
 				diffs );
 
 		diffs =
 				diffList( Diff.fromText( DELETE, "abcxxx" ), Diff.fromText( INSERT, "xxxdef" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupSemantic: Overlap elimination.",
 				diffList( Diff.fromText( DELETE, "abc" ), Diff.fromText( EQUAL, "xxx" ),
@@ -311,7 +311,7 @@ public class DiffTest
 
 		diffs =
 				diffList( Diff.fromText( DELETE, "xxxabc" ), Diff.fromText( INSERT, "defxxx" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupSemantic: Reverse overlap elimination.",
 				diffList( Diff.fromText( INSERT, "def" ), Diff.fromText( EQUAL, "xxx" ),
@@ -321,7 +321,7 @@ public class DiffTest
 				diffList( Diff.fromText( DELETE, "abcd1212" ),
 						Diff.fromText( INSERT, "1212efghi" ), Diff.fromText( EQUAL, "----" ),
 						Diff.fromText( DELETE, "A3" ), Diff.fromText( INSERT, "3BC" ) );
-		dmp.diff_cleanupSemantic( diffs );
+		dmp.diff_cleanupSemantic( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupSemantic: Two overlap eliminations.",
 				diffList( Diff.fromText( DELETE, "abcd" ), Diff.fromText( EQUAL, "1212" ),
@@ -334,13 +334,13 @@ public class DiffTest
 		// Cleanup operationally trivial equalities.
 		dmp.Diff_EditCost = 4;
 		LinkedList<Diff<Integer>> diffs = diffList( );
-		dmp.diff_cleanupEfficiency( diffs );
+		dmp.diff_cleanupEfficiency( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupEfficiency: Null case.", diffList( ), diffs );
 
 		diffs =
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
 						EQUAL, "wxyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
-		dmp.diff_cleanupEfficiency( diffs );
+		dmp.diff_cleanupEfficiency( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupEfficiency: No elimination.",
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
@@ -350,7 +350,7 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
 						EQUAL, "xyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
-		dmp.diff_cleanupEfficiency( diffs );
+		dmp.diff_cleanupEfficiency( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupEfficiency: Four-edit elimination.",
 				diffList( Diff.fromText( DELETE, "abxyzcd" ), Diff.fromText( INSERT, "12xyz34" ) ),
@@ -359,7 +359,7 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( INSERT, "12" ), Diff.fromText( EQUAL, "x" ), Diff.fromText(
 						DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
-		dmp.diff_cleanupEfficiency( diffs );
+		dmp.diff_cleanupEfficiency( diffs, DiffPatch::equal_or_both_null );
 		assertEquals( "diff_cleanupEfficiency: Three-edit elimination.",
 				diffList( Diff.fromText( DELETE, "xcd" ), Diff.fromText( INSERT, "12x34" ) ),
 				diffs );
@@ -368,7 +368,7 @@ public class DiffTest
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
 						EQUAL, "xy" ), Diff.fromText( INSERT, "34" ), Diff.fromText( EQUAL, "z" ),
 						Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "56" ) );
-		dmp.diff_cleanupEfficiency( diffs );
+		dmp.diff_cleanupEfficiency( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupEfficiency: Backpass elimination.",
 				diffList( Diff.fromText( DELETE, "abxyzcd" ), Diff.fromText( INSERT, "12xy34z56" ) ),
@@ -378,7 +378,7 @@ public class DiffTest
 		diffs =
 				diffList( Diff.fromText( DELETE, "ab" ), Diff.fromText( INSERT, "12" ), Diff.fromText(
 						EQUAL, "wxyz" ), Diff.fromText( DELETE, "cd" ), Diff.fromText( INSERT, "34" ) );
-		dmp.diff_cleanupEfficiency( diffs );
+		dmp.diff_cleanupEfficiency( diffs, DiffPatch::equal_or_both_null );
 		assertEquals(
 				"diff_cleanupEfficiency: High cost elimination.",
 				diffList( Diff.fromText( DELETE, "abwxyzcd" ), Diff.fromText( INSERT, "12wxyz34" ) ),

@@ -67,19 +67,112 @@ public class KnittingTuple<I> implements
 	}
 
 	public Iterable<Bi<I, I>> diff( Tuple<I> other ) {
-		return ( ) -> KnittingCursor.wrap( new DiffIterator<I>( this, other ) )
+		return ( ) -> KnittingCursor.wrap(
+				new DiffIterator<I>( this, other, DiffPatch::equal_or_both_null ) )
 				.asIterator( );
+	}
+
+	public Iterable<Bi<I, I>> diff( Tuple<I> other,
+			Equivalencer<I> equivalencer ) {
+		return ( ) -> KnittingCursor
+				.wrap( new DiffIterator<I>( this, other, equivalencer ) )
+				.asIterator( );
+	}
+
+	public int distance( Tuple<I> other ) {
+		return distance( other, DiffPatch::equal_or_both_null );
 	}
 
 	/*
 	 * Computes Damerau-Levenshtein distance.
 	 */
-	public int distance( Tuple<?> other ) {
-		DiffPatch<Object> dmp = new DiffPatch<Object>( );
-		LinkedList<Diff<Object>> diffs =
-				dmp.diff_main( map( x -> x ),
-						KnittingTuple.wrap( other ).map( x -> x ) );
+	public int distance( Tuple<I> other,
+			Equivalencer<I> equivalencer ) {
+		DiffPatch<I> dmp = new DiffPatch<I>( );
+		LinkedList<Diff<I>> diffs =
+				dmp.diff_main( this, KnittingTuple.wrap( other ), equivalencer );
 		return dmp.diff_levenshtein( diffs );
+	}
+
+	/*
+	 * returns elements which survive the diff with the mask.
+	 */
+	public Vector<I> intersecting(
+			Tuple<I> mask,
+			Equivalencer<I> equivalencer ) {
+		return intersectingAny( KnittingCursor.on( mask ), equivalencer );
+	}
+
+	/*
+	 * returns only elements which survive the diff in one or more masks
+	 */
+	public Vector<I> intersectingAny(
+			Cursor<? extends Tuple<I>> masks,
+			Equivalencer<I> equivalencer ) {
+
+		Vector<Boolean> keeps = new Vector<>( );
+		for ( int i = 0; i < size( ); i++ ) {
+			keeps.add( false );
+		}
+
+		for ( Tuple<I> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
+
+			int j = 0;
+			for ( Bi<I, I> bi : diff( single_mask, equivalencer ) ) {
+				if ( bi.front( ) != null && bi.back( ) != null ) {
+					keeps.set( j, true );
+				}
+				if ( bi.front( ) != null ) {
+					j++;
+				}
+			}
+		}
+
+		Vector<I> result = new Vector<>( );
+		int j = 0;
+		for ( Boolean keep : keeps ) {
+			if ( keep ) {
+				result.add( get( j ) );
+			}
+			j++;
+		}
+		return result;
+	}
+
+	/*
+	 * returns only elements which survive the diff with each mask
+	 */
+	public Vector<I> intersectingAll(
+			Cursor<? extends Tuple<I>> masks,
+			Equivalencer<I> equivalencer ) {
+
+		Vector<Boolean> keeps = new Vector<>( );
+		for ( int i = 0; i < size( ); i++ ) {
+			keeps.add( true );
+		}
+
+		for ( Tuple<I> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
+
+			int j = 0;
+			for ( Bi<I, I> bi : diff( single_mask, equivalencer ) ) {
+				if ( bi.front( ) != null && bi.back( ) != null ) {
+					keeps.set( j, false );
+				}
+				if ( bi.front( ) != null ) {
+					j++;
+				}
+			}
+		}
+
+		Vector<I> result = new Vector<>( );
+		int j = 0;
+		for ( Boolean keep : keeps ) {
+			if ( keep ) {
+				result.add( get( j ) );
+			}
+			j++;
+		}
+		return result;
 	}
 
 	/**
@@ -130,7 +223,7 @@ public class KnittingTuple<I> implements
 			public I next( )
 					throws EndOfCursorException {
 				if ( i >= size )
-					throw EndOfCursorException.neo();
+					throw EndOfCursorException.neo( );
 				return wrapped.get( i++ );
 			}
 		};
@@ -233,6 +326,24 @@ public class KnittingTuple<I> implements
 			I e = wrapped.get( i );
 			Object oe = o.get( i );
 			if ( !( e == null ? oe == null : e.equals( oe ) ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public boolean equivalentTo( Tuple<?> o, Equivalencer<I> equivalencer ) {
+		if ( o == this )
+			return true;
+		final int size = wrapped.size( );
+		if ( size != o.size( ) ) {
+			return false;
+		}
+		for ( int i = 0; i < size; i++ ) {
+			I e = wrapped.get( i );
+			Object oe = o.get( i );
+			if ( !( e == null ? oe == null : equivalencer.equivalent( e, oe ) ) ) {
 				return false;
 			}
 		}
