@@ -41,7 +41,8 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.Stack;
-import java.util.Vector;
+
+import org.github.evenjn.yarn.Equivalencer;
 
 /*
  * Functions for diff, match and patch.
@@ -440,7 +441,7 @@ class DiffPatch<T> {
 	private static KnittingTuple<Integer> tt( String s ) {
 		if (s == null) return null;
 		return KnittingTuple.wrap( KnittingCursor.wrap( s.codePoints( ).boxed( ) )
-				.collect( new Vector<Integer>( ) ) );
+				.collect( new ArrayList<Integer>( ) ) );
   }
 
 

@@ -17,8 +17,33 @@
  */
 package org.github.evenjn.knit;
 
-@FunctionalInterface
-public interface Equivalencer<T> {
+import java.util.ArrayList;
 
-	boolean equivalent( T a, Object b);
+import org.github.evenjn.yarn.Tuple;
+
+class ArrayListTuple<T> implements
+		Tuple<T> {
+
+	private ArrayList<T> arraylist;
+
+	private int size = 0;
+
+	public ArrayListTuple(ArrayList<T> arraylist) {
+		this.arraylist = arraylist;
+		size = arraylist.size( );
+	}
+
+	@Override
+	public T get( int index ) {
+		if ( index >= size ) {
+			throw new IllegalArgumentException( );
+		}
+		return arraylist.get( index );
+	}
+
+	@Override
+	public int size( ) {
+		return size;
+	}
+
 }

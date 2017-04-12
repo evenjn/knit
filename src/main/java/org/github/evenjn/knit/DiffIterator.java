@@ -23,6 +23,7 @@ import org.github.evenjn.knit.DiffPatch.Diff;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
+import org.github.evenjn.yarn.Equivalencer;
 import org.github.evenjn.yarn.Tuple;
 
 class DiffIterator<K> implements

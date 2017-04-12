@@ -22,9 +22,30 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.Cursor;
+import org.github.evenjn.yarn.CursorMap;
+import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.Hook;
 
 public class compiler_check_override {
+
+	private static final CursorMap<String, Integer> cursormap =
+			new CursorMap<String, Integer>( ) {
+
+				@Override
+				public Cursor<Integer> get( String input ) {
+					return KnittingCursor.on( 1 );
+				}
+			};
+
+	private static final CursorMapH<String, Integer> cursormaph =
+			new CursorMapH<String, Integer>( ) {
+
+				@Override
+				public Cursor<Integer> get( Hook h, String input ) {
+					return KnittingCursor.on( 1 );
+				}
+			};
 
 	private static final Predicate<String> predicate =
 			new Predicate<String>( ) {
@@ -55,7 +76,13 @@ public class compiler_check_override {
 
 		cursable.map( x -> x.substring( 1 ) );
 		cursable.filter( x -> x.isEmpty( ) );
+		
+		cursable.flatmap( cursormap );
+		cursable.flatmap( cursormaph );
 
+		cursable.flatmap( x -> KnittingCursor.on( 1 ) );
+		cursable.flatmap( ( h, x ) -> KnittingCursor.on( 1 ) );
+		
 		Function<Hook, Consumer<String>> ff1 = null;
 		Function<Hook, Consumer<Object>> ff2 = null;
 
@@ -68,4 +95,5 @@ public class compiler_check_override {
 		}
 
 	}
+
 }

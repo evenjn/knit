@@ -27,35 +27,48 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.github.evenjn.yarn.ArrayMap;
+import org.github.evenjn.yarn.ArrayPurl;
 import org.github.evenjn.yarn.ArrayPurlFactory;
 import org.github.evenjn.yarn.AutoHook;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
 import org.github.evenjn.yarn.CursableMapH;
+import org.github.evenjn.yarn.CursablePurl;
 import org.github.evenjn.yarn.CursablePurlFactory;
+import org.github.evenjn.yarn.CursablePurlH;
 import org.github.evenjn.yarn.CursablePurlHFactory;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorMapH;
+import org.github.evenjn.yarn.CursorPurl;
 import org.github.evenjn.yarn.CursorPurlFactory;
+import org.github.evenjn.yarn.CursorPurlH;
 import org.github.evenjn.yarn.CursorPurlHFactory;
 import org.github.evenjn.yarn.EndOfCursorException;
+import org.github.evenjn.yarn.Equivalencer;
 import org.github.evenjn.yarn.FunctionH;
 import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
 import org.github.evenjn.yarn.IterableMapH;
+import org.github.evenjn.yarn.IterablePurl;
 import org.github.evenjn.yarn.IterablePurlFactory;
+import org.github.evenjn.yarn.IterablePurlH;
 import org.github.evenjn.yarn.IterablePurlHFactory;
 import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorMapH;
+import org.github.evenjn.yarn.IteratorPurl;
 import org.github.evenjn.yarn.IteratorPurlFactory;
+import org.github.evenjn.yarn.IteratorPurlH;
 import org.github.evenjn.yarn.IteratorPurlHFactory;
 import org.github.evenjn.yarn.OptionMap;
 import org.github.evenjn.yarn.OptionMapH;
+import org.github.evenjn.yarn.OptionalPurl;
 import org.github.evenjn.yarn.OptionalPurlFactory;
+import org.github.evenjn.yarn.OptionalPurlH;
 import org.github.evenjn.yarn.OptionalPurlHFactory;
 import org.github.evenjn.yarn.StreamMapH;
+import org.github.evenjn.yarn.StreamPurlH;
 import org.github.evenjn.yarn.StreamPurlHFactory;
 
 /**
@@ -67,31 +80,109 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * access its contents.
  * </p>
  * 
- * <h2>Methods of a KnittingCursor</h2>
+ * <p>
+ * Briefly, a {@code KnittingCursable} may be used in one of three ways:
+ * </p>
+ * 
+ * <ul>
+ * <li>As a simple Cursable, invoking the
+ * {@link org.github.evenjn.yarn.Cursable#pull(Hook) pull} method;</li>
+ * <li>As a resource to be harvested, invoking a rolling method such as
+ * {@link #collect(Collection)};</li>
+ * <li>As a resource to transform, invoking a transformation method such as
+ * {@link #map(Function)};</li>
+ * </ul>
  * 
  * <p>
- * Non-static public methods of {@code KnittingCursor} fall into one of the
- * following three categories:
+ * Unlike {@code KnittingCursor}, these three modes of operation are not
+ * exclusive: a {@code KnittingCursable} may be used several times, in any mode.
+ * </p>
+ * 
+ * <h2>Methods of a KnittingCursable</h2>
+ * 
+ * <p>
+ * Non-static public methods of {@code KnittingCursable} fall into one of the
+ * following four categories:
  * </p>
  * 
  * <ul>
  * <li>Object methods (inherited from {@link java.lang.Object Object})</li>
- * <li>Terminal methods (listed below)</li>
+ * <li>Cursable methods ({@link #pull(Hook)})</li>
+ * <li>Rolling methods (listed below)</li>
  * <li>Transformation methods (listed below)</li>
+ * <li>Other methods ({@link #contentEquals(Cursable)})</li>
  * </ul>
  *
  * <p>
- * Terminal methods repeatedly invoke the wrapped cursor's
- * {@link org.github.evenjn.yarn.Cursor#next() next()} until the end is reached.
- * The following methods are terminal:
+ * Rolling methods instantiate a {@code Cursor} using the wrapped cursable and
+ * repeatedly invoke the method {@link org.github.evenjn.yarn.Cursor#next()
+ * next()} until the end is reached. The following methods are rolling:
  * </p>
  * <ul>
  * <li>{@link #collect(Collection)}</li>
  * <li>{@link #consume(Function)}</li>
+ * <li>{@link #contentEquals(Cursable)}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
  * <li>{@link #reduce(Object, BiFunction)}</li>
  * <li>{@link #roll()}</li>
+ * <li>{@link #size()}</li>
+ * </ul>
+ * 
+ * 
+ * <p>
+ * Transformations are a group of methods that return a new
+ * {@code KnittingCursable} object, which provides a new view of the contents of
+ * the wrapped cursable. Transformation methods do not instantiate cursors at
+ * the time of their invocation. The following methods are transformations:
+ * </p>
+ * 
+ * <ul>
+ * <li>{@link #append(Cursable)}</li>
+ * <li>{@link #asIterator()}</li>
+ * <li>{@link #asStream()}</li>
+ * <li>{@link #crop(Predicate)}</li>
+ * <li>{@link #entwine(Cursor, BiFunction)}</li>
+ * <li>{@link #filter(Predicate)}</li>
+ * 
+ * <li>{@link #flatmap(CursorMap)}</li>
+ * <li>{@link #flatmap(Hook, CursorMapH)}</li>
+ * <li>{@link #flatmapArray(ArrayMap)}</li>
+ * <li>{@link #flatmapCursable(CursableMap)}</li>
+ * <li>{@link #flatmapCursable(CursableMapH)}</li>
+ * <li>{@link #flatmapCursor(CursorMap)}</li>
+ * <li>{@link #flatmapCursor(CursorMapH)}</li>
+ * <li>{@link #flatmapIterable(IterableMap)}</li>
+ * <li>{@link #flatmapIterable(IterableMapH)}</li>
+ * <li>{@link #flatmapIterator(IteratorMap)}</li>
+ * <li>{@link #flatmapIterator(IteratorMapH)}</li>
+ * <li>{@link #flatmapOptional(OptionMap)}</li>
+ * <li>{@link #flatmapOptional(OptionMapH)}</li>
+ * <li>{@link #flatmapStream(Hook, StreamMapH)}</li>
+ * 
+ * <li>{@link #head(int, int)}</li>
+ * <li>{@link #headless(int)}</li>
+ * <li>{@link #map(Function)}</li>
+ * <li>{@link #map(Hook, FunctionH)}</li>
+ * <li>{@link #numbered()}</li>
+ * <li>{@link #peek(Consumer)}</li>
+ * <li>{@link #prepend(Cursor)}</li>
+ * <li>{@link #purl(CursorPurl)}</li>
+ * <li>{@link #purl(Hook, CursorPurlH)}</li>
+ * <li>{@link #purlArray(ArrayPurl)}</li>
+ * <li>{@link #purlCursable(CursablePurl)}</li>
+ * <li>{@link #purlCursable(Hook, CursablePurlH)}</li>
+ * <li>{@link #purlCursor(CursorPurl)}</li>
+ * <li>{@link #purlCursor(Hook, CursorPurlH)}</li>
+ * <li>{@link #purlIterable(IterablePurl)}</li>
+ * <li>{@link #purlIterable(Hook, IterablePurlH)}</li>
+ * <li>{@link #purlIterator(IteratorPurl)}</li>
+ * <li>{@link #purlIterator(Hook, IteratorPurlH)}</li>
+ * <li>{@link #purlOptional(OptionalPurl)}</li>
+ * <li>{@link #purlOptional(Hook, OptionalPurlH)}</li>
+ * <li>{@link #purlStream(Hook, StreamPurlH)}</li>
+ * <li>{@link #tail(int, int)}</li>
+ * <li>{@link #tailless(int)}</li>
  * </ul>
  * 
  * @param <I>
@@ -124,6 +215,42 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
+	 * Returns a view of this cursable as a {@link java.util.Iterator}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param hook
+	 *          A hook.
+	 * @return A view of this cursable as a {@link java.util.Iterator}.
+	 * @since 1.0
+	 */
+	public Iterator<I> asIterator( Hook hook ) {
+		return pull( hook ).asIterator( );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view of this cursable as a {@link java.util.stream.Stream}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param hook
+	 *          A hook.
+	 * @return A view of this cursable as a {@link java.util.stream.Stream}.
+	 * @since 1.0
+	 */
+	public Stream<I> asStream( Hook hook ) {
+		return pull( hook ).asStream( );
+	}
+
+	/**
+	 * <p>
 	 * Adds all elements of this cursable to the argument collection, then returns
 	 * it.
 	 * </p>
@@ -149,26 +276,43 @@ public class KnittingCursable<I> implements
 		}
 	}
 
-	public int roll( ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			return pull( hook ).roll( );
-		}
-	}
-
+	/**
+	 * <p>
+	 * Feeds a consumer with the elements of this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * Obtains a consumer from the argument {@code consumer_provider}, hooking it
+	 * to a local, temporary hook. Then, this method obtains a cursor using this
+	 * cursable's {@link #pull(Hook)}, hooking it to the same local hook.
+	 * </p>
+	 * 
+	 * <p>
+	 * Finally, this method invokes that cursor's
+	 * {@link org.github.evenjn.yarn.Cursor#next() next()} method, passing each
+	 * object obtained this way to the consumer, until the end of the cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of {@code Consumer} returned by the argument.
+	 * @param consumer_provider
+	 *          A system that provides hooked consumers.
+	 * @since 1.0
+	 */
 	public <K extends Consumer<? super I>> void consume(
-			Function<Hook, K> hook_consumer ) {
+			Function<Hook, K> consumer_provider ) {
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			K consumer = hook_consumer.apply( hook );
+			K consumer = consumer_provider.apply( hook );
 			pull( hook ).peek( consumer ).roll( );
 		}
 	}
 
-	public Iterator<I> asIterator( Hook hook ) {
-		return pull( hook ).asIterator( );
-	}
-
-	public Stream<I> asStream( Hook hook ) {
-		return pull( hook ).asStream( );
+	public KnittingCursable<KnittingCursor<I>> crop( Predicate<I> predicate ) {
+		return KnittingCursable.wrap( h -> pull( h ).crop( predicate ) );
 	}
 
 	/*
@@ -189,6 +333,52 @@ public class KnittingCursable<I> implements
 			}
 		};
 		return wrap( result );
+	}
+
+	/**
+	 * Returns true when this cursable and the {@code other} cursable have the
+	 * same number of elements, and when each i-th element of this cursable is
+	 * equivalent to the i-th element of the {@code other} cursable. Returns false
+	 * otherwise.
+	 * 
+	 * @param other
+	 *          Another cursable.
+	 * @param equivalencer
+	 *          A function that tells whether two objects are equivalent.
+	 * @return true when this cursable and the {@code other} cursable have the
+	 *         same number of elements, and when each i-th element of this
+	 *         cursable is equivalent to the i-th element of the {@code other}
+	 *         cursable. False otherwise.
+	 */
+	public boolean equivalentTo( Cursable<?> other,
+			Equivalencer<I> equivalencer ) {
+		if ( other == this )
+			return true;
+		Cursable<?> o = (Cursable<?>) other;
+
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			KnittingCursor<I> pull1 = this.pull( hook );
+			KnittingCursor<?> pull2 = KnittingCursor.wrap( o.pull( hook ) );
+
+			for ( ;; ) {
+				boolean hasNext1 = pull1.hasNext( );
+				boolean hasNext2 = pull2.hasNext( );
+				if ( hasNext1 != hasNext2 ) {
+					return false;
+				}
+				if ( !hasNext1 ) {
+					return true;
+				}
+				I next1 = pull1.next( );
+				Object next2 = pull2.next( );
+				if ( ! equivalencer.equivalent( next1, next2 ) ) {
+					return false;
+				}
+			}
+		}
+		catch ( EndOfCursorException e ) {
+			throw new IllegalStateException( e );
+		}
 	}
 
 	/**
@@ -213,160 +403,518 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
-	public <O> KnittingCursable<O> flatmapArray(
-			ArrayMap<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) )
-						.flatmapArray( stitch );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> flatmapCursable(
-			CursableMap<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursable(
-						hook, stitch );
-			}
-		} );
-	}
-
-	@Deprecated
-	public <O> KnittingCursable<O> flatmapCursable(
-			CursableMapH<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursable(
-						hook, stitch );
-			}
-		} );
-	}
-
-	@Deprecated
-	public <O> KnittingCursable<O> flatmapCursor(
-			CursorMap<? super I, O> stitch ) {
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmap(CursorMap)} with the argument
+	 * {@code stateless_cursor_map}, and returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursors returned by the argument
+	 *          {@code stateless_cursor_map}.
+	 * @param stateless_cursor_map
+	 *          A stateless function that returns cursors.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmap(
+			CursorMap<? super I, O> stateless_cursor_map ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursor(
-						stitch );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> flatmapCursor(
-			CursorMapH<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursor( hook,
-						stitch );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> flatmapIterable(
-			IterableMap<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterable(
-						stitch );
-			}
-		} );
-	}
-
-	@Deprecated
-	public <O> KnittingCursable<O> flatmapIterable(
-			IterableMapH<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterable(
-						hook, stitch );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> flatmapIterator(
-			IteratorMap<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterator(
-						stitch );
-			}
-		} );
-	}
-
-	@Deprecated
-	public <O> KnittingCursable<O> flatmapIterator(
-			IteratorMapH<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterator(
-						hook, stitch );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> flatmapOptional(
-			OptionMap<? super I, O> optional_map ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) )
-						.flatmapOptional( optional_map );
-			}
-		} );
-	}
-
-	@Deprecated
-	public <O> KnittingCursable<O> flatmapOptional(
-			OptionMapH<? super I, O> optional_map_h )
-			throws IllegalStateException {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) )
-						.flatmapOptional( hook, optional_map_h );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> flatmapStream(
-			StreamMapH<? super I, O> stitch ) {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapStream( hook,
-						stitch );
+						stateless_cursor_map );
 			}
 		} );
 	}
 
 	/**
 	 * <p>
-	 * Returns a view showing the first {@code show} elements visible after hiding
-	 * the first {@code hide} elements in this cursable.
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmap(Hook, CursorMap)} with the hook already
+	 * available and the argument {@code stateless_cursor_map_h}, and returns the
+	 * resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursors returned by the argument
+	 *          {@code stateless_cursor_map_h}.
+	 * @param stateless_cursor_map_h
+	 *          A stateless function that returns cursors.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmap(
+			CursorMapH<? super I, O> stateless_cursor_map_h ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursor( hook,
+						stateless_cursor_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapArray(ArrayMap)} with the argument
+	 * {@code stateless_cursor_map}, and returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursors returned by the argument
+	 *          {@code stateless_array_map}.
+	 * @param stateless_array_map
+	 *          A stateless function that returns arrays.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapArray(
+			ArrayMap<? super I, O> stateless_array_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) )
+						.flatmapArray( stateless_array_map );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapCursable(Hook, CursableMap)} with the hook
+	 * already available and the argument {@code stateless_cursable_map}, and
+	 * returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursables returned by the argument
+	 *          {@code stateless_cursable_map}.
+	 * @param stateless_cursable_map
+	 *          A stateless function that returns cursables.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapCursable(
+			CursableMap<? super I, O> stateless_cursable_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursable(
+						hook, stateless_cursable_map );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapCursable(Hook, CursableMapH)} with the hook
+	 * already available and the argument {@code stateless_cursable_map_h}, and
+	 * returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursables returned by the argument
+	 *          {@code stateless_cursable_map_h}.
+	 * @param stateless_cursable_map_h
+	 *          A stateless function that returns cursables.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapCursable(
+			CursableMapH<? super I, O> stateless_cursable_map_h ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursable(
+						hook, stateless_cursable_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * An alias of {@link #flatmap(CursorMap)}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursors returned by the argument
+	 *          {@code stateless_cursor_map}.
+	 * @param stateless_cursor_map
+	 *          A stateless function that returns cursors.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapCursor(
+			CursorMap<? super I, O> stateless_cursor_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursor(
+						stateless_cursor_map );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * An alias of {@link #flatmap(CursorMaph)}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the cursors returned by the argument
+	 *          {@code stateless_cursor_map_h}.
+	 * @param stateless_cursor_map_h
+	 *          A stateless function that returns cursors.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapCursor(
+			CursorMapH<? super I, O> stateless_cursor_map_h ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapCursor( hook,
+						stateless_cursor_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapIterable(IterableMap)} with the argument
+	 * {@code stateless_iterable_map}, and returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the iterables returned by the argument
+	 *          {@code stateless_iterable_map}.
+	 * @param stateless_iterable_map
+	 *          A stateless function that returns iterables.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapIterable(
+			IterableMap<? super I, O> stateless_iterable_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterable(
+						stateless_iterable_map );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapIterator(IteratorMapH)} with the argument
+	 * {@code stateless_iterator_map}, and returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the iterators returned by the argument
+	 *          {@code stateless_iterator_map}.
+	 * @param stateless_iterator_map
+	 *          A stateless function that returns iterators.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapIterable(
+			IterableMapH<? super I, O> stateless_iterable_map_h ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterable(
+						hook, stateless_iterable_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapIterator(IteratorMap)} with the argument
+	 * {@code stateless_iterator_map}, and returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the iterators returned by the argument
+	 *          {@code stateless_iterator_map}.
+	 * @param stateless_iterator_map
+	 *          A stateless function that returns iterators.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapIterator(
+			IteratorMap<? super I, O> stateless_iterator_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterator(
+						stateless_iterator_map );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapIterable(Hook, IteratorMapH)} with the hook
+	 * already available and the argument {@code stateless_iterator_map_h}, and
+	 * returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the iterators returned by the argument
+	 *          {@code stateless_iterator_map_h}.
+	 * @param stateless_iterator_map_h
+	 *          A stateless function that returns iterators.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapIterator(
+			IteratorMapH<? super I, O> stateless_iterator_map_h ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapIterator(
+						hook, stateless_iterator_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapOptional(OptionMap)} with the argument
+	 * {@code stateless_optional_map}, and returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the optionals returned by the argument
+	 *          {@code stateless_optional_map}.
+	 * @param stateless_optional_map
+	 *          A stateless function that returns optionals.
+	 * @return A complex view.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapOptional(
+			OptionMap<? super I, O> stateless_optional_map ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) )
+						.flatmapOptional( stateless_optional_map );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapOptional(Hook, IteratorMapH)} with the hook
+	 * already available and the argument {@code stateless_optional_map_h}, and
+	 * returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the optionals returned by the argument
+	 *          {@code stateless_optional_map_h}.
+	 * @param stateless_optional_map_h
+	 *          A stateless function that returns optionals.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapOptional(
+			OptionMapH<? super I, O> stateless_optional_map_h )
+			throws IllegalStateException {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) )
+						.flatmapOptional( hook, stateless_optional_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * The result of this transformation is a cursable where each invocation of
+	 * {@link #pull(Hook)} pulls a new cursor from the wrapped cursable, wraps it
+	 * in a KnittingCursor, transforms it using
+	 * {@link KnittingCursor#flatmapStream(Hook, StreamMapH)} with the hook
+	 * already available and the argument {@code stateless_stream_map_h}, and
+	 * returns the resulting cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <O>
+	 *          The type of elements in the streams returned by the argument
+	 *          {@code stateless_stream_map_h}.
+	 * @param stateless_stream_map_h
+	 *          A stateless function that returns streams.
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public <O> KnittingCursable<O> flatmapStream(
+			StreamMapH<? super I, O> stateless_stream_map_h ) {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).flatmapStream( hook,
+						stateless_stream_map_h );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view showing the first {@code show} elements of this cursable
+	 * visible after hiding the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
@@ -378,13 +926,17 @@ public class KnittingCursable<I> implements
 	 * The returned view may contain less than {@code show} elements. This happens
 	 * when this cursable's size is smaller than {@code hide + show}.
 	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
 	 *
 	 * @param hide
 	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements visible after hiding
-	 *         the first {@code hide} elements in this cursable.
+	 * @return A view showing the first {@code show} elements of this cursable
+	 *         visible after hiding the first {@code hide} elements.
 	 * @since 1.0
 	 */
 	public KnittingCursable<I> head( int hide, int show ) {
@@ -401,13 +953,16 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the elements visible after hiding the first {@code hide}
-	 * elements in this cursable.
+	 * Returns a view hiding the first {@code hide} elements of this cursable.
 	 * </p>
 	 * 
 	 * <p>
 	 * The returned view may be empty. This happens when this cursable's size is
 	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
 	 * </p>
 	 * 
 	 * @param hide
@@ -523,147 +1078,9 @@ public class KnittingCursable<I> implements
 		return wrap( result );
 	}
 
-	public <O> KnittingCursable<O> purlOptional(
-			OptionalPurlHFactory<? super I, O> factory )
-			throws IllegalStateException {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlOptional( hook,
-						factory.get( ) );
-			}
-		} );
-	}
-
-	public <O> KnittingCursable<O> purlOptional(
-			OptionalPurlFactory<? super I, O> factory )
-			throws IllegalStateException {
-		return wrap( new Cursable<O>( ) {
-
-			@Override
-			public Cursor<O> pull( Hook hook ) {
-				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlOptional(
-						factory.get( ) );
-			}
-		} );
-	}
-
 	@Override
 	public KnittingCursor<I> pull( Hook hook ) {
 		return KnittingCursor.wrap( wrapped.pull( hook ) );
-	}
-
-	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
-		K reduction = zero;
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<I> kc = pull( hook );
-			try {
-				for ( ;; ) {
-					reduction = fun.apply( reduction, kc.next( ) );
-				}
-			}
-			catch ( EndOfCursorException e ) {
-			}
-			return reduction;
-		}
-	}
-
-	public int size( ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			return pull( hook ).roll( );
-		}
-	}
-
-	public KnittingCursable<KnittingCursor<I>> crop( Predicate<I> predicate ) {
-		return KnittingCursable.wrap( h -> pull( h ).crop( predicate ) );
-	}
-
-	/**
-	 * <p>
-	 * Returns a view of the last {@code show} elements visible after hiding the
-	 * last {@code hide} elements in this cursable.
-	 * </p>
-	 * 
-	 * <p>
-	 * The returned view may be empty. This happens when this cursable's size is
-	 * smaller than {@code hide}.
-	 * </p>
-	 * 
-	 * <p>
-	 * The returned view may contain less than {@code show} elements. This happens
-	 * when this cursable's size is smaller than {@code hide + show}.
-	 * </p>
-	 * 
-	 * <p>
-	 * This operation relies on {@code size()}. Therefore, it has a one-time
-	 * computational time cost linear to the size of this cursable.
-	 * </p>
-	 *
-	 * @param hide
-	 *          The number of elements to hide. A negative numbers counts as zero.
-	 * @param show
-	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view of the last {@code show} elements visible after hiding the
-	 *         last {@code hide} elements in this cursable.
-	 * @since 1.0
-	 */
-	public KnittingCursable<I> tail( int hide, int show ) {
-		int final_show = show < 0 ? 0 : show;
-		int final_hide = hide < 0 ? 0 : hide;
-		int len = size( ) - final_hide;
-		if ( len > final_show ) {
-			len = final_show;
-		}
-		int skip = size( ) - ( final_hide + len );
-		if ( skip < 0 ) {
-			skip = 0;
-		}
-		int final_len = len;
-		int final_skip = skip;
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.sub( wrapped.pull( hook ), final_skip, final_len );
-			}
-		} );
-	}
-
-	/**
-	 * <p>
-	 * Returns a view hiding the last {@code hide} elements in this cursable.
-	 * </p>
-	 * 
-	 * <p>
-	 * The returned view may be empty. This happens when this cursable's size is
-	 * smaller than {@code hide}.
-	 * </p>
-	 * 
-	 * <p>
-	 * This operation relies on {@code size()}. Therefore, it has a one-time
-	 * computational time cost linear to the size of this cursable.
-	 * </p>
-	 *
-	 * @param hide
-	 *          The number of elements to hide. A negative numbers counts as zero.
-	 * @return A view hiding the last {@code hide} elements in this cursable.
-	 * @since 1.0
-	 */
-	public KnittingCursable<I> tailless( int hide ) {
-		int final_hide = hide < 0 ? 0 : hide;
-		int len = size( ) - final_hide;
-		if ( len < 0 ) {
-			len = 0;
-		}
-		int final_len = len;
-		return wrap( new Cursable<I>( ) {
-
-			@Override
-			public Cursor<I> pull( Hook hook ) {
-				return Subcursor.sub( wrapped.pull( hook ), 0, final_len );
-			}
-		} );
 	}
 
 	public <O> KnittingCursable<O>
@@ -775,6 +1192,32 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
+	public <O> KnittingCursable<O> purlOptional(
+			OptionalPurlHFactory<? super I, O> factory )
+			throws IllegalStateException {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlOptional( hook,
+						factory.get( ) );
+			}
+		} );
+	}
+
+	public <O> KnittingCursable<O> purlOptional(
+			OptionalPurlFactory<? super I, O> factory )
+			throws IllegalStateException {
+		return wrap( new Cursable<O>( ) {
+
+			@Override
+			public Cursor<O> pull( Hook hook ) {
+				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlOptional(
+						factory.get( ) );
+			}
+		} );
+	}
+
 	public <O> KnittingCursable<O>
 			purlStream( StreamPurlHFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
@@ -783,6 +1226,120 @@ public class KnittingCursable<I> implements
 			public Cursor<O> pull( Hook hook ) {
 				return KnittingCursor.wrap( wrapped.pull( hook ) ).purlStream(
 						hook, factory.get( ) );
+			}
+		} );
+	}
+
+	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
+		K reduction = zero;
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			KnittingCursor<I> kc = pull( hook );
+			try {
+				for ( ;; ) {
+					reduction = fun.apply( reduction, kc.next( ) );
+				}
+			}
+			catch ( EndOfCursorException e ) {
+			}
+			return reduction;
+		}
+	}
+
+	public int size( ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			return pull( hook ).roll( );
+		}
+	}
+
+	public int roll( ) {
+		try ( AutoHook hook = new BasicAutoHook( ) ) {
+			return pull( hook ).roll( );
+		}
+	}
+
+	/**
+	 * <p>
+	 * Returns a view of the last {@code show} elements visible after hiding the
+	 * last {@code hide} elements in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this cursable's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may contain less than {@code show} elements. This happens
+	 * when this cursable's size is smaller than {@code hide + show}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This operation relies on {@code size()}. Therefore, it has a one-time
+	 * computational time cost linear to the size of this cursable.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view of the last {@code show} elements visible after hiding the
+	 *         last {@code hide} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> tail( int hide, int show ) {
+		int final_show = show < 0 ? 0 : show;
+		int final_hide = hide < 0 ? 0 : hide;
+		int len = size( ) - final_hide;
+		if ( len > final_show ) {
+			len = final_show;
+		}
+		int skip = size( ) - ( final_hide + len );
+		if ( skip < 0 ) {
+			skip = 0;
+		}
+		int final_len = len;
+		int final_skip = skip;
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return Subcursor.sub( wrapped.pull( hook ), final_skip, final_len );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view hiding the last {@code hide} elements in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * The returned view may be empty. This happens when this cursable's size is
+	 * smaller than {@code hide}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This operation relies on {@code size()}. Therefore, it has a one-time
+	 * computational time cost linear to the size of this cursable.
+	 * </p>
+	 *
+	 * @param hide
+	 *          The number of elements to hide. A negative numbers counts as zero.
+	 * @return A view hiding the last {@code hide} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> tailless( int hide ) {
+		int final_hide = hide < 0 ? 0 : hide;
+		int len = size( ) - final_hide;
+		if ( len < 0 ) {
+			len = 0;
+		}
+		int final_len = len;
+		return wrap( new Cursable<I>( ) {
+
+			@Override
+			public Cursor<I> pull( Hook hook ) {
+				return Subcursor.sub( wrapped.pull( hook ), 0, final_len );
 			}
 		} );
 	}
@@ -841,35 +1398,5 @@ public class KnittingCursable<I> implements
 
 	public static <K> KnittingCursable<K> wrap( K[] array ) {
 		return wrap( new ArrayCursable<K>( array ) );
-	}
-
-	public boolean contentEquals( Cursable<?> other ) {
-		if ( other == this )
-			return true;
-		Cursable<?> o = (Cursable<?>) other;
-
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<I> pull1 = this.pull( hook );
-			KnittingCursor<?> pull2 = KnittingCursor.wrap( o.pull( hook ) );
-
-			for ( ;; ) {
-				boolean hasNext1 = pull1.hasNext( );
-				boolean hasNext2 = pull2.hasNext( );
-				if ( hasNext1 != hasNext2 ) {
-					return false;
-				}
-				if ( !hasNext1 ) {
-					return true;
-				}
-				I next1 = pull1.next( );
-				Object next2 = pull2.next( );
-				if ( !( next1 == null ? next2 == null : next1.equals( next2 ) ) ) {
-					return false;
-				}
-			}
-		}
-		catch ( EndOfCursorException e ) {
-			throw new IllegalStateException( e );
-		}
 	}
 }

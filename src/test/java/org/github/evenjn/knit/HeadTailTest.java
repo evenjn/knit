@@ -10,18 +10,18 @@ public class HeadTailTest {
 	public void test( ) {
 		KnittingCursable<Integer> t1 = KnittingCursable.on( 1, 2, 3, 4 );
 		assertEquals( "head", true, KnittingCursable.on( 1, 2 )
-				.contentEquals( KnittingCursable.on( 1, 2 ) ) );
+				.equivalentTo( KnittingCursable.on( 1, 2 ), Integer::equals ) );
 		assertEquals( "head", true,
-				t1.head( 0, 2 ).contentEquals( KnittingCursable.on( 1, 2 ) ) );
+				t1.head( 0, 2 ).equivalentTo( KnittingCursable.on( 1, 2 ), Integer::equals ) );
 		assertEquals( "head", true,
-				t1.head( 1, 3 ).contentEquals( KnittingCursable.on( 2, 3, 4 ) ) );
+				t1.head( 1, 3 ).equivalentTo( KnittingCursable.on( 2, 3, 4 ), Integer::equals ) );
 		assertEquals( "tail", true,
-				t1.tail( 0, 2 ).contentEquals( KnittingCursable.on( 3, 4 ) ) );
+				t1.tail( 0, 2 ).equivalentTo( KnittingCursable.on( 3, 4 ), Integer::equals ) );
 		assertEquals( "tail", true,
-				t1.tail( 1, 3 ).contentEquals( KnittingCursable.on( 1, 2, 3 ) ) );
+				t1.tail( 1, 3 ).equivalentTo( KnittingCursable.on( 1, 2, 3 ), Integer::equals ) );
 		assertEquals( "headless", true,
-				t1.headless( 2 ).contentEquals( KnittingCursable.on( 3, 4 ) ) );
+				t1.headless( 2 ).equivalentTo( KnittingCursable.on( 3, 4 ), Integer::equals ) );
 		assertEquals( "tailless", true,
-				t1.tailless( 2 ).contentEquals( KnittingCursable.on( 1, 2 ) ) );
+				t1.tailless( 2 ).equivalentTo( KnittingCursable.on( 1, 2 ), Integer::equals ) );
 	}
 }

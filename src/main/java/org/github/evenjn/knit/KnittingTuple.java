@@ -17,6 +17,7 @@
  */
 package org.github.evenjn.knit;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import org.github.evenjn.knit.DiffPatch.Diff;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
+import org.github.evenjn.yarn.Equivalencer;
 import org.github.evenjn.yarn.Tuple;
 
 /**
@@ -52,6 +54,10 @@ public class KnittingTuple<I> implements
 			return (KnittingTuple<K>) tuple;
 		}
 		return new KnittingTuple<K>( tuple );
+	}
+
+	public static <K> KnittingTuple<K> wrap( ArrayList<K> arraylist ) {
+		return wrap( new ArrayListTuple<K>( arraylist ) );
 	}
 
 	public static <K> KnittingTuple<K> wrap( Vector<K> vector ) {
@@ -97,7 +103,7 @@ public class KnittingTuple<I> implements
 	/*
 	 * returns elements which survive the diff with the mask.
 	 */
-	public Vector<I> intersecting(
+	public ArrayList<I> intersecting(
 			Tuple<I> mask,
 			Equivalencer<I> equivalencer ) {
 		return intersectingAny( KnittingCursor.on( mask ), equivalencer );
@@ -106,11 +112,11 @@ public class KnittingTuple<I> implements
 	/*
 	 * returns only elements which survive the diff in one or more masks
 	 */
-	public Vector<I> intersectingAny(
+	public ArrayList<I> intersectingAny(
 			Cursor<? extends Tuple<I>> masks,
 			Equivalencer<I> equivalencer ) {
 
-		Vector<Boolean> keeps = new Vector<>( );
+		ArrayList<Boolean> keeps = new ArrayList<>( );
 		for ( int i = 0; i < size( ); i++ ) {
 			keeps.add( false );
 		}
@@ -128,7 +134,7 @@ public class KnittingTuple<I> implements
 			}
 		}
 
-		Vector<I> result = new Vector<>( );
+		ArrayList<I> result = new ArrayList<>( );
 		int j = 0;
 		for ( Boolean keep : keeps ) {
 			if ( keep ) {
@@ -142,11 +148,11 @@ public class KnittingTuple<I> implements
 	/*
 	 * returns only elements which survive the diff with each mask
 	 */
-	public Vector<I> intersectingAll(
+	public ArrayList<I> intersectingAll(
 			Cursor<? extends Tuple<I>> masks,
 			Equivalencer<I> equivalencer ) {
 
-		Vector<Boolean> keeps = new Vector<>( );
+		ArrayList<Boolean> keeps = new ArrayList<>( );
 		for ( int i = 0; i < size( ); i++ ) {
 			keeps.add( true );
 		}
@@ -164,7 +170,7 @@ public class KnittingTuple<I> implements
 			}
 		}
 
-		Vector<I> result = new Vector<>( );
+		ArrayList<I> result = new ArrayList<>( );
 		int j = 0;
 		for ( Boolean keep : keeps ) {
 			if ( keep ) {
@@ -347,7 +353,6 @@ public class KnittingTuple<I> implements
 				return false;
 			}
 		}
-
 		return true;
 	}
 
