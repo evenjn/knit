@@ -77,11 +77,11 @@ public class compiler_check_override {
 		cursable.map( x -> x.substring( 1 ) );
 		cursable.filter( x -> x.isEmpty( ) );
 		
-		cursable.flatmap( cursormap );
-		cursable.flatmap( cursormaph );
+		cursable.flatmapCursor( cursormap );
+		cursable.flatmapCursor( cursormaph );
 
-		cursable.flatmap( x -> KnittingCursor.on( 1 ) );
-		cursable.flatmap( ( h, x ) -> KnittingCursor.on( 1 ) );
+		cursable.flatmapCursor( x -> KnittingCursor.on( 1 ) );
+		cursable.flatmapCursor( ( h, x ) -> KnittingCursor.on( 1 ) );
 		
 		Function<Hook, Consumer<String>> ff1 = null;
 		Function<Hook, Consumer<Object>> ff2 = null;
