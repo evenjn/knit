@@ -1641,7 +1641,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purl(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
 	 * cursables returned by the argument {@code cursable_purl_h}.
 	 * </p>
 	 * 
@@ -1686,7 +1686,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a complex view. For an introduction on purling see
-	 * {@link org.github.evenjn.yarn Yarn}.
+	 * {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1735,7 +1735,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a complex view. For an introduction on purling see
-	 * {@link org.github.evenjn.yarn Yarn}.
+	 * {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1828,7 +1828,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purl(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
 	 * iterables returned by the argument {@code iterable_purl_h}.
 	 * </p>
 	 * 
@@ -1919,7 +1919,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purl(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
 	 * iterators returned by the argument {@code iterator_purl_h}.
 	 * </p>
 	 * 
@@ -1966,7 +1966,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purl(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
 	 * optionals returned by the argument {@code optional_purl_h}.
 	 * </p>
 	 * 
@@ -2065,7 +2065,7 @@ public class KnittingCursor<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purl(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
 	 * streams returned by the argument {@code stream_purl_h}.
 	 * </p>
 	 * 

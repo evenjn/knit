@@ -110,12 +110,12 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <li>Cursable methods ({@link #pull(Hook)})</li>
  * <li>Rolling methods (listed below)</li>
  * <li>Transformation methods (listed below)</li>
- * <li>Other methods ({@link #contentEquals(Cursable)})</li>
  * </ul>
  *
  * <p>
- * Rolling methods instantiate a {@code Cursor} using the wrapped cursable and
- * repeatedly invoke the method {@link #next()} until the end is reached. The
+ * Rolling methods instantiate a {@link KnittingCursor} by invoking
+ * {@link #pull(Hook)} and repeatedly invoke the method
+ * {@link KnittingCursor#map(Hook, FunctionH)} until the end is reached. The
  * following methods are rolling:
  * </p>
  * 
@@ -123,7 +123,7 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <li>{@link #collect(Collection)}</li>
  * <li>{@link #consume(Function)}</li>
  * <li>{@link #count()}</li>
- * <li>{@link #equivalentTo(Cursable)}</li>
+ * <li>{@link #equivalentTo(Cursable, Equivalencer)}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
  * <li>{@link #reduce(Object, BiFunction)}</li>
@@ -140,10 +140,10 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * 
  * <ul>
  * <li>{@link #append(Cursable)}</li>
- * <li>{@link #asIterator()}</li>
- * <li>{@link #asStream()}</li>
+ * <li>{@link #asIterator(Hook)}</li>
+ * <li>{@link #asStream(Hook)}</li>
  * <li>{@link #crop(Predicate)}</li>
- * <li>{@link #entwine(Cursor, BiFunction)}</li>
+ * <li>{@link #entwine(Cursable, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
  * 
  * <li>{@link #flatmapArray(ArrayMap)}</li>
@@ -157,27 +157,27 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <li>{@link #flatmapIterator(IteratorMapH)}</li>
  * <li>{@link #flatmapOptional(OptionMap)}</li>
  * <li>{@link #flatmapOptional(OptionMapH)}</li>
- * <li>{@link #flatmapStream(Hook, StreamMapH)}</li>
+ * <li>{@link #flatmapStream(StreamMapH)}</li>
  * 
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
- * <li>{@link #map(Hook, FunctionH)}</li>
+ * <li>{@link #map(FunctionH)}</li>
  * <li>{@link #numbered()}</li>
  * <li>{@link #peek(Consumer)}</li>
- * <li>{@link #prepend(Cursor)}</li>
- * <li>{@link #purlArray(ArrayPurl)}</li>
- * <li>{@link #purlCursable(CursablePurl)}</li>
- * <li>{@link #purlCursable(Hook, CursablePurlH)}</li>
- * <li>{@link #purlCursor(CursorPurl)}</li>
- * <li>{@link #purlCursor(Hook, CursorPurlH)}</li>
- * <li>{@link #purlIterable(IterablePurl)}</li>
- * <li>{@link #purlIterable(Hook, IterablePurlH)}</li>
- * <li>{@link #purlIterator(IteratorPurl)}</li>
- * <li>{@link #purlIterator(Hook, IteratorPurlH)}</li>
- * <li>{@link #purlOptional(OptionalPurl)}</li>
- * <li>{@link #purlOptional(Hook, OptionalPurlH)}</li>
- * <li>{@link #purlStream(Hook, StreamPurlH)}</li>
+ * <li>{@link #prepend(Cursable)}</li>
+ * <li>{@link #purlArray(ArrayPurlFactory)}</li>
+ * <li>{@link #purlCursable(CursablePurlFactory)}</li>
+ * <li>{@link #purlCursable(CursablePurlHFactory)}</li>
+ * <li>{@link #purlCursor(CursorPurlFactory)}</li>
+ * <li>{@link #purlCursor(CursorPurlHFactory)}</li>
+ * <li>{@link #purlIterable(IterablePurlFactory)}</li>
+ * <li>{@link #purlIterable(IterablePurlHFactory)}</li>
+ * <li>{@link #purlIterator(IteratorPurlFactory)}</li>
+ * <li>{@link #purlIterator(IteratorPurlHFactory)}</li>
+ * <li>{@link #purlOptional(OptionalPurlFactory)}</li>
+ * <li>{@link #purlOptional(OptionalPurlHFactory)}</li>
+ * <li>{@link #purlStream(StreamPurlHFactory)}</li>
  * </ul>
  * 
  * @param <I>
@@ -253,7 +253,8 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * The objects collected may be dead. This is due to the fact that cursors do
 	 * not guarantee that the objects they return survive subsequent invocations
-	 * of {@link #next()}, or closing the hook..
+	 * of {@link org.github.evenjn.yarn.Cursor#next() next()}, or closing the
+	 * hook.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -536,9 +537,9 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * Each invocation of {@link #pull(Hook)} on the returned
 	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
-	 * cursable, transforms it using {@link KnittingCursor#flatmap(CursorMap)}
-	 * with the argument {@code stateless_cursor_map}, then returns the resulting
-	 * cursor.
+	 * cursable, transforms it using
+	 * {@link KnittingCursor#flatmapCursor(CursorMap)} with the argument
+	 * {@code stateless_cursor_map}, then returns the resulting cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -570,7 +571,7 @@ public class KnittingCursable<I> implements
 	 * Each invocation of {@link #pull(Hook)} on the returned
 	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
 	 * cursable, transforms it using
-	 * {@link KnittingCursor#flatmap(Hook, CursorMap)} with the hook already
+	 * {@link KnittingCursor#flatmapCursor(Hook, CursorMapH)} with the hook already
 	 * available and the argument {@code stateless_cursor_map_h}, then returns the
 	 * resulting cursor.
 	 * </p>
@@ -643,8 +644,8 @@ public class KnittingCursable<I> implements
 	 * 
 	 * @param <O>
 	 *          The type of elements in the iterables returned by the argument
-	 *          {@code stateless_iterable_map}.
-	 * @param stateless_iterable_map
+	 *          {@code stateless_iterable_map_h}.
+	 * @param stateless_iterable_map_h
 	 *          A stateless function that returns iterators.
 	 * @return A complex view.
 	 * @since 1.0
@@ -935,7 +936,7 @@ public class KnittingCursable<I> implements
 	 * @param <O>
 	 *          The type of elements returned by the argument
 	 *          {@code stateless_function_h}.
-	 * @param stateless_stream_map_h
+	 * @param stateless_function_h
 	 *          A stateless function.
 	 * @return A complex view.
 	 * @since 1.0
@@ -987,7 +988,8 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * The object returned may be dead. This is due to the fact that cursables do
 	 * not guarantee that the objects they return survive subsequent invocations
-	 * of {@link #next()} on the cursors they provide, or closing the hook.
+	 * of {@link org.github.evenjn.yarn.Cursor#next() next()} on the cursors they
+	 * provide, or closing the hook.
 	 * </p>
 	 * 
 	 * <p>
@@ -1014,7 +1016,8 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * The object returned may be dead. This is due to the fact that cursables do
 	 * not guarantee that the objects they return survive subsequent invocations
-	 * of {@link #next()} on the cursors they provide, or closing the hook.
+	 * of {@link org.github.evenjn.yarn.Cursor#next() next()} on the cursors they
+	 * provide, or closing the hook.
 	 * </p>
 	 * 
 	 * <p>
@@ -1045,9 +1048,10 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * For each {@code KnittingCursor} obtained invoking {@link #pull(Hook)} on
 	 * the returned {@code KnittingCursable}, at each invocation of
-	 * {@code next()}, that {@code KnittingCursor} fetches the next element from
-	 * the cursor it wraps, then invokes the consumer using the fetched element as
-	 * argument, then returns the fetched element.
+	 * {@link org.github.evenjn.yarn.Cursor#next() next()}, that
+	 * {@code KnittingCursor} fetches the next element from the cursor it wraps,
+	 * then invokes the consumer using the fetched element as argument, then
+	 * returns the fetched element.
 	 * </p>
 	 * 
 	 * <p>
@@ -1224,7 +1228,7 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * Pulling a cursor from the returned cursable returns a purl of a cursor
 	 * pulled from this cursable. For an introduction on purling see
-	 * {@link org.github.evenjn.yarn Yarn}.
+	 * {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1251,14 +1255,14 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			purlCursor( CursorPurlFactory<? super I, O> cursor_purl_factory ) {
+			purlCursor( CursorPurlFactory<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
 			public Cursor<O> pull( Hook hook ) {
 				Cursor<I> pull = wrapped.pull( hook );
 				return KnittingCursor.wrap( pull )
-						.purlCursor( cursor_purl_factory.get( ) );
+						.purlCursor( factory.get( ) );
 			}
 		} );
 	}
@@ -1271,7 +1275,7 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * Pulling a cursor from the returned cursable returns a purl of a cursor
 	 * pulled from this cursable. For an introduction on purling see
-	 * {@link org.github.evenjn.yarn Yarn}.
+	 * {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
 	 * </p>
 	 * 
 	 * <p>
