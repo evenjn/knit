@@ -106,12 +106,13 @@ import org.github.evenjn.yarn.Tuple;
  * 
  * <p>
  * Rolling methods repeatedly invoke this cursor's
- * {@link org.github.evenjn.yarn.Cursor#next() next()} until the end is reached.
- * The following methods are rolling:
+ * {@link org.github.evenjn.yarn.Cursor#next() next()}, possibly until the end
+ * is reached. The following methods are rolling:
  * </p>
  * 
  * <ul>
  * <li>{@link #collect(Collection)}</li>
+ * <li>{@link #count()}</li>
  * <li>{@link #consume(Function)}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
@@ -134,8 +135,6 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #crop(Predicate)}</li>
  * <li>{@link #entwine(Cursor, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
- * <li>{@link #flatmap(CursorMap)}</li>
- * <li>{@link #flatmap(Hook, CursorMapH)}</li>
  * <li>{@link #flatmapArray(ArrayMap)}</li>
  * <li>{@link #flatmapCursable(Hook, CursableMap)}</li>
  * <li>{@link #flatmapCursable(Hook, CursableMapH)}</li>
@@ -156,8 +155,6 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #once()}</li>
  * <li>{@link #peek(Consumer)}</li>
  * <li>{@link #prepend(Cursor)}</li>
- * <li>{@link #purlCursor(CursorPurl)}</li>
- * <li>{@link #purl(Hook, CursorPurlH)}</li>
  * <li>{@link #purlArray(ArrayPurl)}</li>
  * <li>{@link #purlCursable(CursablePurl)}</li>
  * <li>{@link #purlCursable(Hook, CursablePurlH)}</li>
@@ -184,9 +181,9 @@ import org.github.evenjn.yarn.Tuple;
  * <p>
  * Every {@code KnittingCursor} object is in pristine state when created, and
  * remains in pristine state until the first invocation of any method not
- * inherited from {@link java.lang.Object}. After {@code KnittingCursor} object
- * leaves the pristine state, it never returns to the pristine state. Any method
- * may be invoked on a {@code KnittingCursor} object in pristine state.
+ * inherited from {@link java.lang.Object}. After a {@code KnittingCursor}
+ * object leaves the pristine state, it never returns to the pristine state. Any
+ * method may be invoked on a {@code KnittingCursor} object in pristine state.
  * </p>
  * 
  * <h2>Used state</h2>
@@ -443,6 +440,44 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
+	 * Counts the number of elements in this cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * Invokes this cursor's {@link org.github.evenjn.yarn.Cursor#next() next()}
+	 * method until a {@link org.github.evenjn.yarn.EndOfCursorException
+	 * EndOfCursorException} is thrown.
+	 * </p>
+	 * 
+	 * <p>
+	 * Returns the number of invocations of {@code next()} that did not throw
+	 * {@code EndOfCursorException}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
+	 * 
+	 * @return The number of elements in this cursor.
+	 * @throws IllegalStateException
+	 *           when this cursor is not in pristine state.
+	 * @since 1.0
+	 */
+	public int count( ) {
+		lock( );
+		int so_far = 0;
+		try {
+			for ( ;; so_far++ ) {
+				wrapped.next( );
+			}
+		}
+		catch ( EndOfCursorException e ) {
+			return so_far;
+		}
+	}
+
+	/**
+	 * <p>
 	 * Returns a cursor where each element is a cursor providing access to a
 	 * subsequence of contiguous elements in this cursor that satisfy the argument
 	 * {@code stateless_predicate}.
@@ -468,14 +503,14 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * Returns a cursor that rolls this cursor and the argument
+	 * Returns a cursor that traverses this cursor and the argument
 	 * {@code other_cursor} in parallel, applying the argument
 	 * {@code stateless_bifunction} to each pair of elements, and providing a view
 	 * of the result of each application.
 	 * </p>
 	 * 
 	 * <p>
-	 * The retuned cursor provides as many elements as the cursor with the least
+	 * The returned cursor provides as many elements as the cursor with the least
 	 * elements.
 	 * </p>
 	 * 
@@ -491,7 +526,7 @@ public class KnittingCursor<I> implements
 	 *          The cursor to roll in parallel to this cursor.
 	 * @param stateless_bifunction
 	 *          The stateless bifunction to apply to each pair of element.
-	 * @return a cursor that rolls this cursor and the argument cursor in
+	 * @return a cursor that traverses this cursor and the argument cursor in
 	 *         parallel, applying the argument bifunction to each pair of
 	 *         elements, and providing a view of the result of each application.
 	 * @throws IllegalStateException
@@ -1395,8 +1430,8 @@ public class KnittingCursor<I> implements
 	 * 
 	 * @return The only element accessible via this cursor.
 	 * @throws IllegalStateException
-	 *           when it not the case that there is exactly one element, when the
-	 *           cursor is not in pristine state.
+	 *           when it is not the case that there is exactly one element, when
+	 *           the cursor is not in pristine state.
 	 * @since 1.0
 	 */
 	public I one( )
@@ -2129,31 +2164,22 @@ public class KnittingCursor<I> implements
 	 * </p>
 	 * 
 	 * <p>
-	 * Returns the number of invocations of {@code next()} that did not throw
-	 * {@code EndOfCursorException}.
-	 * </p>
-	 * 
-	 * <p>
 	 * This is a rolling method.
 	 * </p>
 	 * 
-	 * @return the number of invocations of {@code next()} that did not throw
-	 *         {@code EndOfCursorException}.
 	 * @throws IllegalStateException
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	public int roll( )
+	public void roll( )
 			throws IllegalStateException {
 		lock( );
-		int so_far = 0;
 		try {
-			for ( ;; so_far++ ) {
+			for ( ;; ) {
 				wrapped.next( );
 			}
 		}
 		catch ( EndOfCursorException e ) {
-			return so_far;
 		}
 	}
 
@@ -2189,14 +2215,16 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the argument array.
+	 * Returns new {@code KnittingCursor} providing access to the argument
+	 * elements.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument array.
+	 *          The type of the argument elements.
 	 * @param elements
-	 *          An array of elements.
-	 * @return A view of the argument array.
+	 *          Elements to be wrapped in a new {@code KnittingCursor}.
+	 * @return A new {@code KnittingCursor} providing access to the argument
+	 *         elements.
 	 * @since 1.0
 	 */
 	@SafeVarargs
@@ -2245,9 +2273,6 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Cursor<K> cursor ) {
-		if ( cursor instanceof KnittingTuple ) {
-			return (KnittingCursor<K>) cursor;
-		}
 		return new KnittingCursor<>( cursor );
 	}
 
@@ -2290,6 +2315,22 @@ public class KnittingCursor<I> implements
 				throw EndOfCursorException.neo( );
 			}
 		} );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view of the elements in the argument array.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument array.
+	 * @param array
+	 *          An array of elements.
+	 * @return A view of the elements in the argument array.
+	 * @since 1.0
+	 */
+	public static <K> KnittingCursor<K> wrap( K[] array ) {
+		return wrap( new ArrayCursor<K>( array ) );
 	}
 
 	/**
