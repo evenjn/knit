@@ -33,6 +33,7 @@ public class DistanceTest {
 		assertEquals( "distance", 3, t1.distance( KnittingTuple.on( 0, 2, 3, 4, 5, 5 ) ) );
 		assertEquals( "distance", 4, t1.distance( KnittingTuple.on( 0, 2, 3, 1, 1, 4, 5 ) ) );
 		assertEquals( "distance", 2, t1.distance( KnittingTuple.on( 2, 1, 3, 4 ) ) );
+		assertEquals( "distance", 4, t1.distance( KnittingTuple.on( 4, 9, 9, 9 ) ) );
 	}
 
 }

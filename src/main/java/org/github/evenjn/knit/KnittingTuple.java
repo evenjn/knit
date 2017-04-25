@@ -19,12 +19,10 @@ package org.github.evenjn.knit;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.function.Function;
 
-import org.github.evenjn.knit.DiffPatch.Diff;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
@@ -91,13 +89,72 @@ public class KnittingTuple<I> implements
 
 	/*
 	 * Computes Damerau-Levenshtein distance.
+	 * 
+	 * Adapted from Apache Commons Lang StringUtils.
+	 * 
+	 * Apache Commons Lang Copyright
+	 * 2001-2017 The Apache Software Foundation
+	 * 
+	 * This product includes software developed at The Apache Software Foundation
+	 * (http://www.apache.org/).
 	 */
 	public int distance( Tuple<I> other,
 			Equivalencer<I> equivalencer ) {
-		DiffPatch<I> dmp = new DiffPatch<I>( );
-		LinkedList<Diff<I>> diffs =
-				dmp.diff_main( this, KnittingTuple.wrap( other ), equivalencer );
-		return dmp.diff_levenshtein( diffs );
+		Tuple<I> s = this;
+		Tuple<I> t = other;
+
+		int n = s.size( );
+		int m = t.size( );
+
+		if ( n == 0 ) {
+			return m;
+		}
+		else
+			if ( m == 0 ) {
+				return n;
+			}
+
+		if ( n > m ) {
+			// swap the input strings to consume less memory
+			final Tuple<I> tmp = s;
+			s = t;
+			t = tmp;
+			n = m;
+			m = t.size( );
+		}
+
+		final int p[] = new int[n + 1];
+		// indexes into strings s and t
+		int i; // iterates through s
+		int j; // iterates through t
+		int upper_left;
+		int upper;
+
+		I t_j; // jth character of t
+		int cost;
+
+		for ( i = 0; i <= n; i++ ) {
+			p[i] = i;
+		}
+
+		for ( j = 1; j <= m; j++ ) {
+			upper_left = p[0];
+			t_j = t.get( j - 1 );
+			p[0] = j;
+
+			for ( i = 1; i <= n; i++ ) {
+				upper = p[i];
+				cost = equivalencer.equivalent( s.get( i - 1 ), t_j ) ? 0 : 1;
+				// minimum of cell to the left+1, to the top+1, diagonally left and up
+				// +cost
+				p[i] =
+						Math.min( Math.min( p[i - 1] + 1, p[i] + 1 ), upper_left + cost );
+				upper_left = upper;
+			}
+		}
+
+		return p[n];
+
 	}
 
 	/*
