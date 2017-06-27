@@ -115,14 +115,15 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <p>
  * Rolling methods instantiate a {@link KnittingCursor} by invoking
  * {@link #pull(Hook)} and repeatedly invoke the method
- * {@link KnittingCursor#map(Hook, FunctionH)} until the end is reached. The
- * following methods are rolling:
+ * {@link KnittingCursor#map(Hook, FunctionH)} typically (but not necessarily)
+ * until the end is reached. The following methods are rolling:
  * </p>
  * 
  * <ul>
  * <li>{@link #collect(Collection)}</li>
  * <li>{@link #consume(Function)}</li>
  * <li>{@link #count()}</li>
+ * <li>{@link #equivalentTo(Cursable)}</li>
  * <li>{@link #equivalentTo(Cursable, Equivalencer)}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
@@ -133,9 +134,10 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * 
  * <p>
  * Transformations are a group of methods that return a new
- * {@code KnittingCursable} object, which provides a new view of the contents of
- * the wrapped cursable. Transformation methods do not instantiate cursors at
- * the time of their invocation. The following methods are transformations:
+ * {@code KnittingCursable} object (or something similar), which provides a new
+ * view of the contents of the wrapped cursable. Transformation methods do not
+ * instantiate cursors at the time of their invocation; they return lazy
+ * wrappers. The following methods are transformations:
  * </p>
  * 
  * <ul>
@@ -145,7 +147,6 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <li>{@link #crop(Predicate)}</li>
  * <li>{@link #entwine(Cursable, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
- * 
  * <li>{@link #flatmapArray(ArrayMap)}</li>
  * <li>{@link #flatmapCursable(CursableMap)}</li>
  * <li>{@link #flatmapCursable(CursableMapH)}</li>
@@ -158,7 +159,6 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <li>{@link #flatmapOptional(OptionMap)}</li>
  * <li>{@link #flatmapOptional(OptionMapH)}</li>
  * <li>{@link #flatmapStream(StreamMapH)}</li>
- * 
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -370,11 +370,55 @@ public class KnittingCursable<I> implements
 		return wrap( result );
 	}
 
+	private static <T> boolean equal_null( T first, T second ) {
+		if ( first == null && second == null )
+			return true;
+		if ( first == null || second == null )
+			return false;
+		return first.equals( second );
+	}
+
 	/**
+	 * <p>
 	 * Returns true when this cursable and the {@code other} cursable have the
 	 * same number of elements, and when each i-th element of this cursable is
 	 * equivalent to the i-th element of the {@code other} cursable. Returns false
 	 * otherwise.
+	 * </p>
+	 * 
+	 * <p>
+	 * For the purposes of this method, two {@code null} elements are equivalent.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
+	 * 
+	 * @param other
+	 *          Another cursable.
+	 * @return true when this cursable and the {@code other} cursable have the
+	 *         same number of elements, and when each i-th element of this
+	 *         cursable is equivalent to the i-th element of the {@code other}
+	 *         cursable. False otherwise.
+	 * @since 1.0
+	 */
+	public boolean equivalentTo( Cursable<?> other ) {
+		if ( other == this )
+			return true;
+		return equivalentTo( other, KnittingCursable::equal_null );
+	}
+
+	/**
+	 * <p>
+	 * Returns true when this cursable and the {@code other} cursable have the
+	 * same number of elements, and when each i-th element of this cursable is
+	 * equivalent to the i-th element of the {@code other} cursable. Returns false
+	 * otherwise.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
 	 * 
 	 * @param other
 	 *          Another cursable.
@@ -387,7 +431,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public boolean equivalentTo( Cursable<?> other,
-			Equivalencer<I> equivalencer ) {
+			Equivalencer<I, Object> equivalencer ) {
 		if ( other == this )
 			return true;
 		Cursable<?> o = (Cursable<?>) other;
@@ -421,6 +465,10 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * Returns a view hiding the elements which do not satisfy the argument
 	 * {@code stateless_predicate} in this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
 	 * </p>
 	 * 
 	 * @param stateless_predicate
@@ -571,9 +619,9 @@ public class KnittingCursable<I> implements
 	 * Each invocation of {@link #pull(Hook)} on the returned
 	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
 	 * cursable, transforms it using
-	 * {@link KnittingCursor#flatmapCursor(Hook, CursorMapH)} with the hook already
-	 * available and the argument {@code stateless_cursor_map_h}, then returns the
-	 * resulting cursor.
+	 * {@link KnittingCursor#flatmapCursor(Hook, CursorMapH)} with the hook
+	 * already available and the argument {@code stateless_cursor_map_h}, then
+	 * returns the resulting cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -874,7 +922,7 @@ public class KnittingCursable<I> implements
 	 * 
 	 * @param hide
 	 *          The number of elements to hide. A negative numbers counts as zero.
-	 * @return A view hiding the first {@code hide} elements in this cursable.
+	 * @return A view hiding the first {@code hide} elements of this cursable.
 	 * @since 1.0
 	 */
 	public KnittingCursable<I> headless( int hide ) {
@@ -1543,10 +1591,41 @@ public class KnittingCursable<I> implements
 		} );
 	}
 
+	/**
+	 * <p>
+	 * Returns the result of a computation taking into account all the elements of
+	 * this cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method stores into a local variable the argument {@code zero}. Then,
+	 * for each element {@code E} in this cursable, this method invokes the
+	 * argument {@code bifunction} using the content of the local variable and
+	 * {@code E}. At the end of each such invocation, this method stores into the
+	 * local variable the result of the invocation. Finally, this method returns
+	 * the content of the local variable.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of argument {@code zero} and of the elements returned by
+	 *          the argument {@code bifunction}.
+	 * @param zero
+	 *          The initial value for the reduction.
+	 * @param bifunction
+	 *          A bifunction that will be invoked once for each element of this
+	 *          cursable.
+	 * @return the result of a computation taking into account all the elements of
+	 *         this cursable.
+	 * @since 1.0
+	 */
 	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
 		K reduction = zero;
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			KnittingCursor<I> kc = pull( hook );
+			Cursor<I> kc = wrapped.pull( hook );
 			try {
 				for ( ;; ) {
 					reduction = fun.apply( reduction, kc.next( ) );

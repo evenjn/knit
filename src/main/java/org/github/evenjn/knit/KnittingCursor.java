@@ -106,8 +106,8 @@ import org.github.evenjn.yarn.Tuple;
  * 
  * <p>
  * Rolling methods repeatedly invoke this cursor's
- * {@link org.github.evenjn.yarn.Cursor#next() next()}, possibly until the end
- * is reached. The following methods are rolling:
+ * {@link org.github.evenjn.yarn.Cursor#next() next()}, typically (but not
+ * necessarily) until the end is reached. The following methods are rolling:
  * </p>
  * 
  * <ul>
@@ -122,10 +122,11 @@ import org.github.evenjn.yarn.Tuple;
  * 
  * <p>
  * Transformations are a group of methods that return a new
- * {@code KnittingCursor} object, which provides a new view of the contents of
- * the wrapped cursor. Transformation methods do not invoke the wrapped cursor's
- * {@link org.github.evenjn.yarn.Cursor#next() next()}. The following methods
- * are transformations:
+ * {@code KnittingCursor} object (or something similar), which provides a new
+ * view of the contents of the wrapped cursor. Transformation methods do not
+ * invoke the wrapped cursor's {@link org.github.evenjn.yarn.Cursor#next()
+ * next()}; they return lazy wrappers. The following methods are
+ * transformations:
  * </p>
  * 
  * <ul>
