@@ -398,7 +398,7 @@ public class KnittingTuple<I> implements
 	 */
 	public <Y> Iterable<DiffPair<I,Y>> diff( Tuple<Y> other ) {
 		return ( ) -> KnittingCursor.wrap(
-				new DiffIterator<I,Y>( this, other, DiffPatch::equal_or_both_null ) )
+				new DiffIterator<I,Y>( this, other, KnittingTuple::equal_null ) )
 				.asIterator( );
 	}
 
@@ -500,7 +500,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> int distance( Tuple<Y> other ) {
-		return distance( other, DiffPatch::equal_or_both_null );
+		return distance( other, KnittingTuple::equal_null );
 	}
 
 	/**
@@ -1113,6 +1113,50 @@ public class KnittingTuple<I> implements
 			j++;
 		}
 		return result;
+	}
+
+	/**
+	 * Returns the longest common prefix of this tuple and the argument tuple.
+	 * 
+	 * @param other
+	 *          Another tuple.
+	 * @param equivalencer
+	 *          A system that can tell whether two objects are equivalent.
+	 * @return The common prefix of this tuple and the argument tuple.
+	 * @since 1.0
+	 */
+	public <Y> int longestCommonPrefix( Tuple<Y> other,
+			Equivalencer<I, Y> equivalencer ) {
+		int n = Math.min( size( ), other.size( ) );
+		for ( int i = 0; i < n; i++ ) {
+			if ( !equivalencer.equivalent( get( i ), other.get( i ) ) ) {
+				return i;
+			}
+		}
+		return n;
+	}
+
+	/**
+	 * Returns the longest common suffix of this tuple and the argument tuple.
+	 * 
+	 * @param other
+	 *          Another tuple.
+	 * @param equivalencer
+	 *          A system that can tell whether two objects are equivalent.
+	 * @return The common suffix of this tuple and the argument tuple.
+	 * @since 1.0
+	 */
+	public <Y> int longestCommonSuffix( Tuple<Y> other,
+			Equivalencer<I, Y> equivalencer ) {
+    int text1_length = size();
+    int text2_length = other.size();
+    int n = Math.min(text1_length, text2_length);
+    for (int i = 1; i <= n; i++) {
+      if (! equivalencer.equivalent(get(text1_length - i), other.get(text2_length - i))) {
+        return i - 1;
+      }
+    }
+    return n;
 	}
 
 	/**

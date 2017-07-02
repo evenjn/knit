@@ -169,7 +169,7 @@ class DiffPatch<T,Y> {
 
     // Check for equality (speedup).
     LinkedList<DiffOp<T,Y>> diffs;
-    if (text1.equivalentTo(text2)) {
+    if (text1.equivalentTo(text2, equivalencer)) {
       diffs = new LinkedList<DiffOp<T,Y>>();
       if (text1.size() != 0) {
         diffs.add(DiffOp.equal(text1, text2));
@@ -178,14 +178,14 @@ class DiffPatch<T,Y> {
     }
 
     // Trim off common prefix (speedup).
-    int commonlength_prefix = diff_commonPrefix(text1, text2, equivalencer);
+    int commonlength_prefix = text1.longestCommonPrefix( text2, equivalencer );
     KnittingTuple<T> commonprefix1 = text1.head(0, commonlength_prefix);
     KnittingTuple<Y> commonprefix2 = text2.head(0, commonlength_prefix);
     text1 = text1.headless(commonlength_prefix);
     text2 = text2.headless(commonlength_prefix);
 
     // Trim off common suffix (speedup).
-    int commonlength_suffix = diff_commonSuffix(text1, text2, equivalencer);
+    int commonlength_suffix = text1.longestCommonSuffix( text2, equivalencer );
     KnittingTuple<T> commonsuffix1 = text1.tail(0, commonlength_suffix);
     KnittingTuple<Y> commonsuffix2 = text2.tail(0, commonlength_suffix);
     text1 = text1.tailless(commonlength_suffix);
@@ -449,49 +449,11 @@ class DiffPatch<T,Y> {
 
 
 	public static int diff_commonPrefix(String text1, String text2) {
-  	return DiffPatch.diff_commonPrefix( tt(text1), tt(text2), DiffPatch::equal_or_both_null);
-  }
-
-  /**
-   * Determine the common prefix of two strings
-   * @param text1 First string.
-   * @param text2 Second string.
-   * @return The number of characters common to the start of each string.
-   */
-  public static <T,Y> int diff_commonPrefix(KnittingTuple<T> text1, KnittingTuple<Y> text2,
-  		Equivalencer<T,Y> equivalencer) {
-    // Performance analysis: http://neil.fraser.name/news/2007/10/09/
-    int n = Math.min(text1.size(), text2.size());
-    for (int i = 0; i < n; i++) {
-      if (! equivalencer.equivalent(text1.get(i), text2.get(i))) {
-        return i;
-      }
-    }
-    return n;
+		return tt(text1).longestCommonPrefix( tt(text2), DiffPatch::equal_or_both_null);
   }
   
 	public static int diff_commonSuffix(String text1, String text2) {
-  	return DiffPatch.diff_commonSuffix( tt(text1), tt(text2), DiffPatch::equal_or_both_null);
-  }
-
-  /**
-   * Determine the common suffix of two strings
-   * @param text1 First string.
-   * @param text2 Second string.
-   * @return The number of characters common to the end of each string.
-   */
-  public static <T,Y> int diff_commonSuffix(KnittingTuple<T> text1, KnittingTuple<Y> text2,
-  		Equivalencer<T,Y> equivalencer) {
-    // Performance analysis: http://neil.fraser.name/news/2007/10/09/
-    int text1_length = text1.size();
-    int text2_length = text2.size();
-    int n = Math.min(text1_length, text2_length);
-    for (int i = 1; i <= n; i++) {
-      if (! equivalencer.equivalent(text1.get(text1_length - i), text2.get(text2_length - i))) {
-        return i - 1;
-      }
-    }
-    return n;
+  	return tt(text1).longestCommonSuffix( tt(text2), DiffPatch::equal_or_both_null );
   }
 
   
@@ -873,7 +835,7 @@ class DiffPatch<T,Y> {
           }
           if (both_types) {
             // Factor out any common prefixies.
-            commonlength = diff_commonPrefix(text_insert, text_delete, equivalencer.transpose( ));
+            commonlength = text_insert.longestCommonPrefix( text_delete, equivalencer.transpose( ));
             if (commonlength != 0) {
               if (pointer.hasPrevious()) {
                 thisDiff = pointer.previous();
@@ -892,7 +854,7 @@ class DiffPatch<T,Y> {
               text_delete = text_delete.headless(commonlength);
             }
             // Factor out any common suffixies.
-            commonlength = diff_commonSuffix(text_insert, text_delete, equivalencer.transpose( ));
+            commonlength = text_insert.longestCommonSuffix( text_delete, equivalencer.transpose( ));
             if (commonlength != 0) {
               thisDiff = pointer.next();
               assert thisDiff.operation == Operation.EQUAL

@@ -142,13 +142,13 @@ public class DiffOp<T,Y> {
   	return text_front.size( );
   }
 	
-	static <T,Y> DiffOp<T,Y> insert(KnittingTuple<Y> text) {
+	public static <T,Y> DiffOp<T,Y> insert(KnittingTuple<Y> text) {
 		return new DiffOp<T,Y>(Operation.INSERT, null, text );
 	}
-	static <T,Y> DiffOp<T,Y> delete(KnittingTuple<T> text) {
+	public static <T,Y> DiffOp<T,Y> delete(KnittingTuple<T> text) {
 		return new DiffOp<T,Y>(Operation.DELETE, text, null );
 	}
-	static <T,Y> DiffOp<T,Y> equal(KnittingTuple<T> text_front, KnittingTuple<Y> text_back) {
+	public static <T,Y> DiffOp<T,Y> equal(KnittingTuple<T> text_front, KnittingTuple<Y> text_back) {
 		return new DiffOp<T,Y>(Operation.EQUAL, text_front, text_back );
 	}
 

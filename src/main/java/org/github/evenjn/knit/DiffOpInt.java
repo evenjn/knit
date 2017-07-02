@@ -43,10 +43,10 @@ public class DiffOpInt extends DiffOp<Integer,Integer>{
   	public static DiffOpInt insertFromText( String text) {
   		return new DiffOpInt(Operation.INSERT, null, DiffPatch.tt(text) );
   	}
-  	public static DiffOp<Integer,Integer> deleteFromText( String text) {
+  	public static DiffOpInt deleteFromText( String text) {
   		return new DiffOpInt(Operation.DELETE, DiffPatch.tt(text), null );
   	}
-  	public static DiffOp<Integer,Integer> equalFromText( String text) {
+  	public static DiffOpInt equalFromText( String text) {
   		KnittingTuple<Integer> tt = DiffPatch.tt(text);
   		return new DiffOpInt(Operation.EQUAL, tt, tt );
   	}
