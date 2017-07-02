@@ -19,37 +19,35 @@ package org.github.evenjn.knit;
 
 import java.util.LinkedList;
 
-import org.github.evenjn.knit.DiffPatch.Diff;
-import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Equivalencer;
 import org.github.evenjn.yarn.Tuple;
 
-class DiffIterator<K> implements
-		Cursor<Bi<K, K>> {
+class DiffIterator<F, B> implements
+		Cursor<DiffPair<F, B>> {
 
-	private final KnittingCursor<Diff<K>> kd;
+	private final KnittingCursor<DiffOp<F, B>> kd;
 
-	private final KnittingCursor<K> ka;
+	private final KnittingCursor<F> ka;
 
-	private final KnittingCursor<K> kb;
+	private final KnittingCursor<B> kb;
 
-	public DiffIterator(Tuple<K> a, Tuple<K> b, Equivalencer<K, Object> equivalencer) {
+	public DiffIterator(Tuple<F> a, Tuple<B> b, Equivalencer<F, B> equivalencer) {
 		ka = KnittingCursor.wrap( a );
 		kb = KnittingCursor.wrap( b );
-		DiffPatch<K> dmp = new DiffPatch<K>( );
-		LinkedList<Diff<K>> diffs =
+		DiffPatch<F, B> dmp = new DiffPatch<F, B>( );
+		LinkedList<DiffOp<F, B>> diffs =
 				dmp.diff_main(
-						KnittingTuple.wrap( a ).map( x -> x ),
-						KnittingTuple.wrap( b ).map( x -> x ),
+						KnittingTuple.wrap( a ),
+						KnittingTuple.wrap( b ),
 						equivalencer );
 		kd = KnittingCursor.wrap( diffs.iterator( ) );
 	}
 
-	private Diff<K> current = null;
+	private DiffOp<F, B> current = null;
 
-	private Bik<K, K> tray = Bik.nu( null, null );
+	private DiffPair<F, B> tray;
 
 	private int original_start;
 
@@ -60,21 +58,21 @@ class DiffIterator<K> implements
 	private int revised_length;
 
 	@Override
-	public Bi<K, K> next( )
+	public DiffPair<F, B> next( )
 			throws EndOfCursorException {
 
 		if ( current == null && kd.hasNext( ) ) {
 			current = kd.next( );
 			switch ( current.operation ) {
 				case INSERT:
-					revised_length = current.text.size( );
+					revised_length = current.getTextBack( ).size( );
 					break;
 				case EQUAL:
-					original_length = current.text.size( );
-					revised_length = current.text.size( );
+					original_length = current.getTextFront( ).size( );
+					revised_length = current.getTextBack( ).size( );
 					break;
 				case DELETE:
-					original_length = current.text.size( );
+					original_length = current.getTextFront( ).size( );
 					break;
 				default:
 					break;
@@ -84,7 +82,7 @@ class DiffIterator<K> implements
 		if ( current != null ) {
 			switch ( current.operation ) {
 				case INSERT:
-					tray = Bik.nu( null, kb.next( ) );
+					tray = DiffPair.nu( null, kb.next( ), false, true );
 					revised_length--;
 					if ( revised_length == 0 ) {
 						current = null;
@@ -92,7 +90,7 @@ class DiffIterator<K> implements
 					revised_start++;
 					break;
 				case EQUAL:
-					tray = Bik.nu( ka.next( ), kb.next( ) );
+					tray = DiffPair.nu( ka.next( ), kb.next( ), true, true );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -105,7 +103,7 @@ class DiffIterator<K> implements
 					revised_start++;
 					break;
 				case DELETE:
-					tray = Bik.nu( ka.next( ), null );
+					tray = DiffPair.nu( ka.next( ), null, true, false );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -118,7 +116,7 @@ class DiffIterator<K> implements
 			return tray;
 
 		}
-		throw EndOfCursorException.neo();
+		throw EndOfCursorException.neo( );
 	}
 
 }

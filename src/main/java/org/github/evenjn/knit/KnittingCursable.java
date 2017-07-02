@@ -430,15 +430,14 @@ public class KnittingCursable<I> implements
 	 *         cursable. False otherwise.
 	 * @since 1.0
 	 */
-	public boolean equivalentTo( Cursable<?> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> boolean equivalentTo( Cursable<Y> other,
+			Equivalencer<I,Y> equivalencer ) {
 		if ( other == this )
 			return true;
-		Cursable<?> o = (Cursable<?>) other;
 
 		try ( AutoHook hook = new BasicAutoHook( ) ) {
 			KnittingCursor<I> pull1 = this.pull( hook );
-			KnittingCursor<?> pull2 = KnittingCursor.wrap( o.pull( hook ) );
+			KnittingCursor<Y> pull2 = KnittingCursor.wrap( other.pull( hook ) );
 
 			for ( ;; ) {
 				boolean hasNext1 = pull1.hasNext( );
@@ -450,7 +449,7 @@ public class KnittingCursable<I> implements
 					return true;
 				}
 				I next1 = pull1.next( );
-				Object next2 = pull2.next( );
+				Y next2 = pull2.next( );
 				if ( !equivalencer.equivalent( next1, next2 ) ) {
 					return false;
 				}

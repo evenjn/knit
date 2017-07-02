@@ -28,7 +28,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.github.evenjn.yarn.AutoHook;
-import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Equivalencer;
@@ -350,7 +349,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean contains( KnittingTuple<I> other ) {
+	public <Y> boolean contains( KnittingTuple<Y> other ) {
 		return contains( other, KnittingTuple::equal_null );
 	}
 
@@ -373,8 +372,8 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean contains( KnittingTuple<I> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> boolean contains( KnittingTuple<Y> other,
+			Equivalencer<I,Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
 		return findSubtuple( other, 0, equivalencer ).isPresent( );
@@ -397,21 +396,47 @@ public class KnittingTuple<I> implements
 	 * @return An alignment of this tuple with the argument tuple.
 	 * @since 1.0
 	 */
-	public Iterable<Bi<I, I>> diff( Tuple<I> other ) {
+	public <Y> Iterable<DiffPair<I,Y>> diff( Tuple<Y> other ) {
 		return ( ) -> KnittingCursor.wrap(
-				new DiffIterator<I>( this, other, DiffPatch::equal_or_both_null ) )
+				new DiffIterator<I,Y>( this, other, DiffPatch::equal_or_both_null ) )
 				.asIterator( );
 	}
 
 	/**
 	 * <p>
 	 * Returns an alignment of this tuple with the argument tuple, represented as
-	 * a list of pairs.
+	 * a list of {@link org.github.evenjn.knit.DiffPair pairs}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Each pair has two slots: one at the front, one at the back. At least one of
 	 * the two slots is filled in with an element of the tuples.
+	 * </p>
+	 * 
+	 * <p>
+	 * There is no special provision for {@code null}. When a tuple contains
+	 * {@code null}, a slot will be filled with {@code null}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Whenever the front slot of a pair
+	 * {@linkplain org.github.evenjn.knit.DiffPair#hasFront( ) is filled in}, that
+	 * slot contains an element of this tuple. That element may be {@code null}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Whenever the back slot of a pair
+	 * {@linkplain org.github.evenjn.knit.DiffPair#hasBack( ) is filled in}, that
+	 * slot contains an element of the argument tuple. That element may be
+	 * {@code null}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Whenever both the front slot and the back slot
+	 * {@linkplain org.github.evenjn.knit.DiffPair#hasBoth( ) are filled in}, the
+	 * content of the front slot is equivalent (as specified by the argument
+	 * {@code equivalencer}) to the content of the second slot. They may be both
+	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
@@ -446,11 +471,11 @@ public class KnittingTuple<I> implements
 	 * @return An alignment of this tuple with the argument tuple.
 	 * @since 1.0
 	 */
-	public Iterable<Bi<I, I>> diff(
-			Tuple<I> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> Iterable<DiffPair<I,Y>> diff(
+			Tuple<Y> other,
+			Equivalencer<I,Y> equivalencer ) {
 		return ( ) -> KnittingCursor
-				.wrap( new DiffIterator<I>( this, other, equivalencer ) )
+				.wrap( new DiffIterator<I,Y>( this, other, equivalencer ) )
 				.asIterator( );
 	}
 
@@ -474,7 +499,7 @@ public class KnittingTuple<I> implements
 	 * @return The distance between this tuple and the argument tuple.
 	 * @since 1.0
 	 */
-	public int distance( Tuple<I> other ) {
+	public <Y> int distance( Tuple<Y> other ) {
 		return distance( other, DiffPatch::equal_or_both_null );
 	}
 
@@ -511,10 +536,10 @@ public class KnittingTuple<I> implements
 	 * @return The distance between this tuple and the argument tuple.
 	 * @since 1.0
 	 */
-	public int distance( Tuple<I> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> int distance( Tuple<Y> other,
+			Equivalencer<I,Y> equivalencer ) {
 		Tuple<I> s = this;
-		Tuple<I> t = other;
+		Tuple<Y> t = other;
 
 		int n = s.size( );
 		int m = t.size( );
@@ -529,11 +554,7 @@ public class KnittingTuple<I> implements
 
 		if ( n > m ) {
 			// swap the input strings to consume less memory
-			final Tuple<I> tmp = s;
-			s = t;
-			t = tmp;
-			n = m;
-			m = t.size( );
+			return KnittingTuple.wrap( other ).distance( this, equivalencer.transpose( ) );
 		}
 
 		final int p[] = new int[n + 1];
@@ -543,7 +564,7 @@ public class KnittingTuple<I> implements
 		int upper_left;
 		int upper;
 
-		I t_j; // jth character of t
+		Y t_j; // jth character of t
 		int cost;
 
 		for ( i = 0; i <= n; i++ ) {
@@ -612,8 +633,8 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean endsWith( KnittingTuple<I> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> boolean endsWith( KnittingTuple<Y> other,
+			Equivalencer<I,Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
 		return headless( size( ) - other.size( ) ).equivalentTo( other,
@@ -645,7 +666,7 @@ public class KnittingTuple<I> implements
 	 *         tuple; {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean equivalentTo( Tuple<?> other ) {
+	public <Y> boolean equivalentTo( Tuple<Y> other ) {
 		return equivalentTo( other, KnittingTuple::equal_null );
 	}
 
@@ -673,8 +694,7 @@ public class KnittingTuple<I> implements
 	 *         tuple; {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean equivalentTo( Tuple<?> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> boolean equivalentTo( Tuple<Y> other, Equivalencer<I,Y> equivalencer ) {
 		if ( other == this )
 			return true;
 		final int size = wrapped.size( );
@@ -683,7 +703,7 @@ public class KnittingTuple<I> implements
 		}
 		for ( int i = 0; i < size; i++ ) {
 			I e = wrapped.get( i );
-			Object oe = other.get( i );
+			Y oe = other.get( i );
 			if ( !( e == null ? oe == null : equivalencer.equivalent( e, oe ) ) ) {
 				return false;
 			}
@@ -717,7 +737,7 @@ public class KnittingTuple<I> implements
 	 *         requirements, if such a subtuple exists.
 	 * @since 1.0
 	 */
-	public Optional<Integer> findSubtuple( Tuple<I> other, int skip ) {
+	public <Y> Optional<Integer> findSubtuple( Tuple<Y> other, int skip ) {
 		return findSubtuple( other, skip, KnittingTuple::equal_null );
 	}
 
@@ -751,8 +771,8 @@ public class KnittingTuple<I> implements
 	 *         requirements, if such a subtuple exists.
 	 * @since 1.0
 	 */
-	public Optional<Integer> findSubtuple( Tuple<I> other, int skip,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> Optional<Integer> findSubtuple( Tuple<Y> other, int skip,
+			Equivalencer<I,Y> equivalencer ) {
 		int size = size( );
 		if ( skip > size || skip < 0 ) {
 			throw new IllegalArgumentException( );
@@ -765,7 +785,7 @@ public class KnittingTuple<I> implements
 			return Optional.empty( );
 		}
 		int limit = size - target_size;
-		I first = other.get( 0 );
+		Y first = other.get( 0 );
 		for ( int i = skip; i <= limit; i++ ) {
 			while ( i <= limit && !equivalencer.equivalent( get( i ), first ) ) {
 				i++;
@@ -878,8 +898,8 @@ public class KnittingTuple<I> implements
 	 *         tuple.
 	 * @since 1.0
 	 */
-	public ArrayList<I> lcs(
-			Tuple<I> mask ) {
+	public <Y> ArrayList<I> lcs(
+			Tuple<Y> mask ) {
 		return lcs( mask, KnittingTuple::equal_null );
 	}
 
@@ -902,12 +922,12 @@ public class KnittingTuple<I> implements
 	 *         tuple.
 	 * @since 1.0
 	 */
-	public ArrayList<I> lcs(
-			Tuple<I> mask,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> ArrayList<I> lcs(
+			Tuple<Y> mask,
+			Equivalencer<I,Y> equivalencer ) {
 		ArrayList<I> result = new ArrayList<>( );
-		for ( Bi<I, I> bi : diff( mask, equivalencer ) ) {
-			if ( bi.front( ) != null && bi.back( ) != null ) {
+		for ( DiffPair<I,Y> bi : diff( mask, equivalencer ) ) {
+			if ( bi.hasBoth( ) ) {
 				result.add( bi.front( ) );
 			}
 		}
@@ -936,8 +956,8 @@ public class KnittingTuple<I> implements
 	 *         tuple and each tuple in the argument cursor.
 	 * @since 1.0
 	 */
-	public ArrayList<I> lcsIntersection(
-			Cursor<? extends Tuple<I>> masks ) {
+	public <Y> ArrayList<I> lcsIntersection(
+			Cursor<? extends Tuple<Y>> masks ) {
 		return lcsIntersection( masks, KnittingTuple::equal_null );
 	}
 
@@ -975,23 +995,23 @@ public class KnittingTuple<I> implements
 	 *         tuple and each tuple in the argument cursor.
 	 * @since 1.0
 	 */
-	public ArrayList<I> lcsIntersection(
-			Cursor<? extends Tuple<I>> masks,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> ArrayList<I> lcsIntersection(
+			Cursor<? extends Tuple<Y>> masks,
+			Equivalencer<I,Y> equivalencer ) {
 
 		ArrayList<Boolean> keeps = new ArrayList<>( );
 		for ( int i = 0; i < size( ); i++ ) {
 			keeps.add( true );
 		}
 
-		for ( Tuple<I> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
+		for ( Tuple<Y> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
 
 			int j = 0;
-			for ( Bi<I, I> bi : diff( single_mask, equivalencer ) ) {
-				if ( bi.front( ) != null && bi.back( ) != null ) {
+			for ( DiffPair<I,Y> bi : diff( single_mask, equivalencer ) ) {
+				if ( bi.hasBoth( ) ) {
 					keeps.set( j, false );
 				}
-				if ( bi.front( ) != null ) {
+				if ( bi.hasFront( ) ) {
 					j++;
 				}
 			}
@@ -1029,8 +1049,8 @@ public class KnittingTuple<I> implements
 	 *         and each tuple in the argument cursor.
 	 * @since 1.0
 	 */
-	public ArrayList<I> lcsUnion(
-			Cursor<? extends Tuple<I>> masks ) {
+	public <Y> ArrayList<I> lcsUnion(
+			Cursor<? extends Tuple<Y>> masks ) {
 		return lcsUnion( masks, KnittingTuple::equal_null );
 	}
 
@@ -1062,23 +1082,23 @@ public class KnittingTuple<I> implements
 	 *         and each tuple in the argument cursor.
 	 * @since 1.0
 	 */
-	public ArrayList<I> lcsUnion(
-			Cursor<? extends Tuple<I>> masks,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> ArrayList<I> lcsUnion(
+			Cursor<? extends Tuple<Y>> masks,
+			Equivalencer<I,Y> equivalencer ) {
 
 		ArrayList<Boolean> keeps = new ArrayList<>( );
 		for ( int i = 0; i < size( ); i++ ) {
 			keeps.add( false );
 		}
 
-		for ( Tuple<I> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
+		for ( Tuple<Y> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
 
 			int j = 0;
-			for ( Bi<I, I> bi : diff( single_mask, equivalencer ) ) {
-				if ( bi.front( ) != null && bi.back( ) != null ) {
+			for ( DiffPair<I,Y> bi : diff( single_mask, equivalencer ) ) {
+				if ( bi.hasBoth( ) ) {
 					keeps.set( j, true );
 				}
-				if ( bi.front( ) != null ) {
+				if ( bi.hasFront( ) ) {
 					j++;
 				}
 			}
@@ -1317,7 +1337,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean startsWith( KnittingTuple<I> other ) {
+	public <Y> boolean startsWith( KnittingTuple<Y> other ) {
 		return startsWith( other, KnittingTuple::equal_null );
 	}
 
@@ -1340,8 +1360,8 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean startsWith( KnittingTuple<I> other,
-			Equivalencer<I, Object> equivalencer ) {
+	public <Y> boolean startsWith( KnittingTuple<Y> other,
+			Equivalencer<I,Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
 		return head( 0, other.size( ) ).equivalentTo( other, equivalencer );
@@ -1455,11 +1475,11 @@ public class KnittingTuple<I> implements
 	 *         they are {@linkplain java.lang.Object#equals equal} to each other
 	 *         or both {@code null}.
 	 */
-	public static <K> Equivalencer<K, Object> getNullEquivalencer( ) {
-		return new Equivalencer<K, Object>( ) {
+	public static <K,Y> Equivalencer<K,Y> getNullEquivalencer( ) {
+		return new Equivalencer<K,Y>( ) {
 
 			@Override
-			public boolean equivalent( K first, Object second ) {
+			public boolean equivalent( K first, Y second ) {
 				if ( first == null && second == null )
 					return true;
 				if ( first == null || second == null )
