@@ -17,37 +17,31 @@
  */
 package org.github.evenjn.knit;
 
-import java.util.LinkedList;
-
+import org.github.evenjn.yarn.BiOption;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Equivalencer;
-import org.github.evenjn.yarn.Tuple;
 
 class DiffIterator<F, B> implements
-		Cursor<DiffPair<F, B>> {
+		Cursor<BiOption<F, B>> {
 
 	private final KnittingCursor<DiffOp<F, B>> kd;
 
-	private final KnittingCursor<F> ka;
+	private final KnittingCursor<F> kc_front;
 
-	private final KnittingCursor<B> kb;
+	private final KnittingCursor<B> kc_back;
 
-	public DiffIterator(Tuple<F> a, Tuple<B> b, Equivalencer<F, B> equivalencer) {
-		ka = KnittingCursor.wrap( a );
-		kb = KnittingCursor.wrap( b );
-		DiffPatch<F, B> dmp = new DiffPatch<F, B>( );
-		LinkedList<DiffOp<F, B>> diffs =
-				dmp.diff_main(
-						KnittingTuple.wrap( a ),
-						KnittingTuple.wrap( b ),
-						equivalencer );
-		kd = KnittingCursor.wrap( diffs.iterator( ) );
+	DiffIterator(
+			KnittingCursor<F> kc_front,
+			KnittingCursor<B> kc_back,
+			KnittingCursor<DiffOp<F, B>> kd) {
+		this.kc_front = kc_front;
+		this.kc_back = kc_back;
+		this.kd = kd;
 	}
 
 	private DiffOp<F, B> current = null;
 
-	private DiffPair<F, B> tray;
+	private BiOptionk<F, B> tray;
 
 	private int original_start;
 
@@ -58,12 +52,12 @@ class DiffIterator<F, B> implements
 	private int revised_length;
 
 	@Override
-	public DiffPair<F, B> next( )
+	public BiOptionk<F, B> next( )
 			throws EndOfCursorException {
 
 		if ( current == null && kd.hasNext( ) ) {
 			current = kd.next( );
-			switch ( current.operation ) {
+			switch ( current.getOperation( ) ) {
 				case INSERT:
 					revised_length = current.getTextBack( ).size( );
 					break;
@@ -80,9 +74,9 @@ class DiffIterator<F, B> implements
 		}
 
 		if ( current != null ) {
-			switch ( current.operation ) {
+			switch ( current.getOperation( ) ) {
 				case INSERT:
-					tray = DiffPair.nu( null, kb.next( ), false, true );
+					tray = BiOptionk.nu( null, kc_back.next( ), false, true );
 					revised_length--;
 					if ( revised_length == 0 ) {
 						current = null;
@@ -90,7 +84,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case EQUAL:
-					tray = DiffPair.nu( ka.next( ), kb.next( ), true, true );
+					tray = BiOptionk.nu( kc_front.next( ), kc_back.next( ), true, true );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -103,7 +97,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case DELETE:
-					tray = DiffPair.nu( ka.next( ), null, true, false );
+					tray = BiOptionk.nu( kc_front.next( ), null, true, false );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -118,5 +112,4 @@ class DiffIterator<F, B> implements
 		}
 		throw EndOfCursorException.neo( );
 	}
-
 }

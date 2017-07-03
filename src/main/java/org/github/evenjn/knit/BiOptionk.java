@@ -36,22 +36,14 @@
 
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Bi;
+import org.github.evenjn.yarn.BiOption;
 
-public class DiffPair<T,Y> implements
-		Bi<T, Y> {
+public class BiOptionk<F, B> implements
+		BiOption<F, B> {
 
-	private EmptySlots missing;
+	private boolean has_front = false;
 
-	/**
-	 * A code describing whether the front slot is empty, the back slot is empty,
-	 * or none is empty.
-	 */
-	private enum EmptySlots {
-		FRONTONLY,
-		BACKONLY,
-		NONE
-	}
+	private boolean has_back = false;
 
 	/**
 	 * Returns {@code true} if the both slots are filled in, {@code false}
@@ -61,7 +53,7 @@ public class DiffPair<T,Y> implements
 	 *         otherwise.
 	 */
 	public boolean hasBoth( ) {
-		return missing == EmptySlots.NONE;
+		return has_front && has_back;
 	}
 
 	/**
@@ -72,7 +64,7 @@ public class DiffPair<T,Y> implements
 	 *         otherwise.
 	 */
 	public boolean hasFront( ) {
-		return missing != EmptySlots.FRONTONLY;
+		return has_front;
 	}
 
 	/**
@@ -83,38 +75,34 @@ public class DiffPair<T,Y> implements
 	 *         otherwise.
 	 */
 	public boolean hasBack( ) {
-		return missing != EmptySlots.BACKONLY;
+		return has_back;
 	}
 
 	@Override
-	public T front( ) {
+	public F front( ) {
 		return front;
 	}
 
 	@Override
-	public Y back( ) {
+	public B back( ) {
 		return back;
 	}
 
-	public static <T,Y> DiffPair<T,Y> nu( T front, Y back, boolean has_front,
+	public static <F, B> BiOptionk<F, B> nu( F front, B back, boolean has_front,
 			boolean has_back ) {
-		DiffPair<T,Y> dp = new DiffPair<>( );
+		BiOptionk<F, B> dp = new BiOptionk<>( );
 		dp.front = front;
 		dp.back = back;
-		if ( !has_back ) {
-			dp.missing = EmptySlots.BACKONLY;
+		if ( !has_back && !has_front ) {
+			throw new IllegalArgumentException( );
 		}
-		if ( !has_front ) {
-			dp.missing = EmptySlots.FRONTONLY;
-		}
-		if ( has_back && has_front ) {
-			dp.missing = EmptySlots.NONE;
-		}
+		dp.has_back = has_back;
+		dp.has_front = has_front;
 		return dp;
 	}
 
-	private T front;
+	private F front;
 
-	private Y back;
+	private B back;
 
 }

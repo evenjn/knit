@@ -55,8 +55,8 @@ import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorPurl;
 import org.github.evenjn.yarn.IteratorPurlH;
-import org.github.evenjn.yarn.OptionMap;
-import org.github.evenjn.yarn.OptionMapH;
+import org.github.evenjn.yarn.OptionalMap;
+import org.github.evenjn.yarn.OptionalMapH;
 import org.github.evenjn.yarn.OptionalPurl;
 import org.github.evenjn.yarn.OptionalPurlH;
 import org.github.evenjn.yarn.StreamMapH;
@@ -165,8 +165,8 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #purlIterable(Hook, IterablePurlH)}</li>
  * <li>{@link #purlIterator(IteratorPurl)}</li>
  * <li>{@link #purlIterator(Hook, IteratorPurlH)}</li>
- * <li>{@link #purlOptional(OptionalPurl)}</li>
- * <li>{@link #purlOptional(Hook, OptionalPurlH)}</li>
+ * <li>{@link #purlOptional(OptionPurl)}</li>
+ * <li>{@link #purlOptional(Hook, OptionPurlH)}</li>
  * <li>{@link #purlStream(Hook, StreamPurlH)}</li>
  * </ul>
  * 
@@ -1000,7 +1000,7 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapOptional( Hook hook,
-			OptionMapH<? super I, O> stateless_optional_map_h )
+			OptionalMapH<? super I, O> stateless_optional_map_h )
 			throws IllegalStateException {
 		lock( );
 		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
@@ -1044,7 +1044,7 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapOptional(
-			OptionMap<? super I, O> stateless_optional_map )
+			OptionalMap<? super I, O> stateless_optional_map )
 			throws IllegalStateException {
 		lock( );
 		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {

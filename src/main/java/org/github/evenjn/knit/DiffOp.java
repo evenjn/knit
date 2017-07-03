@@ -36,137 +36,130 @@
 
 package org.github.evenjn.knit;
 
-import org.github.evenjn.knit.DiffPatch.Operation;
-
 /**
  * Class representing one diff operation.
  */
-public class DiffOp<T,Y> {
-	
-  /**
-   * One of: INSERT, DELETE or EQUAL.
-   */
-  public Operation operation;
-  /**
-   * The text associated with this diff operation.
-   */
+class DiffOp<F, B> {
 
-  protected KnittingTuple<T> text_front;
-  protected KnittingTuple<Y> text_back;
-  
-  public void turnDeleteToInsert(KnittingTuple<Y> text) {
-  	if (operation == Operation.DELETE) {
-  		this.text_front = null;
-  		this.text_back = text;
-  		this.operation = Operation.INSERT;
-  		return;
-  	}
-		throw new IllegalStateException( );
-  }
-  
-  public void turnInsertToDelete(KnittingTuple<T> text) {
-  	if (operation == Operation.INSERT) {
-  		this.text_front = text;
-  		this.text_back = null;
-  		this.operation = Operation.DELETE;
-  		return;
-  	}
-		throw new IllegalStateException( );
-  }
-  
-
-  public void setEqualText(KnittingTuple<T> text_front, KnittingTuple<Y> text_back) {
-  	if (operation != Operation.EQUAL) {
-  		throw new IllegalStateException( );
-  	}
-		this.text_front = text_front;
-		this.text_back = text_back;
-  }
-  
-  public void setDeletedText(KnittingTuple<T> text) {
-  	if (operation == Operation.DELETE) {
-  		this.text_front = text;
-  		return;
-  	}
-		throw new IllegalStateException( );
-  }
-  
-  public void setInsertedText(KnittingTuple<Y> text) {
-  	if (operation == Operation.INSERT) {
-    	this.text_back = text;
-  		return;
-  	}
-		throw new IllegalStateException( );
-  }
-  
-  public KnittingTuple<T> getDeletedText() {
-  	if (operation == Operation.DELETE) {
-  		if (text_front == null) {
-    		throw new IllegalStateException( );
-    	}
-  		return text_front;
-  	}
-		throw new IllegalStateException( );
-  }
-
-  
-  public KnittingTuple<Y> getInsertedText() {
-  	if (operation == Operation.INSERT) {
-  		if (text_back == null) {
-    		throw new IllegalStateException( );
-    	}
-  		return text_back;
-  	}
-		throw new IllegalStateException( );
-  }
-  
-  public KnittingTuple<Y> getTextBack() {
-  	if (operation == Operation.DELETE) {
-    		throw new IllegalStateException( );
-  	}
-  	return text_back;
-  }
-  
-
-  public KnittingTuple<T> getTextFront() {
-  	if (operation == Operation.INSERT) {
-    		throw new IllegalStateException( );
-  	}
-  	return text_front;
-  }
-  
-  public int getEqualSize() {
-  	if (operation != Operation.EQUAL) {
-  		throw new IllegalStateException( );
-  	}
-  	return text_front.size( );
-  }
-	
-	public static <T,Y> DiffOp<T,Y> insert(KnittingTuple<Y> text) {
-		return new DiffOp<T,Y>(Operation.INSERT, null, text );
-	}
-	public static <T,Y> DiffOp<T,Y> delete(KnittingTuple<T> text) {
-		return new DiffOp<T,Y>(Operation.DELETE, text, null );
-	}
-	public static <T,Y> DiffOp<T,Y> equal(KnittingTuple<T> text_front, KnittingTuple<Y> text_back) {
-		return new DiffOp<T,Y>(Operation.EQUAL, text_front, text_back );
+	public enum Operation {
+		DELETE,
+		INSERT,
+		EQUAL
 	}
 
-  /**
-   * Constructor.  Initializes the diff with the provided values.
-   * @param operation One of INSERT, DELETE or EQUAL.
-   * @param text The text being applied.
-   */
-  protected DiffOp(Operation operation, KnittingTuple<T> text_front, KnittingTuple<Y> text_back ) {
-    // Construct a diff with the specified operation and text.
-    this.operation = operation;
-    this.text_front = text_front;
-    this.text_back = text_back;
-    if (operation == Operation.EQUAL) {
-    	if (! text_front.equivalentTo( text_back ) ) {
-    		throw new IllegalStateException( );
-    	}
-    }
-  }
+	private Operation operation;
 
+	protected KnittingTuple<F> front;
+
+	protected KnittingTuple<B> back;
+
+	public Operation getOperation( ) {
+		return operation;
+	}
+
+	public void turnDeleteToInsert( KnittingTuple<B> back ) {
+		if ( operation == Operation.DELETE ) {
+			this.front = null;
+			this.back = back;
+			this.operation = Operation.INSERT;
+			return;
+		}
+		throw new IllegalStateException( );
+	}
+
+	public void turnInsertToDelete( KnittingTuple<F> front ) {
+		if ( operation == Operation.INSERT ) {
+			this.front = front;
+			this.back = null;
+			this.operation = Operation.DELETE;
+			return;
+		}
+		throw new IllegalStateException( );
+	}
+
+	public void setEqualText( KnittingTuple<F> front,
+			KnittingTuple<B> back ) {
+		if ( operation != Operation.EQUAL ) {
+			throw new IllegalStateException( );
+		}
+		this.front = front;
+		this.back = back;
+	}
+
+	public void setDeletedText( KnittingTuple<F> text ) {
+		if ( operation == Operation.DELETE ) {
+			this.front = text;
+			return;
+		}
+		throw new IllegalStateException( );
+	}
+
+	public void setInsertedText( KnittingTuple<B> text ) {
+		if ( operation == Operation.INSERT ) {
+			this.back = text;
+			return;
+		}
+		throw new IllegalStateException( );
+	}
+
+	public KnittingTuple<F> getDeletedText( ) {
+		if ( operation == Operation.DELETE ) {
+			if ( front == null ) {
+				throw new IllegalStateException( );
+			}
+			return front;
+		}
+		throw new IllegalStateException( );
+	}
+
+	public KnittingTuple<B> getInsertedText( ) {
+		if ( operation == Operation.INSERT ) {
+			if ( back == null ) {
+				throw new IllegalStateException( );
+			}
+			return back;
+		}
+		throw new IllegalStateException( );
+	}
+
+	public KnittingTuple<B> getTextBack( ) {
+		if ( operation == Operation.DELETE ) {
+			throw new IllegalStateException( );
+		}
+		return back;
+	}
+
+	public KnittingTuple<F> getTextFront( ) {
+		if ( operation == Operation.INSERT ) {
+			throw new IllegalStateException( );
+		}
+		return front;
+	}
+
+	public int getEqualSize( ) {
+		if ( operation != Operation.EQUAL ) {
+			throw new IllegalStateException( );
+		}
+		return front.size( );
+	}
+
+	public static <T, Y> DiffOp<T, Y> insert( KnittingTuple<Y> text ) {
+		return new DiffOp<T, Y>( Operation.INSERT, null, text );
+	}
+
+	public static <T, Y> DiffOp<T, Y> delete( KnittingTuple<T> text ) {
+		return new DiffOp<T, Y>( Operation.DELETE, text, null );
+	}
+
+	public static <T, Y> DiffOp<T, Y> equal( KnittingTuple<T> text_front,
+			KnittingTuple<Y> text_back ) {
+		return new DiffOp<T, Y>( Operation.EQUAL, text_front, text_back );
+	}
+
+	protected DiffOp(Operation operation, KnittingTuple<F> text_front,
+			KnittingTuple<B> text_back) {
+		this.operation = operation;
+		this.front = text_front;
+		this.back = text_back;
+	}
 }

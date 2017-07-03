@@ -61,8 +61,8 @@ import org.github.evenjn.yarn.IteratorPurl;
 import org.github.evenjn.yarn.IteratorPurlFactory;
 import org.github.evenjn.yarn.IteratorPurlH;
 import org.github.evenjn.yarn.IteratorPurlHFactory;
-import org.github.evenjn.yarn.OptionMap;
-import org.github.evenjn.yarn.OptionMapH;
+import org.github.evenjn.yarn.OptionalMap;
+import org.github.evenjn.yarn.OptionalMapH;
 import org.github.evenjn.yarn.OptionalPurl;
 import org.github.evenjn.yarn.OptionalPurlFactory;
 import org.github.evenjn.yarn.OptionalPurlH;
@@ -156,8 +156,8 @@ import org.github.evenjn.yarn.StreamPurlHFactory;
  * <li>{@link #flatmapIterable(IterableMapH)}</li>
  * <li>{@link #flatmapIterator(IteratorMap)}</li>
  * <li>{@link #flatmapIterator(IteratorMapH)}</li>
- * <li>{@link #flatmapOptional(OptionMap)}</li>
- * <li>{@link #flatmapOptional(OptionMapH)}</li>
+ * <li>{@link #flatmapOptional(OptionalMap)}</li>
+ * <li>{@link #flatmapOptional(OptionalMapH)}</li>
  * <li>{@link #flatmapStream(StreamMapH)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
@@ -791,7 +791,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapOptional(
-			OptionMap<? super I, O> stateless_optional_map ) {
+			OptionalMap<? super I, O> stateless_optional_map ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -822,7 +822,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapOptional(
-			OptionMapH<? super I, O> stateless_optional_map_h )
+			OptionalMapH<? super I, O> stateless_optional_map_h )
 			throws IllegalStateException {
 		return wrap( new Cursable<O>( ) {
 
