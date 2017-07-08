@@ -126,9 +126,9 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #findSubtuple(Tuple, Equivalencer)}</li>
  * <li>{@link #longestCommonSubtuple(Tuple)}</li>
  * <li>{@link #longestCommonSubtuple(Tuple, Equivalencer)}</li>
- * <li>{@link #lcsUnion(Cursor)}</li>
+ * <li>{@link #longestCommonSubtupleUnion(Cursor)}</li>
  * <li>{@link #longestCommonSubtupleUnion(Cursor, Equivalencer)}</li>
- * <li>{@link #lcsIntersection(Cursor)}</li>
+ * <li>{@link #longestCommonSubtupleIntersection(Cursor)}</li>
  * <li>{@link #longestCommonSubtupleIntersection(Cursor, Equivalencer)}</li>
  * <li>{@link #startsWith(Tuple)}</li>
  * <li>{@link #startsWith(Tuple, Equivalencer)}</li>
@@ -781,6 +781,9 @@ public class KnittingTuple<I> implements
 	 *          The number of slots to skip.
 	 * @return The index of the first slot of a subtuple that fulfils certain
 	 *         requirements, if such a subtuple exists.
+	 * @throws IllegalArgumentException
+	 *           when {@code skip} is negative, or when it is larger than or equal
+	 *           to the size of this tuple.
 	 * @since 1.0
 	 */
 	public <Y> Optional<Integer> findSubtuple( Tuple<Y> other, int skip ) {
@@ -815,6 +818,9 @@ public class KnittingTuple<I> implements
 	 *          The number of slots to skip.
 	 * @return The index of the first slot of a subtuple that fulfils certain
 	 *         requirements, if such a subtuple exists.
+	 * @throws IllegalArgumentException
+	 *           when {@code skip} is negative, or when it is larger than or equal
+	 *           to the size of this tuple.
 	 * @since 1.0
 	 */
 	public <Y> Optional<Integer> findSubtuple( Tuple<Y> other, int skip,
@@ -858,27 +864,70 @@ public class KnittingTuple<I> implements
 	 * </p>
 	 * 
 	 * @param index
-	 *          A natural number. A negative numbers counts as zero.
+	 *          A natural number. It must be non-negative.
 	 * @return The element mapped to {@code index} by this tuple.
 	 * @throws IllegalArgumentException
-	 *           when {@code index} is larger than or equal to the size of this
-	 *           tuple.
-	 * 
+	 *           when {@code index} is negative, or when it is larger than or
+	 *           equal to the size of this tuple.
 	 * @since 1.0
 	 */
 	@Override
 	public I get( int index ) {
-		int final_index = index < 0 ? 0 : index;
-		if ( final_index >= size( ) ) {
+		if ( index < 0 || index >= size( ) ) {
 			throw new IllegalArgumentException( );
 		}
-		return wrapped.get( final_index );
+		return wrapped.get( index );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view showing elements of this tuple in slots between n and m,
+	 * including n and excluding m.
+	 * </p>
+	 * 
+	 * @param n
+	 *          The index of the first element of the view.
+	 * @param m
+	 *          The index of the element after the last element of the view.
+	 * @return A view showing elements of this tuple in slots between n and m,
+	 *         including n and excluding m.
+	 * @throws IllegalArgumentException
+	 *           when {@code n} is negative, when {@code m} is negative, when
+	 *           {@code n} is larger than {@code m}, when {@code m} is larger than
+	 *           the size of this tuple, when {@code n} is larger than or equal to
+	 *           the size of this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> subTuple( int n, int m ) {
+		if ( n < 0 ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( m < 0 ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( n >= size( ) ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( m > size( ) ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( n > m ) {
+			throw new IllegalArgumentException( );
+		}
+		return wrap( new Subtuple<>( wrapped, n, m - n ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view showing the first {@code show} elements of this tuple
 	 * visible after hiding the first {@code hide} elements.
+	 * </p>
+	 * 
+	 * <p>
+	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
+	 * when the arguments are out of the range of this tuple. This behaviour is
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
+	 * KnittingCursor's head}.
 	 * </p>
 	 * 
 	 * <p>
@@ -908,6 +957,13 @@ public class KnittingTuple<I> implements
 	/**
 	 * <p>
 	 * Returns a view hiding the first {@code hide} elements of this tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
+	 * when the arguments are out of the range of this tuple. This behaviour is
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
+	 * KnittingCursor's head}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1468,6 +1524,13 @@ public class KnittingTuple<I> implements
 	 * </p>
 	 * 
 	 * <p>
+	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
+	 * when the arguments are out of the range of this tuple. This behaviour is
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
+	 * KnittingCursor's head}.
+	 * </p>
+	 * 
+	 * <p>
 	 * The returned view may be empty. This happens when this tuple's size is
 	 * smaller than {@code hide}.
 	 * </p>
@@ -1504,6 +1567,13 @@ public class KnittingTuple<I> implements
 	/**
 	 * <p>
 	 * Returns a view hiding the last {@code hide} elements of this tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
+	 * when the arguments are out of the range of this tuple. This behaviour is
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
+	 * KnittingCursor's head}.
 	 * </p>
 	 * 
 	 * <p>

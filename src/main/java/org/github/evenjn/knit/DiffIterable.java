@@ -28,17 +28,17 @@ import org.github.evenjn.yarn.Tuple;
 class DiffIterable<F, B> implements
 		Iterable<BiOption<F, B>> {
 
-	private KnittingCursor<F> kc_front;
+	private Tuple<F> front;
 
-	private KnittingCursor<B> kc_back;
+	private Tuple<B> back;
 
 	private LinkedList<DiffOp<F, B>> diffs;
 
 	DiffIterable(
 			Tuple<F> front, Tuple<B> back,
 			Equivalencer<F, B> equivalencer) {
-		kc_front = KnittingCursor.wrap( front );
-		kc_back = KnittingCursor.wrap( back );
+		this.front = front;
+		this.back = back;
 		long deadline = ( -1 );
 		diffs =
 				Diff.adiff_main_nc(
@@ -53,7 +53,7 @@ class DiffIterable<F, B> implements
 		KnittingCursor<DiffOp<F, B>> cursor =
 				KnittingCursor.wrap( diffs.iterator( ) );
 		DiffIterator<F, B> diffIterator =
-				new DiffIterator<F, B>( kc_front, kc_back, cursor );
+				new DiffIterator<F, B>( KnittingCursor.wrap( front ), KnittingCursor.wrap( back ), cursor );
 		return KnittingCursor.wrap( diffIterator ).asIterator( );
 	}
 }
