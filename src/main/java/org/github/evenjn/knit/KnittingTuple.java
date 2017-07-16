@@ -28,6 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.BiOption;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
@@ -523,6 +524,189 @@ public class KnittingTuple<I> implements
 		return new DiffIterable<I, Y>( this, other, equivalencer );
 	}
 
+	public <Y> int distanceAll(
+			Tuple<? extends Tuple<Y>> others ) {
+		return distanceAll( others, getNullEquivalencer( ) );
+	}
+	
+	// aligns all tuples according to the lcs, then sums the diff of remaining
+	// segments
+	public <Y> int distanceAll(
+			Tuple<? extends Tuple<Y>> others,
+			Equivalencer<I, Y> equivalencer ) {
+		KnittingTuple<Bi<I, Integer>> numbered = numbered( );
+		
+		Equivalencer<Bi<I, Integer>, Y> equivalencer2 = new Equivalencer<Bi<I, Integer>, Y> () {
+
+			@Override
+			public boolean equivalent( Bi<I, Integer> a, Y b ) {
+				return equivalencer.equivalent( a.front( ), b );
+			}};
+		if ( others.size( ) == 0 ) {
+			throw new IllegalArgumentException( );
+		}
+		int total_distance = 0;
+		ArrayList<Boolean> keeps = new ArrayList<>( );
+		for ( int i = 0; i < size( ); i++ ) {
+			keeps.add( true );
+		}
+		ArrayList<Iterator<BiOption<Bi<I, Integer>, Y>>> all_diffs = new ArrayList<>( );
+		ArrayList<Integer> all_starts = new ArrayList<>( );
+
+		for ( Tuple<Y> single_mask : KnittingTuple.wrap( others ).asIterable( ) ) {
+			
+			Iterable<BiOption<Bi<I, Integer>, Y>> diff = numbered.diff( single_mask, equivalencer2 );
+
+			all_diffs.add( diff.iterator( ) );
+			all_starts.add( 0 );
+
+			int j = 0;
+			for ( BiOption<?, ?> bi : diff ) {
+				if ( bi.hasFront( ) ) {
+					if ( !bi.hasBoth( ) ) {
+						keeps.set( j, false );
+					}
+					j++;
+				}
+			}
+		}
+
+		boolean beginning_found = false;
+		boolean end_found = false;
+		int beginning = -1;
+		int end = -1;
+		for ( int z = 0; z < size( ); z++ ) {
+			if ( keeps.get( z ) ) {
+
+				// the current element is shared among all sequences.
+				if ( beginning_found ) {
+
+					end_found = true;
+					end = z;
+
+					// for each sequence
+
+					boolean best_distance_found = false;
+					int best_distance = -1;
+					for ( int s = 0; s < others.size( ); s++ ) {
+						// scroll until we find the current element
+						Iterator<BiOption<Bi<I, Integer>, Y>> iterator = all_diffs.get( s );
+						Integer start = all_starts.get( s );
+						int scrolled = 0;
+
+						while ( iterator.hasNext( ) ) {
+							BiOption<Bi<I, Integer>, Y> next = iterator.next( );
+
+							if ( next.hasBack( ) ) {
+								scrolled++;
+							}
+							// we cannot rely on equality here. we must check the slot index instead.
+							if ( next.hasBoth( ) && next.front( ).back( ) == z ) {
+								// ok, the corresponding sequence is
+								KnittingTuple<Y> other_subTuple =
+										KnittingTuple.wrap( others.get( s ) ).subTuple( start,
+												start + ( scrolled - 1 ) );
+
+								int current_distance =
+										subTuple( beginning, end ).distance( other_subTuple );
+
+								if ( !best_distance_found
+										|| best_distance > current_distance ) {
+									best_distance = current_distance;
+									best_distance_found = true;
+								}
+								all_starts.set( s, start + scrolled );
+								break;
+							}
+						}
+
+					}
+					if ( !best_distance_found ) {
+						throw new IllegalStateException( );
+					}
+					total_distance = total_distance + best_distance;
+					beginning_found = false;
+				}
+				else {
+					// scroll the other iterators
+					for ( int s = 0; s < others.size( ); s++ ) {
+						// scroll until we find the current element
+						Iterator<?> iterator = all_diffs.get( s );
+						Integer start = all_starts.get( s );
+						iterator.next( );
+						all_starts.set( s, start + 1 );
+					}
+				}
+			}
+			else {
+				if ( !beginning_found ) {
+					beginning_found = true;
+					beginning = z;
+					end_found = false;
+				}
+			}
+
+		}
+
+		if ( !( beginning_found && !end_found ) ) {
+			boolean nothing_left = false;
+			for ( int s = 0; s < others.size( ); s++ ) {
+				Iterator<?> iterator = all_diffs.get( s );
+				if ( !iterator.hasNext( ) ) {
+					nothing_left = true;
+				}
+			}
+			if ( !nothing_left ) {
+				beginning_found = true;
+				beginning = size( );
+				end_found = false;
+			}
+		}
+
+		if ( beginning_found && !end_found ) {
+
+			boolean best_distance_found = false;
+			int best_distance = -1;
+			for ( int s = 0; s < others.size( ); s++ ) {
+				// scroll until we find the current element
+				Iterator<? extends BiOption<?, ?>> iterator = all_diffs.get( s );
+				Integer start = all_starts.get( s );
+				int scrolled = 0;
+
+				while ( iterator.hasNext( ) ) {
+					BiOption<?,?> next = iterator.next( );
+
+					if ( next.hasBack( ) ) {
+						scrolled++;
+					}
+					if ( !iterator.hasNext( ) ) {
+						// ok, the corresponding sequence is
+						KnittingTuple<Y> other_subTuple =
+								KnittingTuple.wrap( others.get( s ) ).subTuple( start,
+										start + scrolled );
+
+						int current_distance =
+								subTuple( beginning, size( ) ).distance( other_subTuple );
+
+						if ( !best_distance_found || best_distance > current_distance ) {
+							best_distance = current_distance;
+							best_distance_found = true;
+						}
+						all_starts.set( s, start + scrolled );
+						break;
+					}
+				}
+
+			}
+			if ( !best_distance_found ) {
+				throw new IllegalStateException( );
+			}
+			total_distance = total_distance + best_distance;
+		}
+		// search for the first non-aligned element:
+		return total_distance;
+	}
+
 	/**
 	 * <p>
 	 * Returns the <a href=
@@ -888,14 +1072,14 @@ public class KnittingTuple<I> implements
 	 * @param n
 	 *          The index of the first element of the view.
 	 * @param m
-	 *          The index of the element after the last element of the view.
+	 *          One plus the index of the last element of the view.
 	 * @return A view showing elements of this tuple in slots between n and m,
 	 *         including n and excluding m.
 	 * @throws IllegalArgumentException
 	 *           when {@code n} is negative, when {@code m} is negative, when
 	 *           {@code n} is larger than {@code m}, when {@code m} is larger than
-	 *           the size of this tuple, when {@code n} is larger than or equal to
-	 *           the size of this tuple.
+	 *           the size of this tuple, when {@code n} is larger than the size of
+	 *           this tuple.
 	 * @since 1.0
 	 */
 	public KnittingTuple<I> subTuple( int n, int m ) {
@@ -905,7 +1089,7 @@ public class KnittingTuple<I> implements
 		if ( m < 0 ) {
 			throw new IllegalArgumentException( );
 		}
-		if ( n >= size( ) ) {
+		if ( n > size( ) ) {
 			throw new IllegalArgumentException( );
 		}
 		if ( m > size( ) ) {
@@ -1112,10 +1296,10 @@ public class KnittingTuple<I> implements
 
 			int j = 0;
 			for ( BiOption<I, Y> bi : diff( single_mask, equivalencer ) ) {
-				if ( !bi.hasBoth( ) ) {
-					keeps.set( j, false );
-				}
 				if ( bi.hasFront( ) ) {
+					if ( !bi.hasBoth( ) ) {
+						keeps.set( j, false );
+					}
 					j++;
 				}
 			}
@@ -1200,10 +1384,10 @@ public class KnittingTuple<I> implements
 
 			int j = 0;
 			for ( BiOption<I, Y> bi : diff( single_mask, equivalencer ) ) {
-				if ( bi.hasBoth( ) ) {
-					keeps.set( j, true );
-				}
 				if ( bi.hasFront( ) ) {
+					if ( !bi.hasBoth( ) ) {
+						keeps.set( j, false );
+					}
 					j++;
 				}
 			}
@@ -1281,18 +1465,11 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingTuple<O> map( Function<? super I, O> stateless_function ) {
-		return wrap( new Tuple<O>( ) {
+		return wrap( new MapTuple<>( wrapped, stateless_function ) );
+	}
 
-			@Override
-			public O get( int index ) {
-				return stateless_function.apply( wrapped.get( index ) );
-			}
-
-			@Override
-			public int size( ) {
-				return wrapped.size( );
-			}
-		} );
+	public KnittingTuple<Bi<I, Integer>> numbered( ) {
+		return wrap( new NumberedTuple<>( wrapped ) );
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,16 @@ package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Bi;
 
+/**
+ * An implementation of {@link org.github.evenjn.yarn.Bi Bi} that provides a
+ * method to {@link #set(Object, Object) set} elements.
+ *
+ * @param <A>
+ *          The type of the object in the <em>front</em> slot.
+ * @param <B>
+ *          The type of the object in the <em>back</em> slot..
+ * @since 1.0
+ */
 public final class Bik<A, B> implements
 		Bi<A, B> {
 
@@ -65,16 +75,30 @@ public final class Bik<A, B> implements
 		return this;
 	}
 
+	/**
+	 * @return the object in the <em>front</em> slot.
+	 * @since 1.0
+	 */
 	@Override
 	public A front( ) {
 		return front;
 	}
 
+	/**
+	 * @return the object in the <em>back</em> slot.
+	 * @since 1.0
+	 */
 	@Override
 	public B back( ) {
 		return back;
 	}
 
+	/**
+	 * Returns a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}.
+	 * 
+	 * @return a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}..
+	 * @since 1.0
+	 */
 	public Bi<A, B> asBi( ) {
 		return this;
 	}
