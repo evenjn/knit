@@ -2336,6 +2336,35 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
+	 * Returns a view of the elements in the argument optional.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument optional.
+	 * @param optional
+	 *          An optional.
+	 * @return A view of the elements in the argument optional.
+	 * @since 1.0
+	 */
+	public static <K> KnittingCursor<K> wrap( Optional<K> optional ) {
+		return new KnittingCursor<>( new Cursor<K>( ) {
+
+			private boolean consumed = false;
+
+			@Override
+			public K next( )
+					throws EndOfCursorException {
+				if ( consumed || !optional.isPresent( ) ) {
+					throw EndOfCursorException.neo( );
+				}
+				consumed = true;
+				return optional.get( );
+			}
+		} );
+	}
+
+	/**
+	 * <p>
 	 * Returns a view of the elements in the argument stream.
 	 * </p>
 	 * 
