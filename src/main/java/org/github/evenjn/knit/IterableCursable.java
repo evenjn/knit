@@ -19,7 +19,7 @@ package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.Rook;
 
 class IterableCursable<T> implements
 		Cursable<T> {
@@ -31,7 +31,7 @@ class IterableCursable<T> implements
 	}
 
 	@Override
-	public Cursor<T> pull( Hook hook ) {
+	public Cursor<T> pull( Rook rook ) {
 		return new IteratorCursor<T>( iterable.iterator( ) );
 	}
 

@@ -18,45 +18,45 @@
 package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.CursorPurlH;
+import org.github.evenjn.yarn.CursorRookPurl;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.Rook;
 
-class CursorStitchProcessor<I, O> implements
+class RookPurlCursor<I, O> implements
 		Cursor<O> {
 
 	private final Cursor<? extends I> cursor;
 
-	private final CursorPurlH<? super I, O> knitting;
+	private final CursorRookPurl<? super I, O> purl;
 
-	private BasicAutoHook internal_hook;
+	private BasicAutoRook internal_rook;
 
-	private final boolean use_internal_hook;
+	private final boolean use_internal_rook;
 
-	CursorStitchProcessor(
+	RookPurlCursor(
 			Cursor<I> cursor,
-			CursorPurlH<? super I, O> knitting) {
+			CursorRookPurl<? super I, O> purl) {
 		this.cursor = cursor;
-		this.knitting = knitting;
-		this.use_internal_hook = false;
+		this.purl = purl;
+		this.use_internal_rook = false;
 	}
 
-	CursorStitchProcessor(
-			Hook hook,
+	RookPurlCursor(
+			Rook rook,
 			Cursor<I> cursor,
-			CursorPurlH<? super I, O> knitting) {
-		this.use_internal_hook = true;
-		hook.hook( new AutoCloseable( ) {
+			CursorRookPurl<? super I, O> purl) {
+		this.use_internal_rook = true;
+		rook.hook( new AutoCloseable( ) {
 
 			@Override
 			public void close( ) {
-				if ( internal_hook != null ) {
-					internal_hook.close( );
+				if ( internal_rook != null ) {
+					internal_rook.close( );
 				}
 			}
 		} );
 		this.cursor = cursor;
-		this.knitting = knitting;
+		this.purl = purl;
 	}
 
 	private Cursor<O> current = null;
@@ -77,34 +77,34 @@ class CursorStitchProcessor<I, O> implements
 				}
 			}
 			if ( end ) {
-				if ( use_internal_hook && internal_hook != null ) {
-					internal_hook.close( );
-					internal_hook = null;
+				if ( use_internal_rook && internal_rook != null ) {
+					internal_rook.close( );
+					internal_rook = null;
 				}
 				throw EndOfCursorException.neo();
 			}
 
 			try {
 				I next = cursor.next( );
-				if ( use_internal_hook ) {
-					if (internal_hook != null) {
-						internal_hook.close( );
-						internal_hook = null;
+				if ( use_internal_rook ) {
+					if (internal_rook != null) {
+						internal_rook.close( );
+						internal_rook = null;
 					}
-					internal_hook = new BasicAutoHook( );
+					internal_rook = new BasicAutoRook( );
 				}
-				current = knitting.next( internal_hook, next );
+				current = purl.next( internal_rook, next );
 			}
 			catch ( EndOfCursorException t ) {
 				end = true;
-				if ( use_internal_hook ) {
-					if (internal_hook != null) {
-						internal_hook.close( );
-						internal_hook = null;
+				if ( use_internal_rook ) {
+					if (internal_rook != null) {
+						internal_rook.close( );
+						internal_rook = null;
 					}
-					internal_hook = new BasicAutoHook( );
+					internal_rook = new BasicAutoRook( );
 				}
-				current = knitting.end( internal_hook );
+				current = purl.end( internal_rook );
 			}
 		}
 	}

@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.Rook;
 import org.github.evenjn.yarn.Tuple;
 
 class ArrayCursor<T> implements
@@ -57,7 +57,7 @@ class ArrayCursable<T> implements
 	}
 
 	@Override
-	public Cursor<T> pull( Hook hook ) {
+	public Cursor<T> pull( Rook rook ) {
 		return new ArrayCursor<>( array );
 	}
 }

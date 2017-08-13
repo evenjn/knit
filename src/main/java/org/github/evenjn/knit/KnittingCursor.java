@@ -32,35 +32,35 @@ import java.util.stream.StreamSupport;
 
 import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.ArrayPurl;
-import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.AutoRook;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
-import org.github.evenjn.yarn.CursableMapH;
 import org.github.evenjn.yarn.CursablePurl;
-import org.github.evenjn.yarn.CursablePurlH;
+import org.github.evenjn.yarn.CursableRookMap;
+import org.github.evenjn.yarn.CursableRookPurl;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
-import org.github.evenjn.yarn.CursorMapH;
 import org.github.evenjn.yarn.CursorPurl;
-import org.github.evenjn.yarn.CursorPurlH;
+import org.github.evenjn.yarn.CursorRookMap;
+import org.github.evenjn.yarn.CursorRookPurl;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.FunctionH;
-import org.github.evenjn.yarn.Hook;
 import org.github.evenjn.yarn.IterableMap;
-import org.github.evenjn.yarn.IterableMapH;
 import org.github.evenjn.yarn.IterablePurl;
-import org.github.evenjn.yarn.IterablePurlH;
+import org.github.evenjn.yarn.IterableRookMap;
+import org.github.evenjn.yarn.IterableRookPurl;
 import org.github.evenjn.yarn.IteratorMap;
-import org.github.evenjn.yarn.IteratorMapH;
 import org.github.evenjn.yarn.IteratorPurl;
-import org.github.evenjn.yarn.IteratorPurlH;
+import org.github.evenjn.yarn.IteratorRookMap;
+import org.github.evenjn.yarn.IteratorRookPurl;
 import org.github.evenjn.yarn.OptionalMap;
-import org.github.evenjn.yarn.OptionalMapH;
 import org.github.evenjn.yarn.OptionalPurl;
-import org.github.evenjn.yarn.OptionalPurlH;
-import org.github.evenjn.yarn.StreamMapH;
-import org.github.evenjn.yarn.StreamPurlH;
+import org.github.evenjn.yarn.OptionalRookMap;
+import org.github.evenjn.yarn.OptionalRookPurl;
+import org.github.evenjn.yarn.Rook;
+import org.github.evenjn.yarn.RookFunction;
+import org.github.evenjn.yarn.StreamRookMap;
+import org.github.evenjn.yarn.StreamRookPurl;
 import org.github.evenjn.yarn.Tuple;
 
 /**
@@ -137,37 +137,37 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #entwine(Cursor, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
  * <li>{@link #flatmapArray(ArrayMap)}</li>
- * <li>{@link #flatmapCursable(Hook, CursableMap)}</li>
- * <li>{@link #flatmapCursable(Hook, CursableMapH)}</li>
+ * <li>{@link #flatmapCursable(Rook, CursableMap)}</li>
+ * <li>{@link #flatmapCursable(Rook, CursableRookMap)}</li>
  * <li>{@link #flatmapCursor(CursorMap)}</li>
- * <li>{@link #flatmapCursor(Hook, CursorMapH)}</li>
+ * <li>{@link #flatmapCursor(Rook, CursorRookMap)}</li>
  * <li>{@link #flatmapIterable(IterableMap)}</li>
- * <li>{@link #flatmapIterable(Hook, IterableMapH)}</li>
+ * <li>{@link #flatmapIterable(Rook, IterableRookMap)}</li>
  * <li>{@link #flatmapIterator(IteratorMap)}</li>
- * <li>{@link #flatmapIterator(Hook, IteratorMapH)}</li>
+ * <li>{@link #flatmapIterator(Rook, IteratorRookMap)}</li>
  * <li>{@link #flatmapOptional(OptionMap)}</li>
- * <li>{@link #flatmapOptional(Hook, OptionMapH)}</li>
- * <li>{@link #flatmapStream(Hook, StreamMapH)}</li>
+ * <li>{@link #flatmapOptional(Rook, OptionRookMap)}</li>
+ * <li>{@link #flatmapStream(Rook, StreamRookMap)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
- * <li>{@link #map(Hook, FunctionH)}</li>
+ * <li>{@link #map(Rook, FunctionH)}</li>
  * <li>{@link #numbered()}</li>
  * <li>{@link #once()}</li>
  * <li>{@link #peek(Consumer)}</li>
  * <li>{@link #prepend(Cursor)}</li>
  * <li>{@link #purlArray(ArrayPurl)}</li>
  * <li>{@link #purlCursable(CursablePurl)}</li>
- * <li>{@link #purlCursable(Hook, CursablePurlH)}</li>
+ * <li>{@link #purlCursable(Rook, CursableRookPurl)}</li>
  * <li>{@link #purlCursor(CursorPurl)}</li>
- * <li>{@link #purlCursor(Hook, CursorPurlH)}</li>
+ * <li>{@link #purlCursor(Rook, CursorRookPurl)}</li>
  * <li>{@link #purlIterable(IterablePurl)}</li>
- * <li>{@link #purlIterable(Hook, IterablePurlH)}</li>
+ * <li>{@link #purlIterable(Rook, IterableRookPurl)}</li>
  * <li>{@link #purlIterator(IteratorPurl)}</li>
- * <li>{@link #purlIterator(Hook, IteratorPurlH)}</li>
+ * <li>{@link #purlIterator(Rook, IteratorRookPurl)}</li>
  * <li>{@link #purlOptional(OptionPurl)}</li>
- * <li>{@link #purlOptional(Hook, OptionPurlH)}</li>
- * <li>{@link #purlStream(Hook, StreamPurlH)}</li>
+ * <li>{@link #purlOptional(Rook, OptionRookPurl)}</li>
+ * <li>{@link #purlStream(Rook, StreamRookPurl)}</li>
  * </ul>
  * 
  * <h2>States of a KnittingCursor</h2>
@@ -389,7 +389,7 @@ public class KnittingCursor<I> implements
 	public <K extends Collection<? super I>> K collect( K collection )
 			throws IllegalStateException {
 		lock( );
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			try {
 				for ( ;; ) {
 					collection.add( wrapped.next( ) );
@@ -408,7 +408,7 @@ public class KnittingCursor<I> implements
 	 * 
 	 * <p>
 	 * Obtains a consumer from the argument {@code consumer_provider}, hooking it
-	 * to a local, temporary hook. Then, this method invokes this cursor's
+	 * to a local, temporary rook. Then, this method invokes this cursor's
 	 * {@link org.github.evenjn.yarn.Cursor#next() next()} method, passing each
 	 * object obtained this way to the consumer, until the end of this cursor.
 	 * </p>
@@ -420,17 +420,17 @@ public class KnittingCursor<I> implements
 	 * @param <K>
 	 *          The type of {@code Consumer} returned by the argument.
 	 * @param consumer_provider
-	 *          A system that provides hooked consumers.
+	 *          A system that provides consumers.
 	 * @throws IllegalStateException
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
 	public <K extends Consumer<? super I>> void consume(
-			Function<Hook, K> consumer_provider )
+			Function<Rook, K> consumer_provider )
 			throws IllegalStateException {
 		lock( );
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			K consumer = consumer_provider.apply( hook );
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
+			K consumer = consumer_provider.apply( rook );
 			for ( ;; ) {
 				consumer.accept( wrapped.next( ) );
 			}
@@ -592,26 +592,26 @@ public class KnittingCursor<I> implements
 			ArrayMap<? super I, O> stateless_array_map )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				O[] nextArray = stateless_array_map.get( input );
 				return nextArray == null ? null : new ArrayCursor<>( nextArray );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(Hook, CursorMapH)} except that the view shows
+	 * {@link #flatmapCursor(Rook, CursorRookMap)} except that the view shows
 	 * elements in the cursables returned by the argument
 	 * {@code stateless_cursable_map}.
 	 * </p>
@@ -623,8 +623,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the cursables returned by the argument
 	 *          {@code stateless_cursable_map}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_cursable_map
 	 *          A stateless function that returns cursables.
 	 * @return A complex view.
@@ -633,31 +633,31 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapCursable(
-			Hook hook,
+			Rook rook,
 			CursableMap<? super I, O> stateless_cursable_map )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				Cursable<O> cursable = stateless_cursable_map.get( input );
-				return cursable == null ? null : cursable.pull( hook );
+				return cursable == null ? null : cursable.pull( rook );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(Hook, CursorMapH)} except that the view shows
+	 * {@link #flatmapCursor(Rook, CursorRookMap)} except that the view shows
 	 * elements in the cursables returned by the argument
 	 * {@code stateless_cursable_map_h}.
 	 * </p>
@@ -669,8 +669,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the cursables returned by the argument
 	 *          {@code stateless_cursable_map_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_cursable_map_h
 	 *          A stateless function that returns cursables.
 	 * @return A complex view.
@@ -679,24 +679,24 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapCursable(
-			Hook hook,
-			CursableMapH<? super I, O> stateless_cursable_map_h )
+			Rook rook,
+			CursableRookMap<? super I, O> stateless_cursable_map_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				Cursable<O> cursable = stateless_cursable_map_h.get( hook, input );
-				return cursable == null ? null : cursable.pull( hook );
+			public Cursor<O> next( Rook rook, I input ) {
+				Cursable<O> cursable = stateless_cursable_map_h.get( rook, input );
+				return cursable == null ? null : cursable.pull( rook );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -728,19 +728,19 @@ public class KnittingCursor<I> implements
 			CursorMap<? super I, O> stateless_cursor_map )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				return stateless_cursor_map.get( input );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
@@ -752,13 +752,13 @@ public class KnittingCursor<I> implements
 	 * For each element {@code E} of this cursor, the view shows elements in the
 	 * cursor {@code C} returned by the argument {@code stateless_cursor_map_h}
 	 * when invoked with argument {@code E} and a temporary
-	 * {@link org.github.evenjn.yarn.Hook hook}.
+	 * {@link org.github.evenjn.yarn.Rook rook}.
 	 * </p>
 	 * 
 	 * <p>
-	 * The temporary hook is hooked to the argument {@code hook}. The returned
-	 * view closes each temporary hook at the end of each cursor {@code C}. The
-	 * argument {@code hook} is in charge of closing resources in the event that
+	 * The temporary rook is hooked to the argument {@code rook}. The returned
+	 * view closes each temporary rook at the end of each cursor {@code C}. The
+	 * argument {@code rook} is in charge of closing resources in the event that
 	 * the returned cursor is abandoned as garbage before reaching its end.
 	 * </p>
 	 * 
@@ -769,8 +769,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the cursors returned by the argument
 	 *          {@code stateless_cursor_map_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_cursor_map_h
 	 *          A stateless function that returns cursors.
 	 * @return A complex view.
@@ -779,30 +779,30 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapCursor(
-			Hook hook,
-			CursorMapH<? super I, O> stateless_cursor_map_h )
+			Rook rook,
+			CursorRookMap<? super I, O> stateless_cursor_map_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				return stateless_cursor_map_h.get( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				return stateless_cursor_map_h.get( rook, input );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(Hook, CursorMapH)} except that the view shows
+	 * {@link #flatmapCursor(Rook, CursorRookMap)} except that the view shows
 	 * elements in the iterables returned by the argument
 	 * {@code stateless_iterable_map_h}.
 	 * </p>
@@ -814,8 +814,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the iterables returned by the argument
 	 *          {@code stateless_iterable_map_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_iterable_map_h
 	 *          A stateless function that returns iterables.
 	 * @return A complex view.
@@ -824,25 +824,25 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapIterable(
-			Hook hook,
-			IterableMapH<? super I, O> stateless_iterable_map_h )
+			Rook rook,
+			IterableRookMap<? super I, O> stateless_iterable_map_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				Iterable<O> nextIterable = stateless_iterable_map_h.get( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				Iterable<O> nextIterable = stateless_iterable_map_h.get( rook, input );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -870,27 +870,27 @@ public class KnittingCursor<I> implements
 			IterableMap<? super I, O> stateless_iterable_map )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				Iterable<O> nextIterable = stateless_iterable_map.get( input );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(Hook, CursorMapH)} except that the view shows
+	 * {@link #flatmapCursor(Rook, CursorRookMap)} except that the view shows
 	 * elements in the iterators returned by the argument
 	 * {@code stateless_iterator_map_h}.
 	 * </p>
@@ -902,8 +902,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the iterators returned by the argument
 	 *          {@code stateless_iterator_map_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_iterator_map_h
 	 *          A stateless function that returns iterators.
 	 * @return A complex view.
@@ -912,25 +912,25 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapIterator(
-			Hook hook,
-			IteratorMapH<? super I, O> stateless_iterator_map_h )
+			Rook rook,
+			IteratorRookMap<? super I, O> stateless_iterator_map_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				Iterator<O> nextIterator = stateless_iterator_map_h.get( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				Iterator<O> nextIterator = stateless_iterator_map_h.get( rook, input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -958,27 +958,27 @@ public class KnittingCursor<I> implements
 			IteratorMap<? super I, O> stateless_iterator_map )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				Iterator<O> nextIterator = stateless_iterator_map.get( input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(Hook, CursorMapH)} except that the view shows
+	 * {@link #flatmapCursor(Rook, CursorRookMap)} except that the view shows
 	 * elements in the optionals returned by the argument
 	 * {@code stateless_optional_map_h}.
 	 * </p>
@@ -990,8 +990,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the optionals returned by the argument
 	 *          {@code stateless_optional_map_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_optional_map_h
 	 *          A stateless function that returns optionals.
 	 * @return A complex view.
@@ -999,15 +999,15 @@ public class KnittingCursor<I> implements
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	public <O> KnittingCursor<O> flatmapOptional( Hook hook,
-			OptionalMapH<? super I, O> stateless_optional_map_h )
+	public <O> KnittingCursor<O> flatmapOptional( Rook rook,
+			OptionalRookMap<? super I, O> stateless_optional_map_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				Optional<O> optional = stateless_optional_map_h.get( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				Optional<O> optional = stateless_optional_map_h.get( rook, input );
 				if ( optional.isPresent( ) ) {
 					return new SingletonCursor<O>( optional.get( ) );
 				}
@@ -1015,11 +1015,11 @@ public class KnittingCursor<I> implements
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -1047,10 +1047,10 @@ public class KnittingCursor<I> implements
 			OptionalMap<? super I, O> stateless_optional_map )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				Optional<O> optional = stateless_optional_map.get( input );
 				if ( optional.isPresent( ) ) {
 					return new SingletonCursor<O>( optional.get( ) );
@@ -1059,17 +1059,17 @@ public class KnittingCursor<I> implements
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(Hook, CursorMapH)} except that the view shows
+	 * {@link #flatmapCursor(Rook, CursorRookMap)} except that the view shows
 	 * elements in the streams returned by the argument
 	 * {@code stateless_stream_map_h}.
 	 * </p>
@@ -1081,8 +1081,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the streams returned by the argument
 	 *          {@code stateless_stream_map_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_stream_map_h
 	 *          A stateless function that returns streams.
 	 * @return A complex view.
@@ -1091,26 +1091,26 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> flatmapStream(
-			Hook hook,
-			StreamMapH<? super I, O> stateless_stream_map_h )
+			Rook rook,
+			StreamRookMap<? super I, O> stateless_stream_map_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				final Stream<O> nextStream = stateless_stream_map_h.get( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				final Stream<O> nextStream = stateless_stream_map_h.get( rook, input );
 				return nextStream == null ? null : new IteratorCursor<>(
 						nextStream.iterator( ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -1252,34 +1252,34 @@ public class KnittingCursor<I> implements
 	public <O> KnittingCursor<O> map( Function<? super I, O> stateless_function )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				return new SingletonCursor<O>( stateless_function.apply( input ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view. For each element {@code E} of this cursor, the view shows
 	 * the returned by the argument {@code stateless_function_h} when invoked with
-	 * argument {@code E} and a temporary {@link org.github.evenjn.yarn.Hook
-	 * hook}.
+	 * argument {@code E} and a temporary {@link org.github.evenjn.yarn.Rook
+	 * rook}.
 	 * </p>
 	 * 
 	 * <p>
-	 * The temporary hook is hooked to the argument {@code hook}. The returned
-	 * view closes the temporary hook at the subsequent invocation of
-	 * {@code next()}. The argument {@code hook} is in charge of closing resources
+	 * The temporary rook is hooked to the argument {@code rook}. The returned
+	 * view closes the temporary rook at the subsequent invocation of
+	 * {@code next()}. The argument {@code rook} is in charge of closing resources
 	 * in the event that the returned cursor is abandoned as garbage before
 	 * reaching its end.
 	 * </p>
@@ -1291,8 +1291,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements returned by the argument
 	 *          {@code stateless_function_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stateless_function_h
 	 *          A stateless function.
 	 * @return A complex view.
@@ -1301,24 +1301,24 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O>
-			map( Hook hook, FunctionH<? super I, O> stateless_function_h )
+			map( Rook rook, RookFunction<? super I, O> stateless_function_h )
 					throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				return new SingletonCursor<O>(
-						stateless_function_h.get( hook, input ) );
+						stateless_function_h.get( rook, input ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return empty( );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -1579,21 +1579,21 @@ public class KnittingCursor<I> implements
 			ArrayPurl<? super I, O> array_purl )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				O[] array = array_purl.next( input );
 				return array == null ? null : new ArrayCursor<>( array );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				O[] array = array_purl.end( );
 				return array == null ? null : new ArrayCursor<>( array );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
@@ -1622,27 +1622,27 @@ public class KnittingCursor<I> implements
 			throws IllegalStateException {
 		lock( );
 
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				final Cursable<O> nextCursable = cursable_purl.next( input );
-				return nextCursable == null ? null : nextCursable.pull( hook );
+				return nextCursable == null ? null : nextCursable.pull( rook );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				final Cursable<O> nextCursable = cursable_purl.end( );
-				return nextCursable == null ? null : nextCursable.pull( hook );
+				return nextCursable == null ? null : nextCursable.pull( rook );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Rook, CursorRookPurl)} except that the view shows elements in the
 	 * cursables returned by the argument {@code cursable_purl_h}.
 	 * </p>
 	 * 
@@ -1653,8 +1653,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the cursables returned by the argument
 	 *          {@code cursable_purl_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param cursable_purl_h
 	 *          A (typically stateful) system that returns cursables.
 	 * @return A complex view.
@@ -1663,25 +1663,25 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> purlCursable(
-			Hook hook,
-			CursablePurlH<? super I, O> cursable_purl_h )
+			Rook rook,
+			CursableRookPurl<? super I, O> cursable_purl_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				final Cursable<O> nextCursable = cursable_purl_h.next( hook, input );
-				return nextCursable == null ? null : nextCursable.pull( hook );
+			public Cursor<O> next( Rook rook, I input ) {
+				final Cursable<O> nextCursable = cursable_purl_h.next( rook, input );
+				return nextCursable == null ? null : nextCursable.pull( rook );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
-				final Cursable<O> nextCursable = cursable_purl_h.end( hook );
-				return nextCursable == null ? null : nextCursable.pull( hook );
+			public Cursor<O> end( Rook rook ) {
+				final Cursable<O> nextCursable = cursable_purl_h.end( rook );
+				return nextCursable == null ? null : nextCursable.pull( rook );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -1718,19 +1718,19 @@ public class KnittingCursor<I> implements
 			CursorPurl<? super I, O> cursor_purl )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				return cursor_purl.next( input );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				return cursor_purl.end( );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
@@ -1742,19 +1742,19 @@ public class KnittingCursor<I> implements
 	 * <p>
 	 * For each element {@code E} of this cursor, the view shows elements in the
 	 * cursor {@code C} returned when invoking {@code cursor_purl_h}
-	 * {@link org.github.evenjn.yarn.CursorPurlH#next(Hook, Object) next(Hook,
+	 * {@link org.github.evenjn.yarn.CursorRookPurl#next(Rook, Object) next(Rook,
 	 * Object)} with argument {@code E} and a temporary
-	 * {@link org.github.evenjn.yarn.Hook hook}. Moreover, the view also includes
+	 * {@link org.github.evenjn.yarn.Rook rook}. Moreover, the view also includes
 	 * all the elements in the cursor {@code C} returned when invoking
-	 * {@code cursor_purl_h} {@link org.github.evenjn.yarn.CursorPurlH#end(Hook)
-	 * end(Hook)} with a temporary {@link org.github.evenjn.yarn.Hook hook} at the
+	 * {@code cursor_purl_h} {@link org.github.evenjn.yarn.CursorRookPurl#end(Rook)
+	 * end(Rook)} with a temporary {@link org.github.evenjn.yarn.Rook rook} at the
 	 * end of this cursor.
 	 * </p>
 	 * 
 	 * <p>
-	 * The temporary hook is hooked to the argument {@code hook}. The returned
-	 * view closes each temporary hook at the end of each cursor {@code C}. The
-	 * argument {@code hook} is in charge of closing resources in the event that
+	 * The temporary rook is hooked to the argument {@code rook}. The returned
+	 * view closes each temporary rook at the end of each cursor {@code C}. The
+	 * argument {@code rook} is in charge of closing resources in the event that
 	 * the returned cursor is abandoned as garbage before reaching its end.
 	 * </p>
 	 * 
@@ -1766,8 +1766,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the cursors returned by the argument
 	 *          {@code cursor_purl_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param cursor_purl_h
 	 *          A (typically stateful) system that returns cursors.
 	 * @return A complex view.
@@ -1776,12 +1776,12 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> purlCursor(
-			Hook hook,
-			CursorPurlH<? super I, O> cursor_purl_h )
+			Rook rook,
+			CursorRookPurl<? super I, O> cursor_purl_h )
 			throws IllegalStateException {
 		lock( );
 		return wrap(
-				new CursorStitchProcessor<I, O>( hook, wrapped, cursor_purl_h ) );
+				new RookPurlCursor<I, O>( rook, wrapped, cursor_purl_h ) );
 	}
 
 	/**
@@ -1809,27 +1809,27 @@ public class KnittingCursor<I> implements
 			IterablePurl<? super I, O> iterable_purl )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				final Iterable<O> nextIterable = iterable_purl.next( input );
 				return new IteratorCursor<>( nextIterable.iterator( ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				final Iterable<O> nextIterable = iterable_purl.end( );
 				return new IteratorCursor<>( nextIterable.iterator( ) );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Rook, CursorRookPurl)} except that the view shows elements in the
 	 * iterables returned by the argument {@code iterable_purl_h}.
 	 * </p>
 	 * 
@@ -1840,8 +1840,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the iterables returned by the argument
 	 *          {@code iterable_purl_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param iterable_purl_h
 	 *          A (typically stateful) system that returns iterables.
 	 * @return A complex view.
@@ -1850,27 +1850,27 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> purlIterable(
-			Hook hook,
-			IterablePurlH<? super I, O> iterable_purl_h )
+			Rook rook,
+			IterableRookPurl<? super I, O> iterable_purl_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				final Iterable<O> nextIterable = iterable_purl_h.next( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				final Iterable<O> nextIterable = iterable_purl_h.next( rook, input );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 
-			public Cursor<O> end( Hook hook ) {
-				final Iterable<O> nextIterable = iterable_purl_h.end( hook );
+			public Cursor<O> end( Rook rook ) {
+				final Iterable<O> nextIterable = iterable_purl_h.end( rook );
 				return nextIterable == null ? null : new IteratorCursor<>(
 						nextIterable.iterator( ) );
 			}
 
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -1898,29 +1898,29 @@ public class KnittingCursor<I> implements
 			IteratorPurl<? super I, O> iterator_purl )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				final Iterator<O> nextIterator = iterator_purl.next( input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				final Iterator<O> nextIterator = iterator_purl.end( );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Rook, CursorRookPurl)} except that the view shows elements in the
 	 * iterators returned by the argument {@code iterator_purl_h}.
 	 * </p>
 	 * 
@@ -1931,8 +1931,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the iterators returned by the argument
 	 *          {@code iterator_purl_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param iterator_purl_h
 	 *          A (typically stateful) system that returns iterators.
 	 * @return A complex view.
@@ -1941,33 +1941,33 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> purlIterator(
-			Hook hook,
-			IteratorPurlH<? super I, O> iterator_purl_h )
+			Rook rook,
+			IteratorRookPurl<? super I, O> iterator_purl_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				final Iterator<O> nextIterator = iterator_purl_h.next( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				final Iterator<O> nextIterator = iterator_purl_h.next( rook, input );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
-				final Iterator<O> nextIterator = iterator_purl_h.end( hook );
+			public Cursor<O> end( Rook rook ) {
+				final Iterator<O> nextIterator = iterator_purl_h.end( rook );
 				return nextIterator == null ? null
 						: new IteratorCursor<>( nextIterator );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Rook, CursorRookPurl)} except that the view shows elements in the
 	 * optionals returned by the argument {@code optional_purl_h}.
 	 * </p>
 	 * 
@@ -1978,8 +1978,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the optionals returned by the argument
 	 *          {@code optional_purl_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param optional_purl_h
 	 *          A (typically stateful) system that returns optionals.
 	 * @return A complex view.
@@ -1988,15 +1988,15 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> purlOptional(
-			Hook hook,
-			OptionalPurlH<? super I, O> optional_purl_h )
+			Rook rook,
+			OptionalRookPurl<? super I, O> optional_purl_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				Optional<O> next = optional_purl_h.next( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				Optional<O> next = optional_purl_h.next( rook, input );
 				if ( next.isPresent( ) ) {
 					return new SingletonCursor<O>( next.get( ) );
 				}
@@ -2004,15 +2004,15 @@ public class KnittingCursor<I> implements
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
-				Optional<O> end = optional_purl_h.end( hook );
+			public Cursor<O> end( Rook rook ) {
+				Optional<O> end = optional_purl_h.end( rook );
 				if ( end.isPresent( ) ) {
 					return new SingletonCursor<O>( end.get( ) );
 				}
 				return null;
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**
@@ -2040,10 +2040,10 @@ public class KnittingCursor<I> implements
 			OptionalPurl<? super I, O> optional_purl )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
+			public Cursor<O> next( Rook rook, I input ) {
 				Optional<O> next = optional_purl.next( input );
 				if ( next.isPresent( ) ) {
 					return new SingletonCursor<O>( next.get( ) );
@@ -2052,7 +2052,7 @@ public class KnittingCursor<I> implements
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
+			public Cursor<O> end( Rook rook ) {
 				Optional<O> end = optional_purl.end( );
 				if ( end.isPresent( ) ) {
 					return new SingletonCursor<O>( end.get( ) );
@@ -2060,13 +2060,13 @@ public class KnittingCursor<I> implements
 				return null;
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( wrapped, stitch ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(Hook, CursorPurlH)} except that the view shows elements in the
+	 * {@link #purlCursor(Rook, CursorRookPurl)} except that the view shows elements in the
 	 * streams returned by the argument {@code stream_purl_h}.
 	 * </p>
 	 * 
@@ -2077,8 +2077,8 @@ public class KnittingCursor<I> implements
 	 * @param <O>
 	 *          The type of elements in the streams returned by the argument
 	 *          {@code stream_purl_h}.
-	 * @param hook
-	 *          A hook.
+	 * @param rook
+	 *          A rook.
 	 * @param stream_purl_h
 	 *          A (typically stateful) system that returns streams.
 	 * @return A complex view.
@@ -2087,27 +2087,27 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursor<O> purlStream(
-			Hook hook,
-			StreamPurlH<? super I, O> stream_purl_h )
+			Rook rook,
+			StreamRookPurl<? super I, O> stream_purl_h )
 			throws IllegalStateException {
 		lock( );
-		CursorPurlH<I, O> stitch = new CursorPurlH<I, O>( ) {
+		CursorRookPurl<I, O> stitch = new CursorRookPurl<I, O>( ) {
 
 			@Override
-			public Cursor<O> next( Hook hook, I input ) {
-				final Stream<O> nextStream = stream_purl_h.next( hook, input );
+			public Cursor<O> next( Rook rook, I input ) {
+				final Stream<O> nextStream = stream_purl_h.next( rook, input );
 				return nextStream == null ? null : new IteratorCursor<>(
 						nextStream.iterator( ) );
 			}
 
 			@Override
-			public Cursor<O> end( Hook hook ) {
-				final Stream<O> nextStream = stream_purl_h.end( hook );
+			public Cursor<O> end( Rook rook ) {
+				final Stream<O> nextStream = stream_purl_h.end( rook );
 				return nextStream == null ? null : new IteratorCursor<>(
 						nextStream.iterator( ) );
 			}
 		};
-		return wrap( new CursorStitchProcessor<I, O>( hook, wrapped, stitch ) );
+		return wrap( new RookPurlCursor<I, O>( rook, wrapped, stitch ) );
 	}
 
 	/**

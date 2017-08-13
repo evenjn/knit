@@ -22,17 +22,17 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.AutoRook;
 
 
 /**
- * An implementation of {@link org.github.evenjn.yarn.AutoHook AutoHook} that
+ * An implementation of {@link org.github.evenjn.yarn.AutoRook AutoRook} that
  * prints a warning on standard error when a resource leak is detected.
  *
  * @since 1.0
  */
-public final class DebuggingAutoHook implements
-		AutoHook {
+public final class DebuggingAutoRook implements
+		AutoRook {
 
 	private boolean closed = false;
 
@@ -44,10 +44,10 @@ public final class DebuggingAutoHook implements
 	/**
 	 * Constructor.
 	 */
-	public DebuggingAutoHook() {
+	public DebuggingAutoRook() {
 		try {
 			throw new IllegalStateException(
-					"This exception may help to identify the owner of this hook." );
+					"This exception may help to identify the owner of this rook." );
 		}
 		catch ( IllegalStateException ise ) {
 			this.ise = ise;
@@ -58,9 +58,9 @@ public final class DebuggingAutoHook implements
 	public void close( ) {
 		if ( closed ) {
 			StringBuilder sb = new StringBuilder( );
-			sb.append( "This hook must be closed only once. No more, no less.\n" );
+			sb.append( "This rook must be closed only once. No more, no less.\n" );
 			sb.append(
-					"The following stacktrace may help to find where this hook was created.\n" );
+					"The following stacktrace may help to find where this rook was created.\n" );
 			throw new IllegalStateException( sb.toString( ), ise );
 		}
 		closed = true;
@@ -81,10 +81,10 @@ public final class DebuggingAutoHook implements
 		if ( !closed ) {
 			StringBuilder sb = new StringBuilder( );
 			sb.append(
-					"This hook is undergoing garbage-collection but it has never been closed. \n" );
+					"This rook is undergoing garbage-collection but it has never been closed. \n" );
 			sb.append( "This may result in a resource leak.\n" );
 			sb.append(
-					"The following stacktrace may help to find where this hook was created.\n" );
+					"The following stacktrace may help to find where this rook was created.\n" );
 			ise.printStackTrace( new PrintStream( new OutputStream( ) {
 
 				@Override

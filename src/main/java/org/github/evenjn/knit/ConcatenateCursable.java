@@ -19,7 +19,7 @@ package org.github.evenjn.knit;
 
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.Rook;
 
 class ConcatenateCursable<I> implements
 		Cursable<I> {
@@ -35,8 +35,8 @@ class ConcatenateCursable<I> implements
 	}
 
 	@Override
-	public Cursor<I> pull( Hook hook ) {
-		return new ConcatenateCursor<>( head.pull( hook ), tail.pull( hook ) );
+	public Cursor<I> pull( Rook rook ) {
+		return new ConcatenateCursor<>( head.pull( rook ), tail.pull( rook ) );
 	}
 
 }

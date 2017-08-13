@@ -21,11 +21,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.AutoRook;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
-import org.github.evenjn.yarn.CursorMapH;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.CursorRookMap;
+import org.github.evenjn.yarn.Rook;
 
 public class compiler_check_override {
 
@@ -38,11 +38,11 @@ public class compiler_check_override {
 				}
 			};
 
-	private static final CursorMapH<String, Integer> cursormaph =
-			new CursorMapH<String, Integer>( ) {
+	private static final CursorRookMap<String, Integer> cursorrookmap =
+			new CursorRookMap<String, Integer>( ) {
 
 				@Override
-				public Cursor<Integer> get( Hook h, String input ) {
+				public Cursor<Integer> get( Rook rook, String input ) {
 					return KnittingCursor.on( 1 );
 				}
 			};
@@ -78,17 +78,17 @@ public class compiler_check_override {
 		cursable.filter( x -> x.isEmpty( ) );
 		
 		cursable.flatmapCursor( cursormap );
-		cursable.flatmapCursor( cursormaph );
+		cursable.flatmapCursor( cursorrookmap );
 
 		cursable.flatmapCursor( x -> KnittingCursor.on( 1 ) );
 		cursable.flatmapCursor( ( h, x ) -> KnittingCursor.on( 1 ) );
 		
-		Function<Hook, Consumer<String>> ff1 = null;
-		Function<Hook, Consumer<Object>> ff2 = null;
+		Function<Rook, Consumer<String>> ff1 = null;
+		Function<Rook, Consumer<Object>> ff2 = null;
 
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			KnittingCursor<String> pull =
-					KnittingCursor.wrap( cursable.pull( hook ) );
+					KnittingCursor.wrap( cursable.pull( rook ) );
 			pull.peek( System.out::println ).roll( );
 			pull.consume( ff1 );
 			pull.consume( ff2 );

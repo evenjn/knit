@@ -27,13 +27,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.AutoRook;
 import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.BiOption;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Equivalencer;
-import org.github.evenjn.yarn.Hook;
+import org.github.evenjn.yarn.Rook;
 import org.github.evenjn.yarn.Tuple;
 
 /**
@@ -348,7 +348,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <K extends Collection<? super I>> K collect( K collection ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			return this.asKnittingCursor( ).collect( collection );
 		}
 	}
@@ -360,7 +360,7 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * Obtains a consumer from the argument {@code consumer_provider}, hooking it
-	 * to a local, temporary hook. Then, this method iterates over all the slots,
+	 * to a local, temporary rook. Then, this method iterates over all the slots,
 	 * passing the object in each slot to the consumer, until the end of the
 	 * slots.
 	 * </p>
@@ -368,13 +368,13 @@ public class KnittingTuple<I> implements
 	 * @param <K>
 	 *          The type of {@code Consumer} returned by the argument.
 	 * @param consumer_provider
-	 *          A system that provides hooked consumers.
+	 *          A system that provides consumers.
 	 * @since 1.0
 	 */
 	public <K extends Consumer<? super I>> void consume(
-			Function<Hook, K> consumer_provider ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
-			K consumer = consumer_provider.apply( hook );
+			Function<Rook, K> consumer_provider ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
+			K consumer = consumer_provider.apply( rook );
 			this.asKnittingCursor( ).peek( consumer ).roll( );
 		}
 	}
@@ -1484,7 +1484,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public I one( ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			return this.asKnittingCursor( ).one( );
 		}
 	}
@@ -1505,7 +1505,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public Optional<I> optionalOne( ) {
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			return asKnittingCursor( ).optionalOne( );
 		}
 	}
@@ -1567,7 +1567,7 @@ public class KnittingTuple<I> implements
 	 */
 	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
 		K reduction = zero;
-		try ( AutoHook hook = new BasicAutoHook( ) ) {
+		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			Cursor<I> kc = pull( );
 			try {
 				for ( ;; ) {

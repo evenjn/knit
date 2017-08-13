@@ -20,15 +20,15 @@ package org.github.evenjn.knit;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.AutoRook;
 
 /**
- * A simple implementation of {@link org.github.evenjn.yarn.AutoHook AutoHook}.
+ * A simple implementation of {@link org.github.evenjn.yarn.AutoRook AutoRook}.
  *
  * @since 1.0
  */
-public final class BasicAutoHook implements
-		AutoHook {
+public final class BasicAutoRook implements
+		AutoRook {
 
 	private LinkedList<AutoCloseable> objects_to_close;
 
@@ -38,7 +38,7 @@ public final class BasicAutoHook implements
 	public void close( ) {
 		if ( closed ) {
 			throw new IllegalStateException(
-					"BasicAutoHook cannot be closed more than once." );
+					"BasicAutoRook cannot be closed more than once." );
 		}
 		if ( objects_to_close != null ) {
 			Collections.reverse( objects_to_close );

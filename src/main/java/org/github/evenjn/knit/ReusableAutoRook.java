@@ -20,17 +20,17 @@ package org.github.evenjn.knit;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.AutoHook;
+import org.github.evenjn.yarn.AutoRook;
 
 /**
- * An implementation of AutoHook that returns to the initial state after
- * invoking {@code close()}. In other words, a closed ReusableAutoHook is as
+ * An implementation of AutoRook that returns to the initial state after
+ * invoking {@code close()}. In other words, a closed ReusableAutoRook is as
  * good as a brand new one, and may be immediately re-used.
  *
  * @since 1.0
  */
-public final class ReusableAutoHook implements
-		AutoHook {
+public final class ReusableAutoRook implements
+		AutoRook {
 
 	private LinkedList<AutoCloseable> objects_to_close;
 
