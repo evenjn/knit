@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2017 Marco Irevisan
+ * Copyright 2017 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,13 +145,13 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #flatmapIterable(Rook, IterableRookMap)}</li>
  * <li>{@link #flatmapIterator(IteratorMap)}</li>
  * <li>{@link #flatmapIterator(Rook, IteratorRookMap)}</li>
- * <li>{@link #flatmapOptional(OptionMap)}</li>
- * <li>{@link #flatmapOptional(Rook, OptionRookMap)}</li>
+ * <li>{@link #flatmapOptional(OptionalMap)}</li>
+ * <li>{@link #flatmapOptional(Rook, OptionalRookMap)}</li>
  * <li>{@link #flatmapStream(Rook, StreamRookMap)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
- * <li>{@link #map(Rook, FunctionH)}</li>
+ * <li>{@link #map(Rook, RookFunction)}</li>
  * <li>{@link #numbered()}</li>
  * <li>{@link #once()}</li>
  * <li>{@link #peek(Consumer)}</li>
@@ -165,8 +165,8 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #purlIterable(Rook, IterableRookPurl)}</li>
  * <li>{@link #purlIterator(IteratorPurl)}</li>
  * <li>{@link #purlIterator(Rook, IteratorRookPurl)}</li>
- * <li>{@link #purlOptional(OptionPurl)}</li>
- * <li>{@link #purlOptional(Rook, OptionRookPurl)}</li>
+ * <li>{@link #purlOptional(OptionalPurl)}</li>
+ * <li>{@link #purlOptional(Rook, OptionalRookPurl)}</li>
  * <li>{@link #purlStream(Rook, StreamRookPurl)}</li>
  * </ul>
  * 

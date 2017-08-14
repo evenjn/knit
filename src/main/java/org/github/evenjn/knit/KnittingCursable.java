@@ -1621,13 +1621,13 @@ public class KnittingCursable<I> implements
 	 *         this cursable.
 	 * @since 1.0
 	 */
-	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
+	public <K> K reduce( K zero, BiFunction<K, I, K> bifunction ) {
 		K reduction = zero;
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			Cursor<I> kc = wrapped.pull( rook );
 			try {
 				for ( ;; ) {
-					reduction = fun.apply( reduction, kc.next( ) );
+					reduction = bifunction.apply( reduction, kc.next( ) );
 				}
 			}
 			catch ( EndOfCursorException e ) {

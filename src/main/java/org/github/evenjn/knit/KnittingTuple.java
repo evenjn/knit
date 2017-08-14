@@ -123,8 +123,8 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #endsWith(Tuple, Equivalencer)}</li>
  * <li>{@link #equivalentTo(Tuple)}</li>
  * <li>{@link #equivalentTo(Tuple, Equivalencer)}</li>
- * <li>{@link #findSubtuple(Tuple)}</li>
- * <li>{@link #findSubtuple(Tuple, Equivalencer)}</li>
+ * <li>{@link #findSubtuple(Tuple, int)}</li>
+ * <li>{@link #findSubtuple(Tuple, int, Equivalencer)}</li>
  * <li>{@link #longestCommonSubtuple(Tuple)}</li>
  * <li>{@link #longestCommonSubtuple(Tuple, Equivalencer)}</li>
  * <li>{@link #longestCommonSubtupleUnion(Cursor)}</li>
@@ -398,7 +398,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public <Y> boolean contains( KnittingTuple<Y> other ) {
+	public <Y> boolean contains( Tuple<Y> other ) {
 		return contains( other, getNullEquivalencer( ) );
 	}
 
@@ -421,7 +421,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public <Y> boolean contains( KnittingTuple<Y> other,
+	public <Y> boolean contains( Tuple<Y> other,
 			Equivalencer<I, Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
@@ -473,14 +473,14 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * Whenever the back slot of a pair
-	 * {@linkplain org.github.evenjn..yarn.BiOption#hasBack( ) is filled in}, that
+	 * {@linkplain org.github.evenjn.yarn.BiOption#hasBack( ) is filled in}, that
 	 * slot contains an element of the argument tuple. That element may be
 	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever both the front slot and the back slot
-	 * {@linkplain org.github.evenjn..yarn.BiOption#hasBoth( ) are filled in}, the
+	 * {@linkplain org.github.evenjn.yarn.BiOption#hasBoth( ) are filled in}, the
 	 * content of the front slot is equivalent (as specified by the argument
 	 * {@code equivalencer}) to the content of the second slot. They may be both
 	 * {@code null}.
@@ -528,20 +528,22 @@ public class KnittingTuple<I> implements
 			Tuple<? extends Tuple<Y>> others ) {
 		return distanceAll( others, getNullEquivalencer( ) );
 	}
-	
+
 	// aligns all tuples according to the lcs, then sums the diff of remaining
 	// segments
 	public <Y> int distanceAll(
 			Tuple<? extends Tuple<Y>> others,
 			Equivalencer<I, Y> equivalencer ) {
 		KnittingTuple<Bi<I, Integer>> numbered = numbered( );
-		
-		Equivalencer<Bi<I, Integer>, Y> equivalencer2 = new Equivalencer<Bi<I, Integer>, Y> () {
 
-			@Override
-			public boolean equivalent( Bi<I, Integer> a, Y b ) {
-				return equivalencer.equivalent( a.front( ), b );
-			}};
+		Equivalencer<Bi<I, Integer>, Y> equivalencer2 =
+				new Equivalencer<Bi<I, Integer>, Y>( ) {
+
+					@Override
+					public boolean equivalent( Bi<I, Integer> a, Y b ) {
+						return equivalencer.equivalent( a.front( ), b );
+					}
+				};
 		if ( others.size( ) == 0 ) {
 			throw new IllegalArgumentException( );
 		}
@@ -550,12 +552,14 @@ public class KnittingTuple<I> implements
 		for ( int i = 0; i < size( ); i++ ) {
 			keeps.add( true );
 		}
-		ArrayList<Iterator<BiOption<Bi<I, Integer>, Y>>> all_diffs = new ArrayList<>( );
+		ArrayList<Iterator<BiOption<Bi<I, Integer>, Y>>> all_diffs =
+				new ArrayList<>( );
 		ArrayList<Integer> all_starts = new ArrayList<>( );
 
 		for ( Tuple<Y> single_mask : KnittingTuple.wrap( others ).asIterable( ) ) {
-			
-			Iterable<BiOption<Bi<I, Integer>, Y>> diff = numbered.diff( single_mask, equivalencer2 );
+
+			Iterable<BiOption<Bi<I, Integer>, Y>> diff =
+					numbered.diff( single_mask, equivalencer2 );
 
 			all_diffs.add( diff.iterator( ) );
 			all_starts.add( 0 );
@@ -600,7 +604,8 @@ public class KnittingTuple<I> implements
 							if ( next.hasBack( ) ) {
 								scrolled++;
 							}
-							// we cannot rely on equality here. we must check the slot index instead.
+							// we cannot rely on equality here. we must check the slot index
+							// instead.
 							if ( next.hasBoth( ) && next.front( ).back( ) == z ) {
 								// ok, the corresponding sequence is
 								KnittingTuple<Y> other_subTuple =
@@ -674,7 +679,7 @@ public class KnittingTuple<I> implements
 				int scrolled = 0;
 
 				while ( iterator.hasNext( ) ) {
-					BiOption<?,?> next = iterator.next( );
+					BiOption<?, ?> next = iterator.next( );
 
 					if ( next.hasBack( ) ) {
 						scrolled++;
@@ -839,7 +844,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean endsWith( KnittingTuple<I> other ) {
+	public boolean endsWith( Tuple<I> other ) {
 		return endsWith( other, getNullEquivalencer( ) );
 	}
 
@@ -862,7 +867,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public <Y> boolean endsWith( KnittingTuple<Y> other,
+	public <Y> boolean endsWith( Tuple<Y> other,
 			Equivalencer<I, Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
@@ -959,8 +964,6 @@ public class KnittingTuple<I> implements
 	 * 
 	 * @param other
 	 *          Another tuple.
-	 * @param equivalencer
-	 *          A system that can tell whether two objects are equivalent.
 	 * @param skip
 	 *          The number of slots to skip.
 	 * @return The index of the first slot of a subtuple that fulfils certain
@@ -1173,21 +1176,21 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * This method invokes
-	 * {@link KnittingTuple#longestCommonSubtuple(Tuple,Equivalencer) lcs(Tuple,
+	 * {@link KnittingTuple#longestCommonSubtuple(Tuple,Equivalencer) longestCommonSubtuple(Tuple,
 	 * Equivalencer)} using an equivalencer that marks two objects as equivalent
 	 * if and only if they are {@linkplain java.lang.Object#equals equal} to each
 	 * other or both {@code null}.
 	 * </p>
 	 * 
-	 * @param masks
-	 *          Other tuples.
+	 * @param tuple
+	 *          Another tuple.
 	 * @return a longest common subsequence between this tuple and the argument
 	 *         tuple.
 	 * @since 1.0
 	 */
 	public <Y> KnittingTuple<I> longestCommonSubtuple(
-			Tuple<Y> mask ) {
-		return longestCommonSubtuple( mask, getNullEquivalencer( ) );
+			Tuple<Y> tuple ) {
+		return longestCommonSubtuple( tuple, getNullEquivalencer( ) );
 	}
 
 	/**
@@ -1201,8 +1204,8 @@ public class KnittingTuple<I> implements
 	 * two tuples.
 	 * </p>
 	 * 
-	 * @param masks
-	 *          Other tuples.
+	 * @param tuple
+	 *          Another tuple.
 	 * @param equivalencer
 	 *          A system that can tell whether two objects are equivalent.
 	 * @return a longest common subsequence between this tuple and the argument
@@ -1210,10 +1213,10 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> KnittingTuple<I> longestCommonSubtuple(
-			Tuple<Y> mask,
+			Tuple<Y> tuple,
 			Equivalencer<I, Y> equivalencer ) {
 		ArrayList<I> result = new ArrayList<>( );
-		for ( BiOption<I, Y> bi : diff( mask, equivalencer ) ) {
+		for ( BiOption<I, Y> bi : diff( tuple, equivalencer ) ) {
 			if ( bi.hasBoth( ) ) {
 				result.add( bi.front( ) );
 			}
@@ -1230,8 +1233,8 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * This method invokes
-	 * {@link KnittingTuple#longestCommonSubtupleIntersection(Tuple,Equivalencer)
-	 * lcsIntersection(Tuple, Equivalencer)} using an equivalencer that marks two
+	 * {@link KnittingTuple#longestCommonSubtupleIntersection(Cursor,Equivalencer)
+	 * longestCommonSubtupleIntersection(Cursor, Equivalencer)} using an equivalencer that marks two
 	 * objects as equivalent if and only if they are
 	 * {@linkplain java.lang.Object#equals equal} to each other or both
 	 * {@code null}.
@@ -1324,16 +1327,14 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * This method invokes
-	 * {@link KnittingTuple#longestCommonSubtupleUnion(Tuple,Equivalencer)
-	 * lcsUnion(Tuple, Equivalencer)} using an equivalencer that marks two objects
+	 * {@link KnittingTuple#longestCommonSubtupleUnion(Cursor,Equivalencer)
+	 * longestCommonSubtupleUnion(Cursor, Equivalencer)} using an equivalencer that marks two objects
 	 * as equivalent if and only if they are {@linkplain java.lang.Object#equals
 	 * equal} to each other or both {@code null}.
 	 * </p>
 	 * 
 	 * @param masks
 	 *          A cursor of tuples.
-	 * @param equivalencer
-	 *          A system that can tell whether two objects are equivalent.
 	 * @return the union of some longest common subsequences between this tuple
 	 *         and each tuple in the argument cursor.
 	 * @since 1.0
@@ -1514,7 +1515,7 @@ public class KnittingTuple<I> implements
 	 * Returns a view of the concatenation of the argument tuple before this
 	 * tuple.
 	 * 
-	 * @param tail
+	 * @param head
 	 *          A tuple to concatenate before this tuple.
 	 * @return A view of the concatenation of the argument tuple before this
 	 *         tuple.
@@ -1565,13 +1566,13 @@ public class KnittingTuple<I> implements
 	 *         this tuple.
 	 * @since 1.0
 	 */
-	public <K> K reduce( K zero, BiFunction<K, I, K> fun ) {
+	public <K> K reduce( K zero, BiFunction<K, I, K> bifunction ) {
 		K reduction = zero;
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			Cursor<I> kc = pull( );
 			try {
 				for ( ;; ) {
-					reduction = fun.apply( reduction, kc.next( ) );
+					reduction = bifunction.apply( reduction, kc.next( ) );
 				}
 			}
 			catch ( EndOfCursorException e ) {
@@ -1664,7 +1665,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public <Y> boolean startsWith( KnittingTuple<Y> other ) {
+	public <Y> boolean startsWith( Tuple<Y> other ) {
 		return startsWith( other, getNullEquivalencer( ) );
 	}
 
@@ -1687,7 +1688,7 @@ public class KnittingTuple<I> implements
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public <Y> boolean startsWith( KnittingTuple<Y> other,
+	public <Y> boolean startsWith( Tuple<Y> other,
 			Equivalencer<I, Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
