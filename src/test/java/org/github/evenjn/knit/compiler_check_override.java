@@ -17,7 +17,6 @@
  */
 package org.github.evenjn.knit;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -26,6 +25,7 @@ import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorRookMap;
 import org.github.evenjn.yarn.Rook;
+import org.github.evenjn.yarn.RookConsumer;
 
 public class compiler_check_override {
 
@@ -83,8 +83,8 @@ public class compiler_check_override {
 		cursable.flatmapCursor( x -> KnittingCursor.on( 1 ) );
 		cursable.flatmapCursor( ( h, x ) -> KnittingCursor.on( 1 ) );
 		
-		Function<Rook, Consumer<String>> ff1 = null;
-		Function<Rook, Consumer<Object>> ff2 = null;
+		RookConsumer<String> ff1 = null;
+		RookConsumer<Object> ff2 = null;
 
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			KnittingCursor<String> pull =

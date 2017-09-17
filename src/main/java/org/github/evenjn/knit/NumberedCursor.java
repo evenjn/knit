@@ -30,7 +30,7 @@ class NumberedCursor<I> implements
 		wrapped = cursor;
 	}
 
-	private final Bik<I, Integer> bi = Bik.nu( null, null );
+	private final BiTray<I, Integer> bi = BiTray.nu( null, null );
 
 	private int i;
 

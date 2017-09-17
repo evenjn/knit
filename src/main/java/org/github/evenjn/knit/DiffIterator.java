@@ -41,7 +41,7 @@ class DiffIterator<F, B> implements
 
 	private DiffOp<F, B> current = null;
 
-	private BiOptionk<F, B> tray;
+	private BiOptionTray<F, B> tray;
 
 	private int original_start;
 
@@ -52,7 +52,7 @@ class DiffIterator<F, B> implements
 	private int revised_length;
 
 	@Override
-	public BiOptionk<F, B> next( )
+	public BiOption<F, B> next( )
 			throws EndOfCursorException {
 
 		if ( current == null && kd.hasNext( ) ) {
@@ -76,7 +76,7 @@ class DiffIterator<F, B> implements
 		if ( current != null ) {
 			switch ( current.getOperation( ) ) {
 				case INSERT:
-					tray = BiOptionk.nu( null, kc_back.next( ), false, true );
+					tray = BiOptionTray.nu( null, kc_back.next( ), false, true );
 					revised_length--;
 					if ( revised_length == 0 ) {
 						current = null;
@@ -84,7 +84,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case EQUAL:
-					tray = BiOptionk.nu( kc_front.next( ), kc_back.next( ), true, true );
+					tray = BiOptionTray.nu( kc_front.next( ), kc_back.next( ), true, true );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -97,7 +97,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case DELETE:
-					tray = BiOptionk.nu( kc_front.next( ), null, true, false );
+					tray = BiOptionTray.nu( kc_front.next( ), null, true, false );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;

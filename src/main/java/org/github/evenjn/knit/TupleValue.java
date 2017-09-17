@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import org.github.evenjn.yarn.Equivalencer;
 import org.github.evenjn.yarn.Tuple;
 
-public class TupleValue<I> implements
+public final class TupleValue<I> implements
 		Tuple<I> {
 
 	private Tuple<I> wrapped;

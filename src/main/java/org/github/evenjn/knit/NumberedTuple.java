@@ -31,7 +31,7 @@ class NumberedTuple<I> implements
 
 	@Override
 	public Bi<I, Integer> get( int index ) {
-		return Bik.nu( base.get( index ), index );
+		return BiTray.nu( base.get( index ), index );
 	}
 
 	@Override

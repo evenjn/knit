@@ -33,7 +33,7 @@ import org.github.evenjn.yarn.BiOption;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Equivalencer;
-import org.github.evenjn.yarn.Rook;
+import org.github.evenjn.yarn.RookConsumer;
 import org.github.evenjn.yarn.Tuple;
 
 /**
@@ -365,16 +365,14 @@ public class KnittingTuple<I> implements
 	 * slots.
 	 * </p>
 	 * 
-	 * @param <K>
-	 *          The type of {@code Consumer} returned by the argument.
 	 * @param consumer_provider
-	 *          A system that provides consumers.
+	 *          A system that provides a consumer.
 	 * @since 1.0
 	 */
-	public <K extends Consumer<? super I>> void consume(
-			Function<Rook, K> consumer_provider ) {
+	public void consume(
+			RookConsumer<? super I> consumer_provider ) {
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
-			K consumer = consumer_provider.apply( rook );
+			Consumer<? super I> consumer = consumer_provider.get( rook );
 			this.asKnittingCursor( ).peek( consumer ).roll( );
 		}
 	}

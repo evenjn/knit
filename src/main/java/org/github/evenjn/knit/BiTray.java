@@ -29,10 +29,10 @@ import org.github.evenjn.yarn.Bi;
  *          The type of the object in the <em>back</em> slot..
  * @since 1.0
  */
-public final class Bik<A, B> implements
+public final class BiTray<A, B> implements
 		Bi<A, B> {
 
-	private Bik() {
+	private BiTray() {
 	}
 
 	/**
@@ -46,11 +46,12 @@ public final class Bik<A, B> implements
 	 *          the element to put in the <em>front</em> slot.
 	 * @param back
 	 *          the element to put in the <em>back</em> slot.
-	 * @return a new {@code Bi} object providing access to the argument objects.
+	 * @return a new {@code BiTray} object providing access to the argument
+	 *         objects.
 	 * @since 1.0
 	 */
-	public static <A, B> Bik<A, B> nu( A front, B back ) {
-		return new Bik<A, B>( ).set( front, back );
+	public static <A, B> BiTray<A, B> nu( A front, B back ) {
+		return new BiTray<A, B>( ).set( front, back );
 	}
 
 	private A front;
@@ -65,11 +66,11 @@ public final class Bik<A, B> implements
 	 *          the element to put in the <em>front</em> slot.
 	 * @param back
 	 *          the element to put in the <em>back</em> slot.
-	 * @return this {@code Bi} object, modified to provide access to the argument
-	 *         objects.
+	 * @return this {@code BiTray} object, modified to provide access to the
+	 *         argument objects.
 	 * @since 1.0
 	 */
-	public Bik<A, B> set( A front, B back ) {
+	public BiTray<A, B> set( A front, B back ) {
 		this.front = front;
 		this.back = back;
 		return this;
@@ -96,7 +97,7 @@ public final class Bik<A, B> implements
 	/**
 	 * Returns a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}.
 	 * 
-	 * @return a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}..
+	 * @return a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}.
 	 * @since 1.0
 	 */
 	public Bi<A, B> asBi( ) {

@@ -11,7 +11,7 @@
  * 
  * <ul>
  * <li>{@link org.github.evenjn.knit.BasicAutoRook BasicAutoRook}</li>
- * <li>{@link org.github.evenjn.knit.Bik Bik}</li>
+ * <li>{@link org.github.evenjn.knit.BiTray BiTray}</li>
  * <li>{@link org.github.evenjn.knit.DebuggingAutoRook DebuggingAutoRook}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursable KnittingCursable}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursor KnittingCursor}</li>

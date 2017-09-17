@@ -58,6 +58,7 @@ import org.github.evenjn.yarn.OptionalPurl;
 import org.github.evenjn.yarn.OptionalRookMap;
 import org.github.evenjn.yarn.OptionalRookPurl;
 import org.github.evenjn.yarn.Rook;
+import org.github.evenjn.yarn.RookConsumer;
 import org.github.evenjn.yarn.RookFunction;
 import org.github.evenjn.yarn.StreamRookMap;
 import org.github.evenjn.yarn.StreamRookPurl;
@@ -417,20 +418,17 @@ public class KnittingCursor<I> implements
 	 * This is a rolling method.
 	 * </p>
 	 * 
-	 * @param <K>
-	 *          The type of {@code Consumer} returned by the argument.
 	 * @param consumer_provider
-	 *          A system that provides consumers.
+	 *          A system that provides a consumer
 	 * @throws IllegalStateException
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	public <K extends Consumer<? super I>> void consume(
-			Function<Rook, K> consumer_provider )
+	public void consume( RookConsumer<? super I> consumer_provider )
 			throws IllegalStateException {
 		lock( );
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
-			K consumer = consumer_provider.apply( rook );
+			Consumer<? super I> consumer = consumer_provider.get( rook );
 			for ( ;; ) {
 				consumer.accept( wrapped.next( ) );
 			}
