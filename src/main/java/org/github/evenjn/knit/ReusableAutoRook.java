@@ -20,8 +20,6 @@ package org.github.evenjn.knit;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.AutoRook;
-
 /**
  * An implementation of AutoRook that returns to the initial state after
  * invoking {@code close()}. In other words, a closed ReusableAutoRook is as

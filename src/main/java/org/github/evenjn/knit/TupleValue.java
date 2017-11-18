@@ -17,8 +17,8 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Equivalencer;
-import org.github.evenjn.yarn.Tuple;
+import org.github.evenjn.lang.Equivalencer;
+import org.github.evenjn.lang.Tuple;
 
 public final class TupleValue<I> implements
 		Tuple<I> {

@@ -17,9 +17,9 @@
  */
 package org.github.evenjn.knit;
 
+import org.github.evenjn.lang.Rook;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.Rook;
 
 class IterableCursable<T> implements
 		Cursable<T> {

@@ -17,7 +17,7 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Tuple;
+import org.github.evenjn.lang.Tuple;
 
 class Subtuple<K> implements
 		Tuple<K> {

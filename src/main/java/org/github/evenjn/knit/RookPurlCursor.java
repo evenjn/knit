@@ -17,34 +17,34 @@
  */
 package org.github.evenjn.knit;
 
+import org.github.evenjn.lang.Rook;
 import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.CursorRookPurl;
+import org.github.evenjn.yarn.CursorRingPurl;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Rook;
 
-class RookPurlCursor<I, O> implements
+class RingPurlCursor<I, O> implements
 		Cursor<O> {
 
 	private final Cursor<? extends I> cursor;
 
-	private final CursorRookPurl<? super I, O> purl;
+	private final CursorRingPurl<? super I, O> purl;
 
 	private BasicAutoRook internal_rook;
 
 	private final boolean use_internal_rook;
 
-	RookPurlCursor(
+	RingPurlCursor(
 			Cursor<I> cursor,
-			CursorRookPurl<? super I, O> purl) {
+			CursorRingPurl<? super I, O> purl) {
 		this.cursor = cursor;
 		this.purl = purl;
 		this.use_internal_rook = false;
 	}
 
-	RookPurlCursor(
+	RingPurlCursor(
 			Rook rook,
 			Cursor<I> cursor,
-			CursorRookPurl<? super I, O> purl) {
+			CursorRingPurl<? super I, O> purl) {
 		this.use_internal_rook = true;
 		rook.hook( new AutoCloseable( ) {
 

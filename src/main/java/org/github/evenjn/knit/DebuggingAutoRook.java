@@ -22,8 +22,6 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.AutoRook;
-
 
 /**
  * An implementation of {@link org.github.evenjn.yarn.AutoRook AutoRook} that

@@ -21,12 +21,12 @@ package org.github.evenjn.knit;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.BiOption;
-import org.github.evenjn.yarn.Equivalencer;
-import org.github.evenjn.yarn.Tuple;
+import org.github.evenjn.lang.BiOptional;
+import org.github.evenjn.lang.Equivalencer;
+import org.github.evenjn.lang.Tuple;
 
 class DiffIterable<F, B> implements
-		Iterable<BiOption<F, B>> {
+		Iterable<BiOptional<F, B>> {
 
 	private Tuple<F> front;
 
@@ -49,7 +49,7 @@ class DiffIterable<F, B> implements
 	}
 
 	@Override
-	public Iterator<BiOption<F, B>> iterator( ) {
+	public Iterator<BiOptional<F, B>> iterator( ) {
 		KnittingCursor<DiffOp<F, B>> cursor =
 				KnittingCursor.wrap( diffs.iterator( ) );
 		DiffIterator<F, B> diffIterator =

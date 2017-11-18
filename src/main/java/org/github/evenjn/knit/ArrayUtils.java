@@ -20,11 +20,11 @@ package org.github.evenjn.knit;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.github.evenjn.lang.Rook;
+import org.github.evenjn.lang.Tuple;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Rook;
-import org.github.evenjn.yarn.Tuple;
 
 class ArrayCursor<T> implements
 		Cursor<T> {

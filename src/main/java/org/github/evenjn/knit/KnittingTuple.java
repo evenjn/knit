@@ -27,14 +27,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.github.evenjn.yarn.AutoRook;
-import org.github.evenjn.yarn.Bi;
-import org.github.evenjn.yarn.BiOption;
+import org.github.evenjn.lang.BiOptional;
+import org.github.evenjn.lang.Equivalencer;
+import org.github.evenjn.lang.Ring;
+import org.github.evenjn.lang.Tuple;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Equivalencer;
-import org.github.evenjn.yarn.RookConsumer;
-import org.github.evenjn.yarn.Tuple;
 
 /**
  * 
@@ -365,12 +363,15 @@ public class KnittingTuple<I> implements
 	 * slots.
 	 * </p>
 	 * 
+	 * @param <K>
+	 *          The type of consumer returned by the argument
+	 *          {@code consumer_provider}.
 	 * @param consumer_provider
 	 *          A system that provides a consumer.
 	 * @since 1.0
 	 */
-	public void consume(
-			RookConsumer<? super I> consumer_provider ) {
+	public <K extends Consumer<? super I>> void consume(
+			Ring<K> consumer_provider ) {
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			this.asKnittingCursor( ).peek( consumer ).roll( );
@@ -443,14 +444,14 @@ public class KnittingTuple<I> implements
 	 * @return An alignment of this tuple with the argument tuple.
 	 * @since 1.0
 	 */
-	public <Y> Iterable<BiOption<I, Y>> diff( Tuple<Y> other ) {
+	public <Y> Iterable<BiOptional<I, Y>> diff( Tuple<Y> other ) {
 		return diff( other, getNullEquivalencer( ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns an alignment of this tuple with the argument tuple, represented as
-	 * a list of {@link org.github.evenjn.yarn.BiOption pairs}.
+	 * a list of {@link org.github.evenjn.yarn.BiOptional pairs}.
 	 * </p>
 	 * 
 	 * <p>
@@ -465,20 +466,20 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * Whenever the front slot of a pair
-	 * {@linkplain org.github.evenjn.yarn.BiOption#hasFront( ) is filled in}, that
+	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasFront( ) is filled in}, that
 	 * slot contains an element of this tuple. That element may be {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever the back slot of a pair
-	 * {@linkplain org.github.evenjn.yarn.BiOption#hasBack( ) is filled in}, that
+	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBack( ) is filled in}, that
 	 * slot contains an element of the argument tuple. That element may be
 	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever both the front slot and the back slot
-	 * {@linkplain org.github.evenjn.yarn.BiOption#hasBoth( ) are filled in}, the
+	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBoth( ) are filled in}, the
 	 * content of the front slot is equivalent (as specified by the argument
 	 * {@code equivalencer}) to the content of the second slot. They may be both
 	 * {@code null}.
@@ -516,198 +517,10 @@ public class KnittingTuple<I> implements
 	 * @return An alignment of this tuple with the argument tuple.
 	 * @since 1.0
 	 */
-	public <Y> Iterable<BiOption<I, Y>> diff(
+	public <Y> Iterable<BiOptional<I, Y>> diff(
 			Tuple<Y> other,
 			Equivalencer<I, Y> equivalencer ) {
 		return new DiffIterable<I, Y>( this, other, equivalencer );
-	}
-
-	public <Y> int distanceAll(
-			Tuple<? extends Tuple<Y>> others ) {
-		return distanceAll( others, getNullEquivalencer( ) );
-	}
-
-	// aligns all tuples according to the lcs, then sums the diff of remaining
-	// segments
-	public <Y> int distanceAll(
-			Tuple<? extends Tuple<Y>> others,
-			Equivalencer<I, Y> equivalencer ) {
-		KnittingTuple<Bi<I, Integer>> numbered = numbered( );
-
-		Equivalencer<Bi<I, Integer>, Y> equivalencer2 =
-				new Equivalencer<Bi<I, Integer>, Y>( ) {
-
-					@Override
-					public boolean equivalent( Bi<I, Integer> a, Y b ) {
-						return equivalencer.equivalent( a.front( ), b );
-					}
-				};
-		if ( others.size( ) == 0 ) {
-			throw new IllegalArgumentException( );
-		}
-		int total_distance = 0;
-		ArrayList<Boolean> keeps = new ArrayList<>( );
-		for ( int i = 0; i < size( ); i++ ) {
-			keeps.add( true );
-		}
-		ArrayList<Iterator<BiOption<Bi<I, Integer>, Y>>> all_diffs =
-				new ArrayList<>( );
-		ArrayList<Integer> all_starts = new ArrayList<>( );
-
-		for ( Tuple<Y> single_mask : KnittingTuple.wrap( others ).asIterable( ) ) {
-
-			Iterable<BiOption<Bi<I, Integer>, Y>> diff =
-					numbered.diff( single_mask, equivalencer2 );
-
-			all_diffs.add( diff.iterator( ) );
-			all_starts.add( 0 );
-
-			int j = 0;
-			for ( BiOption<?, ?> bi : diff ) {
-				if ( bi.hasFront( ) ) {
-					if ( !bi.hasBoth( ) ) {
-						keeps.set( j, false );
-					}
-					j++;
-				}
-			}
-		}
-
-		boolean beginning_found = false;
-		boolean end_found = false;
-		int beginning = -1;
-		int end = -1;
-		for ( int z = 0; z < size( ); z++ ) {
-			if ( keeps.get( z ) ) {
-
-				// the current element is shared among all sequences.
-				if ( beginning_found ) {
-
-					end_found = true;
-					end = z;
-
-					// for each sequence
-
-					boolean best_distance_found = false;
-					int best_distance = -1;
-					for ( int s = 0; s < others.size( ); s++ ) {
-						// scroll until we find the current element
-						Iterator<BiOption<Bi<I, Integer>, Y>> iterator = all_diffs.get( s );
-						Integer start = all_starts.get( s );
-						int scrolled = 0;
-
-						while ( iterator.hasNext( ) ) {
-							BiOption<Bi<I, Integer>, Y> next = iterator.next( );
-
-							if ( next.hasBack( ) ) {
-								scrolled++;
-							}
-							// we cannot rely on equality here. we must check the slot index
-							// instead.
-							if ( next.hasBoth( ) && next.front( ).back( ) == z ) {
-								// ok, the corresponding sequence is
-								KnittingTuple<Y> other_subTuple =
-										KnittingTuple.wrap( others.get( s ) ).subTuple( start,
-												start + ( scrolled - 1 ) );
-
-								int current_distance =
-										subTuple( beginning, end ).distance( other_subTuple );
-
-								if ( !best_distance_found
-										|| best_distance > current_distance ) {
-									best_distance = current_distance;
-									best_distance_found = true;
-								}
-								all_starts.set( s, start + scrolled );
-								break;
-							}
-						}
-
-					}
-					if ( !best_distance_found ) {
-						throw new IllegalStateException( );
-					}
-					total_distance = total_distance + best_distance;
-					beginning_found = false;
-				}
-				else {
-					// scroll the other iterators
-					for ( int s = 0; s < others.size( ); s++ ) {
-						// scroll until we find the current element
-						Iterator<?> iterator = all_diffs.get( s );
-						Integer start = all_starts.get( s );
-						iterator.next( );
-						all_starts.set( s, start + 1 );
-					}
-				}
-			}
-			else {
-				if ( !beginning_found ) {
-					beginning_found = true;
-					beginning = z;
-					end_found = false;
-				}
-			}
-
-		}
-
-		if ( !( beginning_found && !end_found ) ) {
-			boolean nothing_left = false;
-			for ( int s = 0; s < others.size( ); s++ ) {
-				Iterator<?> iterator = all_diffs.get( s );
-				if ( !iterator.hasNext( ) ) {
-					nothing_left = true;
-				}
-			}
-			if ( !nothing_left ) {
-				beginning_found = true;
-				beginning = size( );
-				end_found = false;
-			}
-		}
-
-		if ( beginning_found && !end_found ) {
-
-			boolean best_distance_found = false;
-			int best_distance = -1;
-			for ( int s = 0; s < others.size( ); s++ ) {
-				// scroll until we find the current element
-				Iterator<? extends BiOption<?, ?>> iterator = all_diffs.get( s );
-				Integer start = all_starts.get( s );
-				int scrolled = 0;
-
-				while ( iterator.hasNext( ) ) {
-					BiOption<?, ?> next = iterator.next( );
-
-					if ( next.hasBack( ) ) {
-						scrolled++;
-					}
-					if ( !iterator.hasNext( ) ) {
-						// ok, the corresponding sequence is
-						KnittingTuple<Y> other_subTuple =
-								KnittingTuple.wrap( others.get( s ) ).subTuple( start,
-										start + scrolled );
-
-						int current_distance =
-								subTuple( beginning, size( ) ).distance( other_subTuple );
-
-						if ( !best_distance_found || best_distance > current_distance ) {
-							best_distance = current_distance;
-							best_distance_found = true;
-						}
-						all_starts.set( s, start + scrolled );
-						break;
-					}
-				}
-
-			}
-			if ( !best_distance_found ) {
-				throw new IllegalStateException( );
-			}
-			total_distance = total_distance + best_distance;
-		}
-		// search for the first non-aligned element:
-		return total_distance;
 	}
 
 	/**
@@ -786,7 +599,7 @@ public class KnittingTuple<I> implements
 		if ( n > m ) {
 			// swap the input strings to consume less memory
 			return KnittingTuple.wrap( other ).distance( this,
-					equivalencer.transpose( ) );
+					equivalencer.swap( ) );
 		}
 
 		final int p[] = new int[n + 1];
@@ -1174,10 +987,11 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * This method invokes
-	 * {@link KnittingTuple#longestCommonSubtuple(Tuple,Equivalencer) longestCommonSubtuple(Tuple,
-	 * Equivalencer)} using an equivalencer that marks two objects as equivalent
-	 * if and only if they are {@linkplain java.lang.Object#equals equal} to each
-	 * other or both {@code null}.
+	 * {@link KnittingTuple#longestCommonSubtuple(Tuple,Equivalencer)
+	 * longestCommonSubtuple(Tuple, Equivalencer)} using an equivalencer that
+	 * marks two objects as equivalent if and only if they are
+	 * {@linkplain java.lang.Object#equals equal} to each other or both
+	 * {@code null}.
 	 * </p>
 	 * 
 	 * @param tuple
@@ -1214,7 +1028,7 @@ public class KnittingTuple<I> implements
 			Tuple<Y> tuple,
 			Equivalencer<I, Y> equivalencer ) {
 		ArrayList<I> result = new ArrayList<>( );
-		for ( BiOption<I, Y> bi : diff( tuple, equivalencer ) ) {
+		for ( BiOptional<I, Y> bi : diff( tuple, equivalencer ) ) {
 			if ( bi.hasBoth( ) ) {
 				result.add( bi.front( ) );
 			}
@@ -1232,8 +1046,8 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * This method invokes
 	 * {@link KnittingTuple#longestCommonSubtupleIntersection(Cursor,Equivalencer)
-	 * longestCommonSubtupleIntersection(Cursor, Equivalencer)} using an equivalencer that marks two
-	 * objects as equivalent if and only if they are
+	 * longestCommonSubtupleIntersection(Cursor, Equivalencer)} using an
+	 * equivalencer that marks two objects as equivalent if and only if they are
 	 * {@linkplain java.lang.Object#equals equal} to each other or both
 	 * {@code null}.
 	 * </p>
@@ -1296,7 +1110,7 @@ public class KnittingTuple<I> implements
 		for ( Tuple<Y> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
 
 			int j = 0;
-			for ( BiOption<I, Y> bi : diff( single_mask, equivalencer ) ) {
+			for ( BiOptional<I, Y> bi : diff( single_mask, equivalencer ) ) {
 				if ( bi.hasFront( ) ) {
 					if ( !bi.hasBoth( ) ) {
 						keeps.set( j, false );
@@ -1326,9 +1140,10 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * This method invokes
 	 * {@link KnittingTuple#longestCommonSubtupleUnion(Cursor,Equivalencer)
-	 * longestCommonSubtupleUnion(Cursor, Equivalencer)} using an equivalencer that marks two objects
-	 * as equivalent if and only if they are {@linkplain java.lang.Object#equals
-	 * equal} to each other or both {@code null}.
+	 * longestCommonSubtupleUnion(Cursor, Equivalencer)} using an equivalencer
+	 * that marks two objects as equivalent if and only if they are
+	 * {@linkplain java.lang.Object#equals equal} to each other or both
+	 * {@code null}.
 	 * </p>
 	 * 
 	 * @param masks
@@ -1382,7 +1197,7 @@ public class KnittingTuple<I> implements
 		for ( Tuple<Y> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
 
 			int j = 0;
-			for ( BiOption<I, Y> bi : diff( single_mask, equivalencer ) ) {
+			for ( BiOptional<I, Y> bi : diff( single_mask, equivalencer ) ) {
 				if ( bi.hasFront( ) ) {
 					if ( !bi.hasBoth( ) ) {
 						keeps.set( j, false );
@@ -1467,7 +1282,18 @@ public class KnittingTuple<I> implements
 		return wrap( new MapTuple<>( wrapped, stateless_function ) );
 	}
 
-	public KnittingTuple<Bi<I, Integer>> numbered( ) {
+	/**
+	 * <p>
+	 * Returns a view. For each element {@code E} of this tuple, the view shows
+	 * the element wrapped in a {@link org.github.evenjn.knit.Numbered Numbered}
+	 * object, containing the element itself and the number of elements preceding
+	 * it in this tuple..
+	 * </p>
+	 * 
+	 * @return A complex view.
+	 * @since 1.0
+	 */
+	public KnittingTuple<Numbered<I>> numbered( ) {
 		return wrap( new NumberedTuple<>( wrapped ) );
 	}
 

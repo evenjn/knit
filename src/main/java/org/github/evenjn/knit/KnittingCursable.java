@@ -26,51 +26,49 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.github.evenjn.lang.Equivalencer;
+import org.github.evenjn.lang.Ring;
+import org.github.evenjn.lang.Rook;
 import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.ArrayPurl;
 import org.github.evenjn.yarn.ArrayPurler;
-import org.github.evenjn.yarn.AutoRook;
-import org.github.evenjn.yarn.Bi;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.CursableMap;
 import org.github.evenjn.yarn.CursablePurl;
 import org.github.evenjn.yarn.CursablePurler;
-import org.github.evenjn.yarn.CursableRookMap;
-import org.github.evenjn.yarn.CursableRookPurl;
-import org.github.evenjn.yarn.CursableRookPurler;
+import org.github.evenjn.yarn.CursableRingMap;
+import org.github.evenjn.yarn.CursableRingPurl;
+import org.github.evenjn.yarn.CursableRingPurler;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorMap;
 import org.github.evenjn.yarn.CursorPurl;
 import org.github.evenjn.yarn.CursorPurler;
-import org.github.evenjn.yarn.CursorRookMap;
-import org.github.evenjn.yarn.CursorRookPurl;
-import org.github.evenjn.yarn.CursorRookPurler;
+import org.github.evenjn.yarn.CursorRingMap;
+import org.github.evenjn.yarn.CursorRingPurl;
+import org.github.evenjn.yarn.CursorRingPurler;
 import org.github.evenjn.yarn.EndOfCursorException;
-import org.github.evenjn.yarn.Equivalencer;
 import org.github.evenjn.yarn.IterableMap;
 import org.github.evenjn.yarn.IterablePurl;
 import org.github.evenjn.yarn.IterablePurler;
-import org.github.evenjn.yarn.IterableRookMap;
-import org.github.evenjn.yarn.IterableRookPurl;
-import org.github.evenjn.yarn.IterableRookPurler;
+import org.github.evenjn.yarn.IterableRingMap;
+import org.github.evenjn.yarn.IterableRingPurl;
+import org.github.evenjn.yarn.IterableRingPurler;
 import org.github.evenjn.yarn.IteratorMap;
 import org.github.evenjn.yarn.IteratorPurl;
 import org.github.evenjn.yarn.IteratorPurler;
-import org.github.evenjn.yarn.IteratorRookMap;
-import org.github.evenjn.yarn.IteratorRookPurl;
-import org.github.evenjn.yarn.IteratorRookPurler;
+import org.github.evenjn.yarn.IteratorRingMap;
+import org.github.evenjn.yarn.IteratorRingPurl;
+import org.github.evenjn.yarn.IteratorRingPurler;
 import org.github.evenjn.yarn.OptionalMap;
 import org.github.evenjn.yarn.OptionalPurl;
 import org.github.evenjn.yarn.OptionalPurler;
-import org.github.evenjn.yarn.OptionalRookMap;
-import org.github.evenjn.yarn.OptionalRookPurl;
-import org.github.evenjn.yarn.OptionalRookPurler;
-import org.github.evenjn.yarn.Rook;
-import org.github.evenjn.yarn.RookConsumer;
-import org.github.evenjn.yarn.RookFunction;
-import org.github.evenjn.yarn.StreamRookMap;
-import org.github.evenjn.yarn.StreamRookPurl;
-import org.github.evenjn.yarn.StreamRookPurler;
+import org.github.evenjn.yarn.OptionalRingMap;
+import org.github.evenjn.yarn.OptionalRingPurl;
+import org.github.evenjn.yarn.OptionalRingPurler;
+import org.github.evenjn.yarn.RingFunction;
+import org.github.evenjn.yarn.StreamRingMap;
+import org.github.evenjn.yarn.StreamRingPurl;
+import org.github.evenjn.yarn.StreamRingPurler;
 
 /**
  * 
@@ -150,16 +148,16 @@ import org.github.evenjn.yarn.StreamRookPurler;
  * <li>{@link #filter(Predicate)}</li>
  * <li>{@link #flatmapArray(ArrayMap)}</li>
  * <li>{@link #flatmapCursable(CursableMap)}</li>
- * <li>{@link #flatmapCursable(CursableRookMap)}</li>
+ * <li>{@link #flatmapCursable(CursableRingMap)}</li>
  * <li>{@link #flatmapCursor(CursorMap)}</li>
- * <li>{@link #flatmapCursor(CursorRookMap)}</li>
+ * <li>{@link #flatmapCursor(CursorRingMap)}</li>
  * <li>{@link #flatmapIterable(IterableMap)}</li>
- * <li>{@link #flatmapIterable(IterableRookMap)}</li>
+ * <li>{@link #flatmapIterable(IterableRingMap)}</li>
  * <li>{@link #flatmapIterator(IteratorMap)}</li>
- * <li>{@link #flatmapIterator(IteratorRookMap)}</li>
+ * <li>{@link #flatmapIterator(IteratorRingMap)}</li>
  * <li>{@link #flatmapOptional(OptionalMap)}</li>
- * <li>{@link #flatmapOptional(OptionalRookMap)}</li>
- * <li>{@link #flatmapStream(StreamRookMap)}</li>
+ * <li>{@link #flatmapOptional(OptionalRingMap)}</li>
+ * <li>{@link #flatmapStream(StreamRingMap)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -169,16 +167,16 @@ import org.github.evenjn.yarn.StreamRookPurler;
  * <li>{@link #prepend(Cursable)}</li>
  * <li>{@link #purlArray(ArrayPurler)}</li>
  * <li>{@link #purlCursable(CursablePurler)}</li>
- * <li>{@link #purlCursable(CursableRookPurler)}</li>
+ * <li>{@link #purlCursable(CursableRingPurler)}</li>
  * <li>{@link #purlCursor(CursorPurler)}</li>
- * <li>{@link #purlCursor(CursorRookPurler)}</li>
+ * <li>{@link #purlCursor(CursorRingPurler)}</li>
  * <li>{@link #purlIterable(IterablePurler)}</li>
- * <li>{@link #purlIterable(IterableRookPurler)}</li>
+ * <li>{@link #purlIterable(IterableRingPurler)}</li>
  * <li>{@link #purlIterator(IteratorPurler)}</li>
- * <li>{@link #purlIterator(IteratorRookPurler)}</li>
+ * <li>{@link #purlIterator(IteratorRingPurler)}</li>
  * <li>{@link #purlOptional(OptionalPurler)}</li>
- * <li>{@link #purlOptional(OptionalRookPurler)}</li>
- * <li>{@link #purlStream(StreamRookPurler)}</li>
+ * <li>{@link #purlOptional(OptionalRingPurler)}</li>
+ * <li>{@link #purlStream(StreamRingPurler)}</li>
  * </ul>
  * 
  * @param <I>
@@ -292,11 +290,15 @@ public class KnittingCursable<I> implements
 	 * This is a rolling method.
 	 * </p>
 	 * 
+	 * @param <K>
+	 *          The type of consumer returned by the argument
+	 *          {@code consumer_provider}.
 	 * @param consumer_provider
 	 *          A system that provides a consumer.
 	 * @since 1.0
 	 */
-	public void consume( RookConsumer<? super I> consumer_provider ) {
+	public <K extends Consumer<? super I>> void
+			consume( Ring<K> consumer_provider ) {
 		try ( AutoRook rook = new BasicAutoRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			pull( rook ).peek( consumer ).roll( );
@@ -550,7 +552,7 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(CursorRookMap)} except that the view shows elements
+	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the cursables returned by the argument {@code stateless_cursable_map_h}.
 	 * </p>
 	 * 
@@ -567,7 +569,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapCursable(
-			CursableRookMap<? super I, O> stateless_cursable_map_h ) {
+			CursableRingMap<? super I, O> stateless_cursable_map_h ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -616,7 +618,7 @@ public class KnittingCursable<I> implements
 	 * Each invocation of {@link #pull(Rook)} on the returned
 	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
 	 * cursable, transforms it using
-	 * {@link KnittingCursor#flatmapCursor(Rook, CursorRookMap)} with the rook
+	 * {@link KnittingCursor#flatmapCursor(Rook, CursorRingMap)} with the rook
 	 * already available and the argument {@code stateless_cursor_map_h}, then
 	 * returns the resulting cursor.
 	 * </p>
@@ -634,7 +636,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapCursor(
-			CursorRookMap<? super I, O> stateless_cursor_map_h ) {
+			CursorRingMap<? super I, O> stateless_cursor_map_h ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -679,7 +681,7 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(CursorRookMap)} except that the view shows elements
+	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the iterables returned by the argument {@code stateless_iterable_map_h}.
 	 * </p>
 	 * 
@@ -696,7 +698,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapIterable(
-			IterableRookMap<? super I, O> stateless_iterable_map_h ) {
+			IterableRingMap<? super I, O> stateless_iterable_map_h ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -741,7 +743,7 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(CursorRookMap)} except that the view shows elements
+	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the iterators returned by the argument {@code stateless_iterator_map_h}.
 	 * </p>
 	 * 
@@ -758,7 +760,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapIterator(
-			IteratorRookMap<? super I, O> stateless_iterator_map_h ) {
+			IteratorRingMap<? super I, O> stateless_iterator_map_h ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -803,7 +805,7 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(CursorRookMap)} except that the view shows elements
+	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the optionals returned by the argument {@code stateless_optional_map_h}.
 	 * </p>
 	 * 
@@ -820,7 +822,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapOptional(
-			OptionalRookMap<? super I, O> stateless_optional_map_h )
+			OptionalRingMap<? super I, O> stateless_optional_map_h )
 			throws IllegalStateException {
 		return wrap( new Cursable<O>( ) {
 
@@ -835,7 +837,7 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #flatmapCursor(CursorRookMap)} except that the view shows elements
+	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the streams returned by the argument {@code stateless_stream_map_h}.
 	 * </p>
 	 * 
@@ -852,7 +854,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> flatmapStream(
-			StreamRookMap<? super I, O> stateless_stream_map_h ) {
+			StreamRingMap<? super I, O> stateless_stream_map_h ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -970,7 +972,7 @@ public class KnittingCursable<I> implements
 	 * Each invocation of {@link #pull(Rook)} on the returned
 	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
 	 * cursable, transforms it using
-	 * {@link KnittingCursor#map(Rook, RookFunction)} with the rook already
+	 * {@link KnittingCursor#map(Rook, RingFunction)} with the rook already
 	 * available and the argument {@code stateless_function_h}, then returns the
 	 * resulting cursor.
 	 * </p>
@@ -988,7 +990,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			map( RookFunction<? super I, O> stateless_function_h ) {
+			map( RingFunction<? super I, O> stateless_function_h ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -1002,8 +1004,8 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view that, for each element of this cursable, provides a
-	 * {@linkplain org.github.evenjn.yarn.Bi pair} containing the element itself
-	 * and the number of elements preceding it.
+	 * {@link org.github.evenjn.knit.Numbered Numbered} wrapper, containing the
+	 * element itself and the number of elements preceding it.
 	 * </p>
 	 * 
 	 * <p>
@@ -1011,15 +1013,16 @@ public class KnittingCursable<I> implements
 	 * </p>
 	 * 
 	 * @return A view that, for each element of this cursable, provides a
-	 *         {@linkplain org.github.evenjn.yarn.Bi pair} containing the element
-	 *         itself and the number of elements preceding it.
+	 *         {@link org.github.evenjn.knit.Numbered Numbered} wrapper,
+	 *         containing the element itself and the number of elements preceding
+	 *         it.
 	 * @since 1.0
 	 */
-	public KnittingCursable<Bi<I, Integer>> numbered( ) {
-		return wrap( new Cursable<Bi<I, Integer>>( ) {
+	public KnittingCursable<Numbered<I>> numbered( ) {
+		return wrap( new Cursable<Numbered<I>>( ) {
 
 			@Override
-			public Cursor<Bi<I, Integer>> pull( Rook rook ) {
+			public Cursor<Numbered<I>> pull( Rook rook ) {
 				return new NumberedCursor<>( wrapped.pull( rook ) );
 			}
 		} );
@@ -1172,8 +1175,8 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorPurler)} except that the view shows elements
-	 * in arrays returned by {@link ArrayPurl} objects supplied by the argument
+	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
+	 * arrays returned by {@link ArrayPurl} objects supplied by the argument
 	 * {@code factory}.
 	 * </p>
 	 * 
@@ -1204,9 +1207,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorPurler)} except that the view shows elements
-	 * in cursables returned by {@link CursablePurl} objects supplied by the
-	 * argument {@code factory}.
+	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
+	 * cursables returned by {@link CursablePurl} objects supplied by the argument
+	 * {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1236,9 +1239,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorRookPurler)} except that the view shows
-	 * elements in arrays returned by {@link CursableRookPurl} objects supplied by
-	 * the argument {@code factory}.
+	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
+	 * in arrays returned by {@link CursableRingPurl} objects supplied by the
+	 * argument {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1247,15 +1250,15 @@ public class KnittingCursable<I> implements
 	 * 
 	 * @param <O>
 	 *          The type of elements in cursables returned by
-	 *          {@link CursableRookPurl} objects supplied by the argument
+	 *          {@link CursableRingPurl} objects supplied by the argument
 	 *          {@code factory}.
 	 * @param factory
-	 *          A supplier of {@link CursableRookPurl} objects.
+	 *          A supplier of {@link CursableRingPurl} objects.
 	 * @return A complex view.
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			purlCursable( CursableRookPurler<? super I, O> factory ) {
+			purlCursable( CursableRingPurler<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -1327,9 +1330,9 @@ public class KnittingCursable<I> implements
 	 * <p>
 	 * In detail, when the client invokes {@link Cursable#pull(Rook) pull} on the
 	 * returned cursable, that cursable pulls a new {@link KnittingCursor} from
-	 * this cursable, then it obtains a new {@link CursorRookPurl} from the
+	 * this cursable, then it obtains a new {@link CursorRingPurl} from the
 	 * argument {@code factory}, and finally returns the cursor obtained by
-	 * invoking {@link KnittingCursor#purlCursor(Rook, CursorRookPurl)
+	 * invoking {@link KnittingCursor#purlCursor(Rook, CursorRingPurl)
 	 * purlCursable} using the argument purl.
 	 * </p>
 	 * 
@@ -1339,16 +1342,16 @@ public class KnittingCursable<I> implements
 	 * 
 	 * 
 	 * @param <O>
-	 *          The type of elements in cursors produced by {@link CursorRookPurl}
+	 *          The type of elements in cursors produced by {@link CursorRingPurl}
 	 *          objects supplied by the argument {@code factory}.
 	 * 
 	 * @param factory
-	 *          A supplier of {@link CursorRookPurl} objects.
+	 *          A supplier of {@link CursorRingPurl} objects.
 	 * @return A complex view.
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			purlCursor( CursorRookPurler<? super I, O> factory ) {
+			purlCursor( CursorRingPurler<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -1363,9 +1366,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorPurler)} except that the view shows elements
-	 * in iterables returned by {@link IterablePurl} objects supplied by the
-	 * argument {@code factory}.
+	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
+	 * iterables returned by {@link IterablePurl} objects supplied by the argument
+	 * {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1395,9 +1398,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorRookPurler)} except that the view shows
-	 * elements in iterables returned by {@link IterableRookPurl} objects supplied
-	 * by the argument {@code factory}.
+	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
+	 * in iterables returned by {@link IterableRingPurl} objects supplied by the
+	 * argument {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1406,15 +1409,15 @@ public class KnittingCursable<I> implements
 	 * 
 	 * @param <O>
 	 *          The type of elements in iterables returned by
-	 *          {@link IterableRookPurl} objects supplied by the argument
+	 *          {@link IterableRingPurl} objects supplied by the argument
 	 *          {@code factory}.
 	 * @param factory
-	 *          A supplier of {@link IterableRookPurl} objects.
+	 *          A supplier of {@link IterableRingPurl} objects.
 	 * @return A complex view.
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			purlIterable( IterableRookPurler<? super I, O> factory ) {
+			purlIterable( IterableRingPurler<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -1428,9 +1431,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorPurler)} except that the view shows elements
-	 * in iterators returned by {@link IteratorPurl} objects supplied by the
-	 * argument {@code factory}.
+	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
+	 * iterators returned by {@link IteratorPurl} objects supplied by the argument
+	 * {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1460,9 +1463,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorRookPurler)} except that the view shows
-	 * elements in iterators returned by {@link IteratorRookPurl} objects supplied
-	 * by the argument {@code factory}.
+	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
+	 * in iterators returned by {@link IteratorRingPurl} objects supplied by the
+	 * argument {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1471,15 +1474,15 @@ public class KnittingCursable<I> implements
 	 * 
 	 * @param <O>
 	 *          The type of elements in iterators returned by
-	 *          {@link IteratorRookPurl} objects supplied by the argument
+	 *          {@link IteratorRingPurl} objects supplied by the argument
 	 *          {@code factory}.
 	 * @param factory
-	 *          A supplier of {@link IteratorRookPurl} objects.
+	 *          A supplier of {@link IteratorRingPurl} objects.
 	 * @return A complex view.
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			purlIterator( IteratorRookPurler<? super I, O> factory ) {
+			purlIterator( IteratorRingPurler<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override
@@ -1493,9 +1496,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorPurler)} except that the view shows elements
-	 * in optionals returned by {@link OptionalPurl} objects supplied by the
-	 * argument {@code factory}.
+	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
+	 * optionals returned by {@link OptionalPurl} objects supplied by the argument
+	 * {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1526,9 +1529,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorRookPurler)} except that the view shows
-	 * elements in optionals returned by {@link OptionalRookPurl} objects supplied
-	 * by the argument {@code factory}.
+	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
+	 * in optionals returned by {@link OptionalRingPurl} objects supplied by the
+	 * argument {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1537,15 +1540,15 @@ public class KnittingCursable<I> implements
 	 * 
 	 * @param <O>
 	 *          The type of elements in optionals returned by
-	 *          {@link OptionalRookPurl} objects supplied by the argument
+	 *          {@link OptionalRingPurl} objects supplied by the argument
 	 *          {@code factory}.
 	 * @param factory
-	 *          A supplier of {@link OptionalRookPurl} objects.
+	 *          A supplier of {@link OptionalRingPurl} objects.
 	 * @return A complex view.
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O> purlOptional(
-			OptionalRookPurler<? super I, O> factory )
+			OptionalRingPurler<? super I, O> factory )
 			throws IllegalStateException {
 		return wrap( new Cursable<O>( ) {
 
@@ -1560,9 +1563,9 @@ public class KnittingCursable<I> implements
 	/**
 	 * <p>
 	 * Returns a view realizing the same transformation as
-	 * {@link #purlCursor(CursorRookPurler)} except that the view shows
-	 * elements in streams returned by {@link StreamRookPurl} objects supplied by
-	 * the argument {@code factory}.
+	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
+	 * in streams returned by {@link StreamRingPurl} objects supplied by the
+	 * argument {@code factory}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1570,15 +1573,15 @@ public class KnittingCursable<I> implements
 	 * </p>
 	 * 
 	 * @param <O>
-	 *          The type of elements in streams returned by {@link StreamRookPurl}
+	 *          The type of elements in streams returned by {@link StreamRingPurl}
 	 *          objects supplied by the argument {@code factory}.
 	 * @param factory
-	 *          A supplier of {@link StreamRookPurl} objects.
+	 *          A supplier of {@link StreamRingPurl} objects.
 	 * @return A complex view.
 	 * @since 1.0
 	 */
 	public <O> KnittingCursable<O>
-			purlStream( StreamRookPurler<? super I, O> factory ) {
+			purlStream( StreamRingPurler<? super I, O> factory ) {
 		return wrap( new Cursable<O>( ) {
 
 			@Override

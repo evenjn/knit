@@ -29,7 +29,7 @@ import java.util.ListIterator;
 import java.util.Optional;
 
 import org.github.evenjn.knit.DiffOp.Operation;
-import org.github.evenjn.yarn.Equivalencer;
+import org.github.evenjn.lang.Equivalencer;
 
 class Diff {
 	
@@ -124,7 +124,7 @@ class Diff {
       }
     }
     else {
-      Optional<Integer> opt = text2.findSubtuple(text1, 0, equivalencer.transpose( ));
+      Optional<Integer> opt = text2.findSubtuple(text1, 0, equivalencer.swap( ));
       if (opt.isPresent()) {
       	int i = opt.get();
         // Shorter text is inside the longer text (speedup).
@@ -322,7 +322,7 @@ class Diff {
           }
           if (both_types) {
             // Factor out any common prefixies.
-            commonlength = text_insert.longestCommonPrefix(text_delete, equivalencer.transpose());
+            commonlength = text_insert.longestCommonPrefix(text_delete, equivalencer.swap());
             if (commonlength != 0) {
               if (pointer.hasPrevious()) {
                 thisDiff = pointer.previous();
@@ -341,7 +341,7 @@ class Diff {
               text_delete = text_delete.headless(commonlength);
             }
             // Factor out any common suffixies.
-            commonlength = text_insert.longestCommonSuffix(text_delete, equivalencer.transpose());
+            commonlength = text_insert.longestCommonSuffix(text_delete, equivalencer.swap());
             if (commonlength != 0) {
               thisDiff = pointer.next();
               assert thisDiff.getOperation() == Operation.EQUAL

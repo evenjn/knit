@@ -1,7 +1,7 @@
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Bi;
-import org.github.evenjn.yarn.Equivalencer;
+import org.github.evenjn.lang.Bi;
+import org.github.evenjn.lang.Equivalencer;
 
 /**
  * An implementation of {@link org.github.evenjn.yarn.Di Di}.

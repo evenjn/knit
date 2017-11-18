@@ -26,7 +26,7 @@ public class DistanceTest {
 	@Test
 	public void test( ) {
 		KnittingTuple<Integer> t1 = KnittingTuple.on( 1, 2, 3, 4 );
-		KnittingTuple<Integer> t2 = KnittingTuple.on( 1, 2, 3, 4, 5 );
+//		KnittingTuple<Integer> t2 = KnittingTuple.on( 1, 2, 3, 4, 5 );
 
 		assertEquals( "distance", 0,
 				t1.distance( KnittingTuple.on( 1, 2, 3, 4 ) ) );
@@ -43,11 +43,32 @@ public class DistanceTest {
 		assertEquals( "distance", 4,
 				t1.distance( KnittingTuple.on( 4, 9, 9, 9 ) ) );
 
+		/*
 		assertEquals( "distance", 1,
 				t1.distanceAll( KnittingTuple.on( KnittingTuple.on( 1, 2, 3, 5 ) ) ) );
 
 		assertEquals( "distance", 1,
 				t1.distanceAll( KnittingTuple.on( KnittingTuple.on( 1, 2, 3 ) ) ) );
+		
+		
+		
+
+		assertEquals( "distance", 0,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 1, 2, 3, 4 ) ) ));
+		assertEquals( "distance", 1,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 1, 2, 3, 4, 5 ) ) ));
+		assertEquals( "distance", 2,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 1, 2, 3, 4, 5, 5 ) ) ));
+		assertEquals( "distance", 3,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 0, 2, 3, 4, 5, 5 ) ) ));
+		assertEquals( "distance", 4,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 0, 2, 3, 1, 1, 4, 5 ) ) ));
+		assertEquals( "distance", 2,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 2, 1, 3, 4 ) ) ));
+		
+		assertEquals( "distance", 4,
+				t1.distanceAll( KnittingTuple.on(KnittingTuple.on( 4, 9, 9, 9 ) ) ));
+		
 
 		assertEquals( "distance", 1, t1.distanceAll( KnittingTuple.on(
 				KnittingTuple.on( 1, 2, 3 ),
@@ -141,6 +162,7 @@ public class DistanceTest {
 				KnittingTuple.on( 1, 2, 3, 4, 4, 5 ) ) ) );
 		assertEquals( "distance", 2, t2.distanceAll( KnittingTuple.on(
 				KnittingTuple.on( 1, 2, 3, 3, 4, 4, 5 ) ) ) );
+				*/
 	}
 
 }

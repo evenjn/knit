@@ -24,7 +24,7 @@ import static org.github.evenjn.knit.Diff.adiff_main_nc;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.Tuple;
+import org.github.evenjn.lang.Tuple;
 
 import name.fraser.neil.plaintext.diff_match_patch;
 import name.fraser.neil.plaintext.diff_match_patch.Diff;

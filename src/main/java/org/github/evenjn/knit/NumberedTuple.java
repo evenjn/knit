@@ -17,11 +17,10 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Bi;
-import org.github.evenjn.yarn.Tuple;
+import org.github.evenjn.lang.Tuple;
 
 class NumberedTuple<I> implements
-		Tuple<Bi<I, Integer>> {
+		Tuple<Numbered<I>> {
 
 	private Tuple<I> base;
 
@@ -30,8 +29,8 @@ class NumberedTuple<I> implements
 	}
 
 	@Override
-	public Bi<I, Integer> get( int index ) {
-		return BiTray.nu( base.get( index ), index );
+	public Numbered<I> get( int index ) {
+		return new Numbered<I>( base.get( index ), index );
 	}
 
 	@Override

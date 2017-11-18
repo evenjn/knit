@@ -17,7 +17,7 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Bi;
+import org.github.evenjn.lang.Bi;
 
 /**
  * An implementation of {@link org.github.evenjn.yarn.Bi Bi} that provides a

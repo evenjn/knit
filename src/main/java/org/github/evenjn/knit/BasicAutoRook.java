@@ -20,8 +20,6 @@ package org.github.evenjn.knit;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import org.github.evenjn.yarn.AutoRook;
-
 /**
  * A simple implementation of {@link org.github.evenjn.yarn.AutoRook AutoRook}.
  *

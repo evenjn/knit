@@ -36,10 +36,10 @@
 
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.BiOption;
+import org.github.evenjn.lang.BiOptional;
 
-public class BiOptionTray<F, B> implements
-		BiOption<F, B> {
+public class BiOptionalTray<F, B> implements
+		BiOptional<F, B> {
 
 	private boolean has_front = false;
 
@@ -88,9 +88,9 @@ public class BiOptionTray<F, B> implements
 		return back;
 	}
 
-	public static <F, B> BiOptionTray<F, B> nu( F front, B back, boolean has_front,
+	public static <F, B> BiOptionalTray<F, B> nu( F front, B back, boolean has_front,
 			boolean has_back ) {
-		BiOptionTray<F, B> dp = new BiOptionTray<>( );
+		BiOptionalTray<F, B> dp = new BiOptionalTray<>( );
 		dp.front = front;
 		dp.back = back;
 		if ( !has_back && !has_front ) {

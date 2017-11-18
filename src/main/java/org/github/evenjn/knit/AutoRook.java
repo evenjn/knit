@@ -17,25 +17,23 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Cursor;
-import org.github.evenjn.yarn.EndOfCursorException;
+import org.github.evenjn.lang.Rook;
 
-class NumberedCursor<I> implements
-		Cursor<Numbered<I>> {
+/**
+ * <p>
+ * An {@code AutoRook} is an {@linkplain java.lang.AutoCloseable autocloseable}
+ * {@linkplain org.github.evenjn.lang.Rook rook}.
+ * </p>
+ * 
+ * <p>
+ * This class is part of package {@link org.github.evenjn.lang Lang}.
+ * </p>
+ * 
+ * @since 1.0
+ */
+public interface AutoRook extends
+		Rook,
+		AutoCloseable {
 
-	private final Cursor<I> wrapped;
-
-	NumberedCursor(Cursor<I> cursor) {
-		wrapped = cursor;
-	}
-
-	private int i;
-
-	@Override
-	public Numbered<I> next( )
-			throws EndOfCursorException {
-		I next = wrapped.next( );
-		return new Numbered<I>( next, i++ );
-	}
-
+	void close( );
 }

@@ -17,12 +17,12 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.BiOption;
+import org.github.evenjn.lang.BiOptional;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
 class DiffIterator<F, B> implements
-		Cursor<BiOption<F, B>> {
+		Cursor<BiOptional<F, B>> {
 
 	private final KnittingCursor<DiffOp<F, B>> kd;
 
@@ -41,7 +41,7 @@ class DiffIterator<F, B> implements
 
 	private DiffOp<F, B> current = null;
 
-	private BiOptionTray<F, B> tray;
+	private BiOptionalTray<F, B> tray;
 
 	private int original_start;
 
@@ -52,7 +52,7 @@ class DiffIterator<F, B> implements
 	private int revised_length;
 
 	@Override
-	public BiOption<F, B> next( )
+	public BiOptional<F, B> next( )
 			throws EndOfCursorException {
 
 		if ( current == null && kd.hasNext( ) ) {
@@ -76,7 +76,7 @@ class DiffIterator<F, B> implements
 		if ( current != null ) {
 			switch ( current.getOperation( ) ) {
 				case INSERT:
-					tray = BiOptionTray.nu( null, kc_back.next( ), false, true );
+					tray = BiOptionalTray.nu( null, kc_back.next( ), false, true );
 					revised_length--;
 					if ( revised_length == 0 ) {
 						current = null;
@@ -84,7 +84,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case EQUAL:
-					tray = BiOptionTray.nu( kc_front.next( ), kc_back.next( ), true, true );
+					tray = BiOptionalTray.nu( kc_front.next( ), kc_back.next( ), true, true );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -97,7 +97,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case DELETE:
-					tray = BiOptionTray.nu( kc_front.next( ), null, true, false );
+					tray = BiOptionalTray.nu( kc_front.next( ), null, true, false );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;

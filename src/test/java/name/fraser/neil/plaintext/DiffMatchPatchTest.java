@@ -23,8 +23,6 @@
 
 package name.fraser.neil.plaintext;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +32,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import junit.framework.TestCase;
 import name.fraser.neil.plaintext.diff_match_patch.Diff;
 import name.fraser.neil.plaintext.diff_match_patch.LinesToCharsResult;
 import name.fraser.neil.plaintext.diff_match_patch.Patch;
@@ -455,6 +454,11 @@ public class DiffMatchPatchTest extends TestCase {
 
     diffs = diffList(new Diff(DELETE, "abc"), new Diff(EQUAL, "xyz"), new Diff(INSERT, "1234"));
     assertEquals("Levenshtein with middle equality.", 7, dmp.diff_levenshtein(diffs));
+    
+    /* this is why we don't use this implementation of the Levenshtein distance.
+    diffs =  dmp.diff_main("abc1", "1234", false);
+    assertEquals("Levenshtein with middle equality.", 4, dmp.diff_levenshtein(diffs));
+    */
   }
 
 	@Test

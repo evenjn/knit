@@ -19,7 +19,7 @@ package org.github.evenjn.knit;
 
 import java.util.function.Function;
 
-import org.github.evenjn.yarn.Tuple;
+import org.github.evenjn.lang.Tuple;
 
 class MapTuple<I, O> implements
 		Tuple<O> {
