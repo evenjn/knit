@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.BiOptional;
 import org.github.evenjn.lang.Equivalencer;
 import org.github.evenjn.lang.Ring;
@@ -346,7 +347,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <K extends Collection<? super I>> K collect( K collection ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return this.asKnittingCursor( ).collect( collection );
 		}
 	}
@@ -372,7 +373,7 @@ public class KnittingTuple<I> implements
 	 */
 	public <K extends Consumer<? super I>> void consume(
 			Ring<K> consumer_provider ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			this.asKnittingCursor( ).peek( consumer ).roll( );
 		}
@@ -466,21 +467,22 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * Whenever the front slot of a pair
-	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasFront( ) is filled in}, that
-	 * slot contains an element of this tuple. That element may be {@code null}.
+	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasFront( ) is filled in},
+	 * that slot contains an element of this tuple. That element may be
+	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever the back slot of a pair
-	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBack( ) is filled in}, that
-	 * slot contains an element of the argument tuple. That element may be
+	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBack( ) is filled in},
+	 * that slot contains an element of the argument tuple. That element may be
 	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever both the front slot and the back slot
-	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBoth( ) are filled in}, the
-	 * content of the front slot is equivalent (as specified by the argument
+	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBoth( ) are filled in},
+	 * the content of the front slot is equivalent (as specified by the argument
 	 * {@code equivalencer}) to the content of the second slot. They may be both
 	 * {@code null}.
 	 * </p>
@@ -1309,7 +1311,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public I one( ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return this.asKnittingCursor( ).one( );
 		}
 	}
@@ -1330,7 +1332,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public Optional<I> optionalOne( ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return asKnittingCursor( ).optionalOne( );
 		}
 	}
@@ -1392,7 +1394,7 @@ public class KnittingTuple<I> implements
 	 */
 	public <K> K reduce( K zero, BiFunction<K, I, K> bifunction ) {
 		K reduction = zero;
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			Cursor<I> kc = pull( );
 			try {
 				for ( ;; ) {

@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.Ring;
 import org.github.evenjn.lang.Rook;
 import org.github.evenjn.yarn.Cursor;
@@ -76,17 +77,17 @@ public class compiler_check_override {
 
 		cursable.map( x -> x.substring( 1 ) );
 		cursable.filter( x -> x.isEmpty( ) );
-		
+
 		cursable.flatmapCursor( cursormap );
 		cursable.flatmapCursor( cursorrookmap );
 
 		cursable.flatmapCursor( x -> KnittingCursor.on( 1 ) );
 		cursable.flatmapCursor( ( h, x ) -> KnittingCursor.on( 1 ) );
-		
+
 		Ring<Consumer<String>> ff1 = null;
 		Ring<Consumer<Object>> ff2 = null;
 
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			KnittingCursor<String> pull =
 					KnittingCursor.wrap( cursable.pull( rook ) );
 			pull.peek( System.out::println ).roll( );

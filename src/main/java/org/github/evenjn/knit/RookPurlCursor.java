@@ -17,6 +17,7 @@
  */
 package org.github.evenjn.knit;
 
+import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.Rook;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.CursorRingPurl;
@@ -29,7 +30,7 @@ class RingPurlCursor<I, O> implements
 
 	private final CursorRingPurl<? super I, O> purl;
 
-	private BasicAutoRook internal_rook;
+	private BasicRook internal_rook;
 
 	private final boolean use_internal_rook;
 
@@ -91,7 +92,7 @@ class RingPurlCursor<I, O> implements
 						internal_rook.close( );
 						internal_rook = null;
 					}
-					internal_rook = new BasicAutoRook( );
+					internal_rook = new BasicRook( );
 				}
 				current = purl.next( internal_rook, next );
 			}
@@ -102,7 +103,7 @@ class RingPurlCursor<I, O> implements
 						internal_rook.close( );
 						internal_rook = null;
 					}
-					internal_rook = new BasicAutoRook( );
+					internal_rook = new BasicRook( );
 				}
 				current = purl.end( internal_rook );
 			}

@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.Ring;
 import org.github.evenjn.lang.Rook;
 import org.github.evenjn.lang.Tuple;
@@ -388,7 +389,7 @@ public class KnittingCursor<I> implements
 	public <K extends Collection<? super I>> K collect( K collection )
 			throws IllegalStateException {
 		lock( );
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			try {
 				for ( ;; ) {
 					collection.add( wrapped.next( ) );
@@ -429,7 +430,7 @@ public class KnittingCursor<I> implements
 			consume( Ring<K> consumer_provider )
 					throws IllegalStateException {
 		lock( );
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			for ( ;; ) {
 				consumer.accept( wrapped.next( ) );

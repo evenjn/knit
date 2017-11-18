@@ -22,6 +22,8 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.github.evenjn.lang.Rook;
+
 
 /**
  * An implementation of {@link org.github.evenjn.yarn.AutoRook AutoRook} that
@@ -30,7 +32,7 @@ import java.util.LinkedList;
  * @since 1.0
  */
 public final class DebuggingAutoRook implements
-		AutoRook {
+		AutoCloseable, Rook {
 
 	private boolean closed = false;
 

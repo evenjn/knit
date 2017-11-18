@@ -20,6 +20,8 @@ package org.github.evenjn.knit;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.github.evenjn.lang.Rook;
+
 /**
  * An implementation of AutoRook that returns to the initial state after
  * invoking {@code close()}. In other words, a closed ReusableAutoRook is as
@@ -28,7 +30,8 @@ import java.util.LinkedList;
  * @since 1.0
  */
 public final class ReusableAutoRook implements
-		AutoRook {
+		AutoCloseable,
+		Rook {
 
 	private LinkedList<AutoCloseable> objects_to_close;
 

@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.Equivalencer;
 import org.github.evenjn.lang.Ring;
 import org.github.evenjn.lang.Rook;
@@ -264,7 +265,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public <K extends Collection<? super I>> K collect( K collection ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return pull( rook ).collect( collection );
 		}
 	}
@@ -299,7 +300,7 @@ public class KnittingCursable<I> implements
 	 */
 	public <K extends Consumer<? super I>> void
 			consume( Ring<K> consumer_provider ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			pull( rook ).peek( consumer ).roll( );
 		}
@@ -435,7 +436,7 @@ public class KnittingCursable<I> implements
 		if ( other == this )
 			return true;
 
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			KnittingCursor<I> pull1 = this.pull( rook );
 			KnittingCursor<Y> pull2 = KnittingCursor.wrap( other.pull( rook ) );
 
@@ -1051,7 +1052,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public I one( ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return pull( rook ).one( );
 		}
 	}
@@ -1083,7 +1084,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public Optional<I> optionalOne( ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return pull( rook ).optionalOne( );
 		}
 	}
@@ -1625,7 +1626,7 @@ public class KnittingCursable<I> implements
 	 */
 	public <K> K reduce( K zero, BiFunction<K, I, K> bifunction ) {
 		K reduction = zero;
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			Cursor<I> kc = wrapped.pull( rook );
 			try {
 				for ( ;; ) {
@@ -1651,7 +1652,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public void roll( ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			pull( rook ).roll( );
 		}
 	}
@@ -1674,7 +1675,7 @@ public class KnittingCursable<I> implements
 	 * @since 1.0
 	 */
 	public int count( ) {
-		try ( AutoRook rook = new BasicAutoRook( ) ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
 			return pull( rook ).count( );
 		}
 	}
