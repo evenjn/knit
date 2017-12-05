@@ -4,15 +4,31 @@ import org.github.evenjn.lang.Bi;
 import org.github.evenjn.lang.Equivalencer;
 
 /**
- * An implementation of {@link org.github.evenjn.yarn.Di Di}.
- *
- * @param <A>
+ * 
+ * <h2>Design Notes</h2>
+ * 
+ * <p>
+ * Type {@code BiValueTray} is opaque, generic and non-descriptive. While it is
+ * convenient to use {@code BiValueTray} to develop code quickly, we recommend
+ * that APIs never expose {@code BiValueTray} or types that extends or implement
+ * {@code BiValue}. Instead, we recommend that APIs define their own types that
+ * provide context and explanation for the elements of the pair.
+ * </p>
+ * 
+ * <p>
+ * In particular, for return types, we recommend that APIs expose a custom
+ * interface (that does not extend {@code BiValueTray}) and implementation uses
+ * a private class extending {@code BiValueTray} and implementing the custom
+ * interface.
+ * </p>
+ * 
+ * @param <F>
  *          The type of the object in the <em>front</em> slot.
  * @param <B>
  *          The type of the object in the <em>back</em> slot..
  * @since 1.0
  */
-public final class BiValue<F, B> implements
+public class BiValueTray<F, B> implements
 		Bi<F, B> {
 
 	private final int hash_code;
@@ -25,7 +41,7 @@ public final class BiValue<F, B> implements
 
 	private Equivalencer<B, Object> back_equivalencer;
 
-	private BiValue(
+	protected BiValueTray(
 			F front,
 			B back,
 			Equivalencer<F, Object> front_equivalencer,
@@ -40,12 +56,12 @@ public final class BiValue<F, B> implements
 		this.back = back;
 	}
 
-	public static <F, B> BiValue<F, B> nu(
+	public static <F, B> BiValueTray<F, B> nu(
 			F front,
 			B back,
 			Equivalencer<F, Object> front_equivalencer,
 			Equivalencer<B, Object> back_equivalencer ) {
-		return new BiValue<F, B>( front, back, front_equivalencer,
+		return new BiValueTray<F, B>( front, back, front_equivalencer,
 				back_equivalencer );
 	}
 
@@ -68,9 +84,9 @@ public final class BiValue<F, B> implements
 	public boolean equals( Object other ) {
 		if ( other == this )
 			return true;
-		if ( !( other instanceof BiValue ) )
+		if ( !( other instanceof BiValueTray ) )
 			return false;
-		BiValue<?, ?> o = (BiValue<?, ?>) other;
+		BiValueTray<?, ?> o = (BiValueTray<?, ?>) other;
 		return front_equivalencer.equivalent( front, o.front )
 				&& back_equivalencer.equivalent( back, o.back );
 	}

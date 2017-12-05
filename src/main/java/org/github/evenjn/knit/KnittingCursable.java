@@ -145,6 +145,7 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #asIterator(Rook)}</li>
  * <li>{@link #asStream(Rook)}</li>
  * <li>{@link #crop(Predicate)}</li>
+ * <li>{@link #cut(Predicate)}</li>
  * <li>{@link #entwine(Cursable, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
  * <li>{@link #flatmapArray(ArrayMap)}</li>
@@ -291,15 +292,11 @@ public class KnittingCursable<I> implements
 	 * This is a rolling method.
 	 * </p>
 	 * 
-	 * @param <K>
-	 *          The type of consumer returned by the argument
-	 *          {@code consumer_provider}.
 	 * @param consumer_provider
 	 *          A system that provides a consumer.
 	 * @since 1.0
 	 */
-	public <K extends Consumer<? super I>> void
-			consume( Ring<K> consumer_provider ) {
+	public void consume( Ring<? extends Consumer<? super I>> consumer_provider ) {
 		try ( BasicRook rook = new BasicRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			pull( rook ).peek( consumer ).roll( );
@@ -324,6 +321,25 @@ public class KnittingCursable<I> implements
 	public KnittingCursable<KnittingCursor<I>>
 			crop( Predicate<I> stateless_predicate ) {
 		return KnittingCursable.wrap( h -> pull( h ).crop( stateless_predicate ) );
+	}
+
+	/**
+	 * <p>
+	 * Returns a cursable where each element is a cursor providing access to a
+	 * subsequence of contiguous elements that would recontsruct the original
+	 * cursable if concatenated.
+	 * </p>
+	 * 
+	 * @param stateful_predicate
+	 *          A stateful system that identifies elements that mark beginning of
+	 *          a new element of the partition.
+	 * @return a cursable where each element is a cursor providing access to a
+	 *         partition of the elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<KnittingCursor<I>>
+			cut( Predicate<I> stateful_predicate ) {
+		return KnittingCursable.wrap( h -> pull( h ).cut( stateful_predicate ) );
 	}
 
 	/**

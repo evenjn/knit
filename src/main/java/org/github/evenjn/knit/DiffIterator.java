@@ -17,12 +17,27 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.lang.BiOptional;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
+class DiffPairImpl<F, B>
+		extends BiOptionalTray<F, B> implements
+		DiffPair<F, B> {
+
+	protected DiffPairImpl(F front, B back, boolean has_front,
+			boolean has_back) {
+		super( front, back, has_front, has_back );
+	}
+
+	public static <F, B> DiffPairImpl<F, B> nu( F front, B back,
+			boolean has_front,
+			boolean has_back ) {
+		return new DiffPairImpl<F, B>( front, back, has_front, has_back );
+	}
+}
+
 class DiffIterator<F, B> implements
-		Cursor<BiOptional<F, B>> {
+		Cursor<DiffPair<F, B>> {
 
 	private final KnittingCursor<DiffOp<F, B>> kd;
 
@@ -41,7 +56,7 @@ class DiffIterator<F, B> implements
 
 	private DiffOp<F, B> current = null;
 
-	private BiOptionalTray<F, B> tray;
+	private DiffPairImpl<F, B> tray;
 
 	private int original_start;
 
@@ -52,7 +67,7 @@ class DiffIterator<F, B> implements
 	private int revised_length;
 
 	@Override
-	public BiOptional<F, B> next( )
+	public DiffPair<F, B> next( )
 			throws EndOfCursorException {
 
 		if ( current == null && kd.hasNext( ) ) {
@@ -76,7 +91,7 @@ class DiffIterator<F, B> implements
 		if ( current != null ) {
 			switch ( current.getOperation( ) ) {
 				case INSERT:
-					tray = BiOptionalTray.nu( null, kc_back.next( ), false, true );
+					tray = DiffPairImpl.nu( null, kc_back.next( ), false, true );
 					revised_length--;
 					if ( revised_length == 0 ) {
 						current = null;
@@ -84,7 +99,8 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case EQUAL:
-					tray = BiOptionalTray.nu( kc_front.next( ), kc_back.next( ), true, true );
+					tray = DiffPairImpl.nu( kc_front.next( ), kc_back.next( ), true,
+							true );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;
@@ -97,7 +113,7 @@ class DiffIterator<F, B> implements
 					revised_start++;
 					break;
 				case DELETE:
-					tray = BiOptionalTray.nu( kc_front.next( ), null, true, false );
+					tray = DiffPairImpl.nu( kc_front.next( ), null, true, false );
 					original_length--;
 					if ( original_length == 0 ) {
 						current = null;

@@ -38,6 +38,36 @@ package org.github.evenjn.knit;
 
 import org.github.evenjn.lang.BiOptional;
 
+/**
+ * <p>
+ * A {@code BiOptional} object is an object that may have empty slots. The
+ * content of an empty slot is {@code null}.
+ * </p>
+ * 
+ * <h2>Design Notes</h2>
+ * 
+ * <p>
+ * Type {@code BiOptionalTray} is opaque, generic and non-descriptive. While it
+ * is convenient to use {@code BiOptionalTray} to develop code quickly, we
+ * recommend that APIs never expose {@code BiOptionalTray} or types that extends
+ * or implement {@code BiOptionalTray}. Instead, we recommend that APIs define
+ * their own types that provide context and explanation for the elements of the
+ * pair.
+ * </p>
+ * 
+ * <p>
+ * In particular, for return types, we recommend that APIs expose a custom
+ * interface (that does not extend {@code BiOptionalTray}) and implementation
+ * uses a private class extending {@code BiOptionalTray} and implementing the
+ * custom interface.
+ * </p>
+ *
+ * @param <F>
+ *          The type of the object in the <em>front</em> slot.
+ * @param <B>
+ *          The type of the object in the <em>back</em> slot.
+ * @since 1.0
+ */
 public class BiOptionalTray<F, B> implements
 		BiOptional<F, B> {
 
@@ -78,27 +108,37 @@ public class BiOptionalTray<F, B> implements
 		return has_back;
 	}
 
-	@Override
+	/**
+	 * @return The object in the <em>front</em> slot.
+	 * @since 1.0
+	 */
 	public F front( ) {
 		return front;
 	}
 
-	@Override
+	/**
+	 * @return The object in the <em>back</em> slot.
+	 * @since 1.0
+	 */
 	public B back( ) {
 		return back;
 	}
 
-	public static <F, B> BiOptionalTray<F, B> nu( F front, B back, boolean has_front,
-			boolean has_back ) {
-		BiOptionalTray<F, B> dp = new BiOptionalTray<>( );
-		dp.front = front;
-		dp.back = back;
+	protected BiOptionalTray(F front, B back, boolean has_front,
+			boolean has_back) {
+		this.front = front;
+		this.back = back;
 		if ( !has_back && !has_front ) {
 			throw new IllegalArgumentException( );
 		}
-		dp.has_back = has_back;
-		dp.has_front = has_front;
-		return dp;
+		this.has_back = has_back;
+		this.has_front = has_front;
+	}
+
+	public static <F, B> BiOptionalTray<F, B> nu( F front, B back,
+			boolean has_front,
+			boolean has_back ) {
+		return new BiOptionalTray<F, B>( front, back, has_front, has_back );
 	}
 
 	private F front;

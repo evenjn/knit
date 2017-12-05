@@ -28,7 +28,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.github.evenjn.lang.BasicRook;
-import org.github.evenjn.lang.BiOptional;
 import org.github.evenjn.lang.Equivalencer;
 import org.github.evenjn.lang.Ring;
 import org.github.evenjn.lang.Tuple;
@@ -364,15 +363,11 @@ public class KnittingTuple<I> implements
 	 * slots.
 	 * </p>
 	 * 
-	 * @param <K>
-	 *          The type of consumer returned by the argument
-	 *          {@code consumer_provider}.
 	 * @param consumer_provider
 	 *          A system that provides a consumer.
 	 * @since 1.0
 	 */
-	public <K extends Consumer<? super I>> void consume(
-			Ring<K> consumer_provider ) {
+	public void consume( Ring<? extends Consumer<? super I>> consumer_provider ) {
 		try ( BasicRook rook = new BasicRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			this.asKnittingCursor( ).peek( consumer ).roll( );
@@ -445,14 +440,14 @@ public class KnittingTuple<I> implements
 	 * @return An alignment of this tuple with the argument tuple.
 	 * @since 1.0
 	 */
-	public <Y> Iterable<BiOptional<I, Y>> diff( Tuple<Y> other ) {
+	public <Y> Iterable<DiffPair<I, Y>> diff( Tuple<Y> other ) {
 		return diff( other, getNullEquivalencer( ) );
 	}
 
 	/**
 	 * <p>
 	 * Returns an alignment of this tuple with the argument tuple, represented as
-	 * a list of {@link org.github.evenjn.yarn.BiOptional pairs}.
+	 * a list of {@link org.github.evenjn.knit.DiffPair pairs}.
 	 * </p>
 	 * 
 	 * <p>
@@ -467,21 +462,21 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * Whenever the front slot of a pair
-	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasFront( ) is filled in},
+	 * {@linkplain org.github.evenjn.knit.DiffPair#hasFront( ) is filled in},
 	 * that slot contains an element of this tuple. That element may be
 	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever the back slot of a pair
-	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBack( ) is filled in},
+	 * {@linkplain org.github.evenjn.knit.DiffPair#hasBack( ) is filled in},
 	 * that slot contains an element of the argument tuple. That element may be
 	 * {@code null}.
 	 * </p>
 	 * 
 	 * <p>
 	 * Whenever both the front slot and the back slot
-	 * {@linkplain org.github.evenjn.yarn.BiOptional#hasBoth( ) are filled in},
+	 * {@linkplain org.github.evenjn.knit.DiffPair#hasBoth( ) are filled in},
 	 * the content of the front slot is equivalent (as specified by the argument
 	 * {@code equivalencer}) to the content of the second slot. They may be both
 	 * {@code null}.
@@ -519,7 +514,7 @@ public class KnittingTuple<I> implements
 	 * @return An alignment of this tuple with the argument tuple.
 	 * @since 1.0
 	 */
-	public <Y> Iterable<BiOptional<I, Y>> diff(
+	public <Y> Iterable<DiffPair<I, Y>> diff(
 			Tuple<Y> other,
 			Equivalencer<I, Y> equivalencer ) {
 		return new DiffIterable<I, Y>( this, other, equivalencer );
@@ -1030,7 +1025,7 @@ public class KnittingTuple<I> implements
 			Tuple<Y> tuple,
 			Equivalencer<I, Y> equivalencer ) {
 		ArrayList<I> result = new ArrayList<>( );
-		for ( BiOptional<I, Y> bi : diff( tuple, equivalencer ) ) {
+		for ( DiffPair<I, Y> bi : diff( tuple, equivalencer ) ) {
 			if ( bi.hasBoth( ) ) {
 				result.add( bi.front( ) );
 			}
@@ -1112,7 +1107,7 @@ public class KnittingTuple<I> implements
 		for ( Tuple<Y> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
 
 			int j = 0;
-			for ( BiOptional<I, Y> bi : diff( single_mask, equivalencer ) ) {
+			for ( DiffPair<I, Y> bi : diff( single_mask, equivalencer ) ) {
 				if ( bi.hasFront( ) ) {
 					if ( !bi.hasBoth( ) ) {
 						keeps.set( j, false );
@@ -1199,7 +1194,7 @@ public class KnittingTuple<I> implements
 		for ( Tuple<Y> single_mask : KnittingCursor.wrap( masks ).once( ) ) {
 
 			int j = 0;
-			for ( BiOptional<I, Y> bi : diff( single_mask, equivalencer ) ) {
+			for ( DiffPair<I, Y> bi : diff( single_mask, equivalencer ) ) {
 				if ( bi.hasFront( ) ) {
 					if ( !bi.hasBoth( ) ) {
 						keeps.set( j, false );

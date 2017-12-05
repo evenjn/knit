@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.github.evenjn.lang.BasicRook;
+import org.github.evenjn.lang.Equivalencer;
 import org.github.evenjn.lang.Ring;
 import org.github.evenjn.lang.Rook;
 import org.github.evenjn.lang.Tuple;
@@ -134,6 +135,7 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #asIterator()}</li>
  * <li>{@link #asStream()}</li>
  * <li>{@link #crop(Predicate)}</li>
+ * <li>{@link #cut(Predicate)}</li>
  * <li>{@link #entwine(Cursor, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
  * <li>{@link #flatmapArray(ArrayMap)}</li>
@@ -417,18 +419,14 @@ public class KnittingCursor<I> implements
 	 * This is a rolling method.
 	 * </p>
 	 * 
-	 * @param <K>
-	 *          The type of consumer returned by the argument
-	 *          {@code consumer_provider}.
 	 * @param consumer_provider
 	 *          A system that provides a consumer
 	 * @throws IllegalStateException
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	public <K extends Consumer<? super I>> void
-			consume( Ring<K> consumer_provider )
-					throws IllegalStateException {
+	public void consume( Ring<? extends Consumer<? super I>> consumer_provider )
+			throws IllegalStateException {
 		lock( );
 		try ( BasicRook rook = new BasicRook( ) ) {
 			Consumer<? super I> consumer = consumer_provider.get( rook );
@@ -500,7 +498,85 @@ public class KnittingCursor<I> implements
 					throws IllegalStateException {
 		lock( );
 		return KnittingCursor
-				.wrap( new SplitCursor<I>( wrapped, stateless_predicate.negate( ) ) );
+				.wrap( new CropCursor<I>( wrapped, stateless_predicate.negate( ) ) );
+	}
+
+	/**
+	 * <p>
+	 * Returns a cursor where each element is a cursor providing access to a
+	 * subsequence of contiguous elements that would recontsruct the original
+	 * cursor if concatenated.
+	 * </p>
+	 * 
+	 * @param stateful_predicate
+	 *          A stateful system that identifies elements that mark beginning of
+	 *          a new element of the partition.
+	 * @return a cursor where each element is a cursor providing access to a
+	 *         partition of the elements in this cursor.
+	 * @throws IllegalStateException
+	 *           when this cursor is not in pristine state.
+	 * @since 1.0
+	 */
+	public KnittingCursor<KnittingCursor<I>>
+			cut( Predicate<I> stateful_predicate )
+					throws IllegalStateException {
+		lock( );
+		return KnittingCursor
+				.wrap( new CutCursor<I>( wrapped, stateful_predicate ) );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view showing only the elements which are not equal to other
+	 * elements appearing before them. Each invocation might require as much
+	 * memory as necessary to store the entire content of the cursor in a hashset.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @return A view showing only the elements which are not equal to other
+	 *         elements appearing before them.
+	 * 
+	 * @throws IllegalStateException
+	 *           when this cursor is not in pristine state.
+	 * @since 1.0
+	 */
+	public KnittingCursor<I> distinct( )
+			throws IllegalStateException {
+		lock( );
+		return wrap( new DistinctNonEqualCursor<I>( wrapped ) );
+	}
+
+	/**
+	 * <p>
+	 * Returns a view showing only the elements which are not equivalent to other
+	 * elements appearing before them. Each invocation might require as much
+	 * memory as necessary to store the entire content of the cursor in a hashset.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param hasher
+	 *          A function that assigns equal integers to equivalent objects.
+	 * @param equivalencer
+	 *          An equivalencer.
+	 * @return A view showing only the elements which are not equivalent to other
+	 *         elements appearing before them.
+	 * 
+	 * @throws IllegalStateException
+	 *           when this cursor is not in pristine state.
+	 * @since 1.0
+	 */
+	public KnittingCursor<I> distinct( Function<I, Integer> hasher,
+			Equivalencer<I, Object> equivalencer )
+			throws IllegalStateException {
+		lock( );
+		return wrap( new DistinctNonEquivalentCursor<I>(
+				wrapped, hasher, equivalencer ) );
 	}
 
 	/**

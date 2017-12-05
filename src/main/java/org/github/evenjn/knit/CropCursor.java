@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
-class SplitCursor<K> implements
+class CropCursor<K> implements
 		Cursor<KnittingCursor<K>> {
 
 	private final Predicate<K> predicate;
@@ -31,9 +31,9 @@ class SplitCursor<K> implements
 
 	private KnittingCursor<K> mono = null;
 
-	private SegmentCursor<K> sc = null;
+	private CropSegmentCursor<K> sc = null;
 
-	public SplitCursor(Cursor<K> cursor, Predicate<K> predicate) {
+	public CropCursor(Cursor<K> cursor, Predicate<K> predicate) {
 		this.predicate = predicate;
 		this.kc = KnittingCursor.wrap( cursor );
 	}
@@ -52,13 +52,13 @@ class SplitCursor<K> implements
 				throw EndOfCursorException.neo();
 			}
 		}
-		sc = new SegmentCursor<>( kc, predicate );
+		sc = new CropSegmentCursor<>( kc, predicate );
 		mono = KnittingCursor.wrap( sc );
 		return mono;
 	}
 }
 
-class SegmentCursor<K> implements
+class CropSegmentCursor<K> implements
 		Cursor<K> {
 
 	private final Predicate<K> predicate;
@@ -67,7 +67,7 @@ class SegmentCursor<K> implements
 
 	private boolean end_on_separator = false;
 
-	public SegmentCursor(KnittingCursor<K> cursor, Predicate<K> predicate) {
+	public CropSegmentCursor(KnittingCursor<K> cursor, Predicate<K> predicate) {
 		this.predicate = predicate;
 		if ( cursor == null )
 			throw new IllegalArgumentException( );

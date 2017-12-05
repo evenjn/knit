@@ -23,22 +23,41 @@ import org.github.evenjn.lang.Bi;
  * An implementation of {@link org.github.evenjn.yarn.Bi Bi} that provides a
  * method to {@link #set(Object, Object) set} elements.
  *
- * @param <A>
+ * <h2>Design Notes</h2>
+ * 
+ * <p>
+ * Type {@code BiTray} is opaque, generic and non-descriptive. While it is
+ * convenient to use {@code BiTray} to develop code quickly, we recommend that
+ * APIs never expose {@code BiTray} or types that extends or implement
+ * {@code BiTray}. Instead, we recommend that APIs define their own types that
+ * provide context and explanation for the elements of the pair.
+ * </p>
+ * 
+ * <p>
+ * In particular, for return types, we recommend that APIs expose a custom
+ * interface (that does not extend {@code BiTray}) and implementation
+ * uses a private class extending {@code BiTray} and implementing the
+ * custom interface.
+ * </p>
+ * 
+ * @param <F>
  *          The type of the object in the <em>front</em> slot.
  * @param <B>
  *          The type of the object in the <em>back</em> slot..
  * @since 1.0
  */
-public final class BiTray<A, B> implements
-		Bi<A, B> {
+public class BiTray<F, B> implements
+		Bi<F, B> {
 
-	private BiTray() {
+	protected BiTray(F front, B back) {
+		this.front = front;
+		this.back = back;
 	}
 
 	/**
 	 * Static factory method.
 	 * 
-	 * @param <A>
+	 * @param <F>
 	 *          The type of the object in the <em>front</em> slot.
 	 * @param <B>
 	 *          The type of the object in the <em>back</em> slot.
@@ -50,11 +69,11 @@ public final class BiTray<A, B> implements
 	 *         objects.
 	 * @since 1.0
 	 */
-	public static <A, B> BiTray<A, B> nu( A front, B back ) {
-		return new BiTray<A, B>( ).set( front, back );
+	public static <F, B> BiTray<F, B> nu( F front, B back ) {
+		return new BiTray<F, B>( front, back );
 	}
 
-	private A front;
+	private F front;
 
 	private B back;
 
@@ -70,7 +89,7 @@ public final class BiTray<A, B> implements
 	 *         argument objects.
 	 * @since 1.0
 	 */
-	public BiTray<A, B> set( A front, B back ) {
+	public BiTray<F, B> set( F front, B back ) {
 		this.front = front;
 		this.back = back;
 		return this;
@@ -81,7 +100,7 @@ public final class BiTray<A, B> implements
 	 * @since 1.0
 	 */
 	@Override
-	public A front( ) {
+	public F front( ) {
 		return front;
 	}
 
@@ -100,7 +119,7 @@ public final class BiTray<A, B> implements
 	 * @return a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}.
 	 * @since 1.0
 	 */
-	public Bi<A, B> asBi( ) {
+	public Bi<F, B> asBi( ) {
 		return this;
 	}
 }
