@@ -24,15 +24,15 @@ import java.util.LinkedList;
 
 import org.github.evenjn.lang.Rook;
 
-
 /**
- * An implementation of {@link org.github.evenjn.yarn.AutoRook AutoRook} that
- * prints a warning on standard error when a resource leak is detected.
+ * An implementation of {@link org.github.evenjn.lang.Rook Rook} that prints a
+ * warning on standard error when a resource leak is detected.
  *
  * @since 1.0
  */
 public final class DebuggingAutoRook implements
-		AutoCloseable, Rook {
+		AutoCloseable,
+		Rook {
 
 	private boolean closed = false;
 

@@ -115,13 +115,13 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <p>
  * Rolling methods instantiate a {@link KnittingCursor} by invoking
  * {@link #pull(Rook)} and repeatedly invoke the method
- * {@link KnittingCursor#map(Rook, RookFunction)} typically (but not
+ * {@link KnittingCursor#next()} typically (but not
  * necessarily) until the end is reached. The following methods are rolling:
  * </p>
  * 
  * <ul>
  * <li>{@link #collect(Collection)}</li>
- * <li>{@link #consume(Function)}</li>
+ * <li>{@link #consume(Ring)}</li>
  * <li>{@link #count()}</li>
  * <li>{@link #equivalentTo(Cursable)}</li>
  * <li>{@link #equivalentTo(Cursable, Equivalencer)}</li>
@@ -163,7 +163,7 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
- * <li>{@link #map(RookFunction)}</li>
+ * <li>{@link #map(RingFunction)}</li>
  * <li>{@link #numbered()}</li>
  * <li>{@link #peek(Consumer)}</li>
  * <li>{@link #prepend(Cursable)}</li>

@@ -10,12 +10,16 @@
  * </p>
  * 
  * <ul>
- * <li>{@link org.github.evenjn.knit.BasicAutoRook BasicAutoRook}</li>
  * <li>{@link org.github.evenjn.knit.BiTray BiTray}</li>
+ * <li>{@link org.github.evenjn.knit.BiOptionalTray BiOptionalTray}</li>
+ * <li>{@link org.github.evenjn.knit.BiValueTray BiValueTray}</li>
  * <li>{@link org.github.evenjn.knit.DebuggingAutoRook DebuggingAutoRook}</li>
+ * <li>{@link org.github.evenjn.knit.DiffPair DiffPair}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursable KnittingCursable}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursor KnittingCursor}</li>
  * <li>{@link org.github.evenjn.knit.KnittingTuple KnittingTuple}</li>
+ * <li>{@link org.github.evenjn.knit.Numbered Numbered}</li>
+ * <li>{@link org.github.evenjn.knit.TupleValue TupleValue}</li>
  * <li>{@link org.github.evenjn.knit.ReusableAutoRook ReusableAutoRook}</li>
  * </ul>
  * 

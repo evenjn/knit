@@ -20,7 +20,7 @@ package org.github.evenjn.knit;
 import org.github.evenjn.lang.Bi;
 
 /**
- * An implementation of {@link org.github.evenjn.yarn.Bi Bi} that provides a
+ * An implementation of {@link org.github.evenjn.lang.Bi Bi} that provides a
  * method to {@link #set(Object, Object) set} elements.
  *
  * <h2>Design Notes</h2>
@@ -114,9 +114,9 @@ public class BiTray<F, B> implements
 	}
 
 	/**
-	 * Returns a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}.
+	 * Returns a view of this object as a {@link org.github.evenjn.lang.Bi Bi}.
 	 * 
-	 * @return a view of this object as a {@link org.github.evenjn.yarn.Bi Bi}.
+	 * @return a view of this object as a {@link org.github.evenjn.lang.Bi Bi}.
 	 * @since 1.0
 	 */
 	public Bi<F, B> asBi( ) {

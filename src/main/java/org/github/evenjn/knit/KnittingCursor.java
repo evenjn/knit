@@ -153,7 +153,7 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
- * <li>{@link #map(Rook, RookFunction)}</li>
+ * <li>{@link #map(Rook, RingFunction)}</li>
  * <li>{@link #numbered()}</li>
  * <li>{@link #once()}</li>
  * <li>{@link #peek(Consumer)}</li>
@@ -829,7 +829,7 @@ public class KnittingCursor<I> implements
 	 * For each element {@code E} of this cursor, the view shows elements in the
 	 * cursor {@code C} returned by the argument {@code stateless_cursor_map_h}
 	 * when invoked with argument {@code E} and a temporary
-	 * {@link org.github.evenjn.yarn.Rook rook}.
+	 * {@link org.github.evenjn.lang.Rook rook}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1349,7 +1349,7 @@ public class KnittingCursor<I> implements
 	 * <p>
 	 * Returns a view. For each element {@code E} of this cursor, the view shows
 	 * the returned by the argument {@code stateless_function_h} when invoked with
-	 * argument {@code E} and a temporary {@link org.github.evenjn.yarn.Rook
+	 * argument {@code E} and a temporary {@link org.github.evenjn.lang.Rook
 	 * rook}.
 	 * </p>
 	 * 
@@ -1821,11 +1821,11 @@ public class KnittingCursor<I> implements
 	 * cursor {@code C} returned when invoking {@code cursor_purl_h}
 	 * {@link org.github.evenjn.yarn.CursorRingPurl#next(Rook, Object) next(Rook,
 	 * Object)} with argument {@code E} and a temporary
-	 * {@link org.github.evenjn.yarn.Rook rook}. Moreover, the view also includes
+	 * {@link org.github.evenjn.lang.Rook rook}. Moreover, the view also includes
 	 * all the elements in the cursor {@code C} returned when invoking
 	 * {@code cursor_purl_h}
 	 * {@link org.github.evenjn.yarn.CursorRingPurl#end(Rook) end(Rook)} with a
-	 * temporary {@link org.github.evenjn.yarn.Rook rook} at the end of this
+	 * temporary {@link org.github.evenjn.lang.Rook rook} at the end of this
 	 * cursor.
 	 * </p>
 	 * 

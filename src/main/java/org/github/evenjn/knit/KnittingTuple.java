@@ -139,7 +139,7 @@ import org.github.evenjn.yarn.EndOfCursorException;
  * 
  * <ul>
  * <li>{@link #collect(Collection)}</li>
- * <li>{@link #consume(Function)}</li>
+ * <li>{@link #consume(Ring)}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
  * <li>{@link #reduce(Object, BiFunction)}</li>
@@ -317,7 +317,7 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * The resulting TupleValue implementation of
 	 * {@linkplain java.lang.Object#equals(Object) equals}, when invoked passing a
-	 * {@link org.github.evenjn.yarn.Tuple Tuple} argument, uses the argument
+	 * {@link org.github.evenjn.lang.Tuple Tuple} argument, uses the argument
 	 * {@code equivalencer} to decide whether an element of this tuple is equal to
 	 * an element of the argument tuple.
 	 * </p>
