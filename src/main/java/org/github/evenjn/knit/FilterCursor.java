@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
-public class FilterCursor<I> implements
+class FilterCursor<I> implements
 		Cursor<I> {
 
 	private final Cursor<I> wrapped;

@@ -1,5 +1,6 @@
 /**
  * <h1>Knit</h1>
+ * 
  * <p>
  * Knit is a collection of tools that carry out folding and unfolding with state
  * and resources.

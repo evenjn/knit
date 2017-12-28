@@ -76,8 +76,8 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <h1>KnittingCursable</h1>
  * 
  * <p>
- * A {@code KnittingCursable} wraps a cursable and provides utility methods to
- * access its contents.
+ * A {@code KnittingCursable} wraps a {@link org.github.evenjn.yarn.Cursable
+ * Cursable} and provides utility methods to access its contents.
  * </p>
  * 
  * <p>
@@ -85,7 +85,7 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * </p>
  * 
  * <ul>
- * <li>As a simple Cursable, invoking the
+ * <li>As a simple cursable, invoking the
  * {@link org.github.evenjn.knit.KnittingCursable#pull(Rook) pull} method;</li>
  * <li>As a resource to be harvested, invoking a rolling method such as
  * {@link #collect(Collection)};</li>
@@ -115,8 +115,8 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <p>
  * Rolling methods instantiate a {@link KnittingCursor} by invoking
  * {@link #pull(Rook)} and repeatedly invoke the method
- * {@link KnittingCursor#next()} typically (but not
- * necessarily) until the end is reached. The following methods are rolling:
+ * {@link KnittingCursor#next()} typically (but not necessarily) until the end
+ * is reached. The following methods are rolling:
  * </p>
  * 
  * <ul>
@@ -179,6 +179,21 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #purlOptional(OptionalPurler)}</li>
  * <li>{@link #purlOptional(OptionalRingPurler)}</li>
  * <li>{@link #purlStream(StreamRingPurler)}</li>
+ * </ul>
+ * 
+ * <h2>Static Methods of KnittingCursable</h2>
+ * 
+ * <p>
+ * Static public methods of {@code KnittingCursable} return
+ * {@code KnittingCursable} objects providing access to an argument sequence of
+ * objects.
+ * </p>
+ * 
+ * <ul>
+ * <li>{@link #empty()}</li>
+ * <li>{@link #on(Object...)}</li>
+ * <li>{@link #wrap(Iterable)}</li>
+ * <li>{@link #wrap(Object[])}</li>
  * </ul>
  * 
  * @param <I>
@@ -1138,7 +1153,7 @@ public class KnittingCursable<I> implements
 
 			@Override
 			public Cursor<I> pull( Rook rook ) {
-				return new TapCursor<I>( wrapped.pull( rook ), consumer );
+				return new PeekCursor<I>( wrapped.pull( rook ), consumer );
 			}
 
 		} );

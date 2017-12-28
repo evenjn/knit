@@ -23,9 +23,11 @@ import java.util.LinkedList;
 import org.github.evenjn.lang.Rook;
 
 /**
- * An implementation of AutoRook that returns to the initial state after
- * invoking {@code close()}. In other words, a closed ReusableAutoRook is as
- * good as a brand new one, and may be immediately re-used.
+ * An {@linkplain java.lang.AutoCloseable auto-closeable}
+ * {@linkplain org.github.evenjn.lang.Rook Rook} that returns to the initial
+ * state after invoking {@link #close()}. In other words, a closed
+ * {@code ReusableAutoRook} is as good as a brand new one, and can be
+ * immediately re-used.
  *
  * @since 1.0
  */

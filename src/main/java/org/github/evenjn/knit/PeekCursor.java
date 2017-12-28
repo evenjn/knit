@@ -22,14 +22,14 @@ import java.util.function.Consumer;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
-public class TapCursor<I> implements
+public class PeekCursor<I> implements
 		Cursor<I> {
 
 	private final Cursor<I> wrapped;
 
 	private final Consumer<? super I> consumer;
 
-	TapCursor(Cursor<I> cursor, Consumer<? super I> consumer) {
+	PeekCursor(Cursor<I> cursor, Consumer<? super I> consumer) {
 		this.wrapped = cursor;
 		this.consumer = consumer;
 	}
