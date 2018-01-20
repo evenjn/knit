@@ -93,7 +93,7 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <h2>Methods of a KnittingCursor</h2>
  * 
  * <p>
- * Non-static public methods of {@code KnittingCursor} fall into one of the
+ * Public instance methods of {@code KnittingCursor} fall into one of the
  * following four categories:
  * </p>
  * 
@@ -121,12 +121,11 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * </ul>
  * 
  * <p>
- * Transformations are a group of methods that return a new
- * {@code KnittingCursor} object (or something similar), which provides a new
- * view of the contents of the wrapped cursor. Transformation methods do not
- * invoke the wrapped cursor's {@link org.github.evenjn.yarn.Cursor#next()
- * next()}; they return lazy wrappers. The following methods are
- * transformations:
+ * Transformation methos are a methods that return a new {@code KnittingCursor}
+ * object (or something similar), which provides a new view of the contents of
+ * the wrapped cursor. Transformation methods do not invoke the wrapped cursor's
+ * {@link org.github.evenjn.yarn.Cursor#next() next()}; they return lazy
+ * wrappers. The following methods are transformation methods:
  * </p>
  * 
  * <ul>
@@ -203,15 +202,15 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <p>
  * When the first transformation or rolling method of a {@code KnittingCursor}
  * object is invoked, the object enters the locked state. Invocation of any
- * method other than those inherited from {@link java.lang.Object} will throw an
- * {@code IllegalStateException}.
+ * public instance method other than those inherited from
+ * {@link java.lang.Object} will throw an {@code IllegalStateException}.
  * </p>
  * 
  * 
  * <h2>Static Methods of KnittingCursor</h2>
  * 
  * <p>
- * Static public methods of {@code KnittingCursor} return {@code KnittingCursor}
+ * Public static methods of {@code KnittingCursor} return {@code KnittingCursor}
  * objects providing access to an argument sequence of objects.
  * </p>
  * 
@@ -226,11 +225,13 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #wrap(Stream)}</li>
  * <li>{@link #wrap(Tuple)}</li>
  * </ul>
- * 
+ *
+ * <p>
+ * This class is part of package {@link org.github.evenjn.knit Knit}.
+ * </p>
  * 
  * @param <I>
  *          The type of elements accessible via this cursor.
- * @see org.github.evenjn.knit
  * @since 1.0
  */
 public class KnittingCursor<I> implements
@@ -297,11 +298,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>append</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the concatenation of the argument cursor after this
-	 * cursor.
+	 * {@code append} returns a view of the concatenation of the argument cursor
+	 * after this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -323,10 +322,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>asIterator</h1>
-	 * 
 	 * <p>
-	 * Returns a view of this cursor as a {@link java.util.Iterator}.
+	 * {@code asIterator} returns a view of this cursor as an
+	 * {@link java.util.Iterator}.
 	 * </p>
 	 * 
 	 * <p>
@@ -345,10 +343,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>asStream</h1>
-	 * 
 	 * <p>
-	 * Returns a view of this cursor as a {@link java.util.stream.Stream}.
+	 * {@code asStream} returns a view of this cursor as a
+	 * {@link java.util.stream.Stream}.
 	 * </p>
 	 * 
 	 * <p>
@@ -390,17 +387,15 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>collect</h1>
-	 * 
 	 * <p>
-	 * Adds all elements in this cursor to the argument collection, then returns
-	 * it.
+	 * {@code collect} adds all elements in this cursor to the argument
+	 * collection, then returns it.
 	 * </p>
 	 * 
 	 * <p>
 	 * The objects collected may be dead. In general, cursors do not guarantee
 	 * that the objects they return survive subsequent invocations of
-	 * {@link {@link org.github.evenjn.yarn.Cursor#next() next()}.
+	 * {@link org.github.evenjn.yarn.Cursor#next() next()}.
 	 * </p>
 	 * 
 	 * <p>
@@ -432,11 +427,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>consume</h1>
-	 * 
 	 * <p>
-	 * Feeds a {@linkplain java.util.function.Consumer consumer} with the elements
-	 * of this cursor.
+	 * {@code consume} feeds a {@linkplain java.util.function.Consumer consumer}
+	 * with the elements in this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -471,10 +464,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>count</h1>
-	 * 
 	 * <p>
-	 * Counts the number of elements in this cursor.
+	 * {@code count} returns the number of elements in this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -511,12 +502,10 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>crop</h1>
-	 * 
 	 * <p>
-	 * Returns a cursor where each element is a cursor providing access to a
-	 * subsequence of contiguous elements in this cursor that satisfy the argument
-	 * {@code stateless_predicate}.
+	 * {@code crop} returns a cursor where each element is a cursor providing
+	 * access to a subsequence of contiguous elements in this cursor that satisfy
+	 * the argument {@code stateless_predicate}.
 	 * </p>
 	 * 
 	 * <p>
@@ -533,6 +522,7 @@ public class KnittingCursor<I> implements
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
+	@Deprecated
 	public KnittingCursor<KnittingCursor<I>>
 			crop( Predicate<I> stateless_predicate )
 					throws IllegalStateException {
@@ -542,11 +532,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>cut</h1>
-	 * 
 	 * <p>
-	 * Returns a cursor where each element is a cursor providing access to a
-	 * subsequence of contiguous elements that would recontsruct the original
+	 * {@code cut} returns a cursor where each element is a cursor providing
+	 * access to a subsequence of contiguous elements that would recontsruct this
 	 * cursor if concatenated.
 	 * </p>
 	 * 
@@ -559,6 +547,7 @@ public class KnittingCursor<I> implements
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
+	@Deprecated
 	public KnittingCursor<KnittingCursor<I>>
 			cut( Predicate<I> stateful_predicate )
 					throws IllegalStateException {
@@ -568,12 +557,11 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>distinct</h1>
-	 * 
 	 * <p>
-	 * Returns a view showing only the elements which are not equal to other
-	 * elements appearing before them. Each invocation might require as much
-	 * memory as necessary to store the entire content of the cursor in a hashset.
+	 * {@code distinct} returns a view showing only the elements which are not
+	 * equal to other elements appearing before them. Each invocation might
+	 * require as much memory as necessary to store the entire content of the
+	 * cursor in a hashset.
 	 * </p>
 	 * 
 	 * <p>
@@ -594,12 +582,11 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>distinct</h1>
-	 * 
 	 * <p>
-	 * Returns a view showing only the elements which are not equivalent to other
-	 * elements appearing before them. Each invocation might require as much
-	 * memory as necessary to store the entire content of the cursor in a hashset.
+	 * {@code distinct} returns a view showing only the elements which are not
+	 * equivalent to other elements appearing before them. Each invocation might
+	 * require as much memory as necessary to store the entire content of the
+	 * cursor in a hashset.
 	 * </p>
 	 * 
 	 * <p>
@@ -617,7 +604,8 @@ public class KnittingCursor<I> implements
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	public KnittingCursor<I> distinct( Function<I, Integer> hasher,
+	public KnittingCursor<I> distinct(
+			Function<I, Integer> hasher,
 			Equivalencer<I, Object> equivalencer )
 			throws IllegalStateException {
 		lock( );
@@ -626,10 +614,12 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>entwine</h1>
+	 * <p>
+	 * {@code entwine} returns a complex view.
+	 * </p>
 	 * 
 	 * <p>
-	 * Returns a cursor that traverses this cursor and the argument
+	 * It returns a cursor that traverses this cursor and the argument
 	 * {@code other_cursor} in parallel, applying the argument
 	 * {@code stateless_bifunction} to each pair of elements, and providing a view
 	 * of the result of each application.
@@ -669,11 +659,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>filter</h1>
-	 * 
 	 * <p>
-	 * Returns a view showing only the elements which satisfy the argument
-	 * {@code stateless_predicate} in this cursor.
+	 * {@code filter} returns a view showing only the elements which satisfy the
+	 * argument {@code stateless_predicate} in this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -695,10 +683,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapArray</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapArray} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the arrays returned by the argument {@code stateless_array_map}.
 	 * </p>
@@ -738,10 +724,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapCursable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapCursable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(Rook, CursorRingMap)} except that the view shows
 	 * elements in the cursables returned by the argument
 	 * {@code stateless_cursable_map}.
@@ -786,10 +770,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapCursable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapCursable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(Rook, CursorRingMap)} except that the view shows
 	 * elements in the cursables returned by the argument
 	 * {@code stateless_cursable_ring_map}.
@@ -833,10 +815,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapCursor</h1>
-	 * 
 	 * <p>
-	 * Returns a complex view.
+	 * {@code flatmapCursor} returns a complex view.
 	 * </p>
 	 * 
 	 * <p>
@@ -879,10 +859,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapCursor</h1>
-	 * 
 	 * <p>
-	 * Returns a complex view.
+	 * {@code flatmapCursor} returns a complex view.
 	 * </p>
 	 * 
 	 * <p>
@@ -937,10 +915,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapIterable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(Rook, CursorRingMap)} except that the view shows
 	 * elements in the iterables returned by the argument
 	 * {@code stateless_iterable_ring_map}.
@@ -986,10 +962,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapIterable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the iterables returned by the argument {@code stateless_iterable_map}.
 	 * </p>
@@ -1030,10 +1004,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapIterator</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterator} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(Rook, CursorRingMap)} except that the view shows
 	 * elements in the iterators returned by the argument
 	 * {@code stateless_iterator_ring_map}.
@@ -1079,10 +1051,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapIterator</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterator} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the iterators returned by the argument {@code stateless_iterator_map}.
 	 * </p>
@@ -1123,10 +1093,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapOptional</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapOptional} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the optionals returned by the argument {@code stateless_optional_map}.
 	 * </p>
@@ -1169,10 +1137,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapOptional</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapOptional} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(Rook, CursorRingMap)} except that the view shows
 	 * elements in the optionals returned by the argument
 	 * {@code stateless_optional_ring_map}.
@@ -1218,10 +1184,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>flatmapStream</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapStream} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(Rook, CursorRingMap)} except that the view shows
 	 * elements in the streams returned by the argument
 	 * {@code stateless_stream_ring_map}.
@@ -1268,12 +1232,11 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>hasNext</h1>
-	 * 
 	 * <p>
-	 * Returns whether there are one or more elements to retrieve from this
-	 * cursor. When there are no more elements to retrieve, the next invocation of
-	 * {@link #next() next()} will throw a {@link EndOfCursorException}.
+	 * {@code hasNext} returns whether there are one or more elements to retrieve
+	 * from this cursor. When there are no more elements to retrieve, the next
+	 * invocation of {@link #next() next()} will throw a
+	 * {@link EndOfCursorException}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1320,11 +1283,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>head</h1>
-	 * 
 	 * <p>
-	 * Returns a view showing the first {@code show} elements in this cursor
-	 * visible after hiding the first {@code hide} elements.
+	 * {@code head} returns a view showing the first {@code show} elements in this
+	 * cursor visible after hiding the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
@@ -1360,10 +1321,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>headless</h1>
-	 * 
 	 * <p>
-	 * Returns a view hiding the first {@code hide} elements in this cursor.
+	 * {@code headless} returns a view hiding the first {@code hide} elements in
+	 * this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -1390,12 +1350,14 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>map</h1>
+	 * <p>
+	 * {@code map} returns a complex view.
+	 * </p>
 	 * 
 	 * <p>
-	 * Returns a view. For each element {@code E} of this cursor, the view shows
-	 * the element returned by the argument {@code stateless_function} when
-	 * invoked with argument {@code E}.
+	 * For each element {@code E} of this cursor, the view shows the element
+	 * returned by the argument {@code stateless_function} when invoked with
+	 * argument {@code E}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1432,13 +1394,14 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>map</h1>
+	 * <p>
+	 * {@code map} returns a complex view.
+	 * </p>
 	 * 
 	 * <p>
-	 * Returns a view. For each element {@code E} of this cursor, the view shows
-	 * the returned by the argument {@code stateless_function_h} when invoked with
-	 * argument {@code E} and a temporary {@link org.github.evenjn.lang.Rook
-	 * rook}.
+	 * For each element {@code E} of this cursor, the view shows the returned by
+	 * the argument {@code stateless_ring_function} when invoked with argument
+	 * {@code E} and a temporary {@link org.github.evenjn.lang.Rook rook}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1455,7 +1418,7 @@ public class KnittingCursor<I> implements
 	 * 
 	 * @param <O>
 	 *          The type of elements returned by the argument
-	 *          {@code stateless_function_h}.
+	 *          {@code stateless_ring_function}.
 	 * @param rook
 	 *          A rook.
 	 * @param stateless_ring_function
@@ -1487,10 +1450,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>next</h1>
-	 * 
 	 * <p>
-	 * Returns the next element provided by the wrapped cursor.
+	 * {@code next} returns the next element provided by the wrapped cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -1533,12 +1494,11 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>numbered</h1>
-	 * 
 	 * <p>
-	 * Returns a cursor that, for each element in this cursor, provides a
-	 * {@link org.github.evenjn.knit.Numbered Numbered} wrapper, containing the
-	 * element itself and the number of elements retrieved before it.
+	 * {@code numbered} returns a cursor that, for each element in this cursor,
+	 * provides a {@link org.github.evenjn.knit.Numbered Numbered} wrapper,
+	 * containing the element itself and the number of elements retrieved before
+	 * it.
 	 * </p>
 	 * 
 	 * <p>
@@ -1557,10 +1517,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>once</h1>
-	 * 
 	 * <p>
-	 * Returns a view of this cursor as a {@link java.lang.Iterable}.
+	 * {@code once} returns a view of this cursor as a {@link java.lang.Iterable}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1587,7 +1545,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>one</h1>
+	 * <p>
+	 * {@code one} returns the only element in this cursor.
+	 * </p>
 	 * 
 	 * <p>
 	 * When this cursor provides access to one element only, this method returns
@@ -1631,7 +1591,10 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>optionalOne</h1>
+	 * <p>
+	 * {@code optionalOne} returns an {@linkplain java.util.Optional optional}
+	 * with the only element in this cursor.
+	 * </p>
 	 * 
 	 * <p>
 	 * When this cursor provides access to one non-null element only, this method
@@ -1678,11 +1641,10 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>peek</h1>
-	 * 
 	 * <p>
-	 * Returns a view providing access to the elements in this cursor. The view
-	 * passes the elements to the argument consumer before retuning them.
+	 * {@code peek} returns a view providing access to the elements in this
+	 * cursor. The view passes the elements to the argument consumer before
+	 * retuning them.
 	 * </p>
 	 * 
 	 * <p>
@@ -1712,11 +1674,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>prepend</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the concatenation of the argument cursor before this
-	 * cursor.
+	 * {@code prepend} returns a view of the concatenation of the argument cursor
+	 * before this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -1738,10 +1698,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlArray</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlArray} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurl)} except that the view shows elements in the
 	 * arrays returned by the argument {@code array_purl}.
 	 * </p>
@@ -1782,10 +1740,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlCursable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlCursable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurl)} except that the view shows elements in the
 	 * cursables returned by the argument {@code cursable_purl}.
 	 * </p>
@@ -1827,10 +1783,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlCursable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlCursable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(Rook, CursorRingPurl)} except that the view shows
 	 * elements in the cursables returned by the argument
 	 * {@code cursable_ring_purl}.
@@ -1875,11 +1829,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlCursor</h1>
-	 * 
 	 * <p>
-	 * Returns a complex view. For an introduction on purling see
-	 * {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
+	 * {@code purlCursor} returns a complex view. For an introduction on purling
+	 * see {@link org.github.evenjn.yarn.YarnPurl YarnPurl}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1926,11 +1878,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlCursor</h1>
-	 * 
 	 * <p>
-	 * Returns a complex view. For an introduction on purling see
-	 * {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
+	 * {@code purlCursor} returns a complex view. For an introduction on purling
+	 * see {@link org.github.evenjn.yarn.CursorPurl CursorPurl}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1980,10 +1930,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlIterable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurl)} except that the view shows elements in the
 	 * iterables returned by the argument {@code iterable_purl}.
 	 * </p>
@@ -2024,10 +1972,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlIterable</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(Rook, CursorRingPurl)} except that the view shows
 	 * elements in the iterables returned by the argument
 	 * {@code iterable_ring_purl}.
@@ -2074,10 +2020,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlIterator</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterator} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurl)} except that the view shows elements in the
 	 * iterators returned by the argument {@code iterator_purl}.
 	 * </p>
@@ -2120,10 +2064,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlIterator</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterator} returns a view realizing the same transformation as
 	 * {@link #purlCursor(Rook, CursorRingPurl)} except that the view shows
 	 * elements in the iterators returned by the argument
 	 * {@code iterator_ring_purl}.
@@ -2170,10 +2112,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlOptional</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlOptional} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurl)} except that the view shows elements in the
 	 * optionals returned by the argument {@code optional_purl}.
 	 * </p>
@@ -2220,10 +2160,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlOptional</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlOptional} returns a view realizing the same transformation as
 	 * {@link #purlCursor(Rook, CursorRingPurl)} except that the view shows
 	 * elements in the optionals returned by the argument
 	 * {@code optional_ring_purl}.
@@ -2274,10 +2212,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>purlStream</h1>
-	 * 
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlStream} returns a view realizing the same transformation as
 	 * {@link #purlCursor(Rook, CursorRingPurl)} except that the view shows
 	 * elements in the streams returned by the argument {@code stream_ring_purl}.
 	 * </p>
@@ -2323,11 +2259,9 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>reduce</h1>
-	 * 
 	 * <p>
-	 * Returns the result of a computation taking into account all the elements in
-	 * this cursor.
+	 * {@code reduce} returns the result of a computation taking into account all
+	 * the elements in this cursor.
 	 * </p>
 	 * 
 	 * <p>
@@ -2372,10 +2306,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>roll</h1>
-	 * 
 	 * <p>
-	 * Invokes this cursor's {@link #next()} method until a
+	 * {@code roll} invokes this cursor's {@link #next()} method until a
 	 * {@link org.github.evenjn.yarn.EndOfCursorException EndOfCursorException} is
 	 * thrown.
 	 * </p>
@@ -2401,10 +2333,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>empty</h1>
-	 * 
 	 * <p>
-	 * Returns an empty cursor.
+	 * {@code empty} returns an empty cursor.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2433,10 +2363,8 @@ public class KnittingCursor<I> implements
 	} );
 
 	/**
-	 * <h1>on</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the argument elements.
+	 * {@code on} returns a view of the argument elements.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2453,10 +2381,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument tuple.
+	 * {@code wrap} returns a view of the elements in the argument tuple.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2484,10 +2410,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument cursor.
+	 * {@code wrap} returns a view of the elements in the argument cursor.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2503,10 +2427,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument iterable.
+	 * {@code wrap} returns a view of the elements in the argument iterable.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2522,10 +2444,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument iterator.
+	 * {@code wrap} returns a view of the elements in the argument iterator.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2550,10 +2470,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument array.
+	 * {@code wrap} returns a view of the elements in the argument array.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2569,10 +2487,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument optional.
+	 * {@code wrap} returns a view of the elements in the argument optional.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2601,10 +2517,8 @@ public class KnittingCursor<I> implements
 	}
 
 	/**
-	 * <h1>wrap</h1>
-	 * 
 	 * <p>
-	 * Returns a view of the elements in the argument stream.
+	 * {@code wrap} returns a view of the elements in the argument stream.
 	 * </p>
 	 * 
 	 * @param <K>

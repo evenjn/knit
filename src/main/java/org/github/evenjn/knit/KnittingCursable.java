@@ -101,7 +101,7 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <h2>Methods of a KnittingCursable</h2>
  * 
  * <p>
- * Non-static public methods of {@code KnittingCursable} fall into one of the
+ * Public instance methods of {@code KnittingCursable} fall into one of the
  * following four categories:
  * </p>
  * 
@@ -195,10 +195,13 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #wrap(Iterable)}</li>
  * <li>{@link #wrap(Object[])}</li>
  * </ul>
+ *
+ * <p>
+ * This class is part of package {@link org.github.evenjn.knit Knit}.
+ * </p>
  * 
  * @param <I>
  *          The type of elements accessible via this cursable.
- * @see org.github.evenjn.knit
  * @since 1.0
  */
 public class KnittingCursable<I> implements
@@ -333,6 +336,7 @@ public class KnittingCursable<I> implements
 	 *         the argument {@code stateless_predicate}.
 	 * @since 1.0
 	 */
+	@Deprecated
 	public KnittingCursable<KnittingCursor<I>>
 			crop( Predicate<I> stateless_predicate ) {
 		return KnittingCursable.wrap( h -> pull( h ).crop( stateless_predicate ) );
@@ -352,6 +356,7 @@ public class KnittingCursable<I> implements
 	 *         partition of the elements in this cursable.
 	 * @since 1.0
 	 */
+	@Deprecated
 	public KnittingCursable<KnittingCursor<I>>
 			cut( Predicate<I> stateful_predicate ) {
 		return KnittingCursable.wrap( h -> pull( h ).cut( stateful_predicate ) );

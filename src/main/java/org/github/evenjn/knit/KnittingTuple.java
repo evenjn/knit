@@ -66,7 +66,7 @@ import org.github.evenjn.yarn.EndOfCursorException;
  * <h2>Methods of a KnittingTuple</h2>
  * 
  * <p>
- * Non-static public methods of {@code KnittingTuple} fall into one of the
+ * Public instance methods of {@code KnittingTuple} fall into one of the
  * following four categories:
  * </p>
  * 
@@ -145,6 +145,10 @@ import org.github.evenjn.yarn.EndOfCursorException;
  * <li>{@link #reduce(Object, BiFunction)}</li>
  * </ul>
  *
+ * <p>
+ * This class is part of package {@link org.github.evenjn.knit Knit}.
+ * </p>
+ * 
  * @param <I>
  *          The type of elements accessible via this tuple.
  * @since 1.0

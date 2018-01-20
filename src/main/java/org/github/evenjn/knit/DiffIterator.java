@@ -20,20 +20,82 @@ package org.github.evenjn.knit;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
-class DiffPairImpl<F, B>
-		extends BiOptionalTray<F, B> implements
+class DiffPairImpl<F, B>  implements
 		DiffPair<F, B> {
+
+	private boolean has_front = false;
+
+	private boolean has_back = false;
+
+	/**
+	 * Returns {@code true} if the both slots are filled in, {@code false}
+	 * otherwise.
+	 * 
+	 * @return {@code true} if the both slots are filled in, {@code false}
+	 *         otherwise.
+	 */
+	public boolean hasBoth( ) {
+		return has_front && has_back;
+	}
+
+	/**
+	 * Returns {@code true} if the front slot is filled in, {@code false}
+	 * otherwise.
+	 * 
+	 * @return {@code true} if the front slot is filled in, {@code false}
+	 *         otherwise.
+	 */
+	public boolean hasFront( ) {
+		return has_front;
+	}
+
+	/**
+	 * Returns {@code true} if the back slot is filled in, {@code false}
+	 * otherwise.
+	 * 
+	 * @return {@code true} if the back slot is filled in, {@code false}
+	 *         otherwise.
+	 */
+	public boolean hasBack( ) {
+		return has_back;
+	}
+
+	/**
+	 * @return The object in the <em>front</em> slot.
+	 * @since 1.0
+	 */
+	public F front( ) {
+		return front;
+	}
+
+	/**
+	 * @return The object in the <em>back</em> slot.
+	 * @since 1.0
+	 */
+	public B back( ) {
+		return back;
+	}
 
 	protected DiffPairImpl(F front, B back, boolean has_front,
 			boolean has_back) {
-		super( front, back, has_front, has_back );
+		this.front = front;
+		this.back = back;
+		if ( !has_back && !has_front ) {
+			throw new IllegalArgumentException( );
+		}
+		this.has_back = has_back;
+		this.has_front = has_front;
 	}
 
-	public static <F, B> DiffPairImpl<F, B> nu( F front, B back,
+	static <F, B> DiffPairImpl<F, B> nu( F front, B back,
 			boolean has_front,
 			boolean has_back ) {
 		return new DiffPairImpl<F, B>( front, back, has_front, has_back );
 	}
+
+	private F front;
+
+	private B back;
 }
 
 class DiffIterator<F, B> implements

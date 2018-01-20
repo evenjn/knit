@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
 
-public class PeekCursor<I> implements
+class PeekCursor<I> implements
 		Cursor<I> {
 
 	private final Cursor<I> wrapped;
