@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.github.evenjn.lang.Rook;
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.yarn.Tuple;
 import org.github.evenjn.yarn.Cursable;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;

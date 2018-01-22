@@ -24,7 +24,8 @@ import static org.github.evenjn.knit.Diff.adiff_main_nc;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.lang.BasicEquivalencer;
+import org.github.evenjn.yarn.Tuple;
 
 import name.fraser.neil.plaintext.diff_match_patch;
 import name.fraser.neil.plaintext.diff_match_patch.Diff;
@@ -34,7 +35,7 @@ public class diff_adapter {
 	public static LinkedList<Diff> diff_main_nc( String text1, String text2,
 			long deadline ) {
 		LinkedList<DiffOp<Integer, Integer>> diffs = adiff_main_nc( tt( text1 ),
-				tt( text2 ), KnittingTuple.getNullEquivalencer( ), deadline );
+				tt( text2 ), new BasicEquivalencer<Integer, Integer>( ), deadline );
 		LinkedList<Diff> result = new LinkedList<Diff>( );
 		for ( DiffOp<Integer, Integer> d : diffs ) {
 			result.add( encode( d ) );
@@ -45,7 +46,7 @@ public class diff_adapter {
 	public static LinkedList<Diff> diff_bisect( String text1, String text2,
 			long deadline ) {
 		LinkedList<DiffOp<Integer, Integer>> diffs = adiff_bisect( tt( text1 ),
-				tt( text2 ), KnittingTuple.getNullEquivalencer( ), deadline );
+				tt( text2 ), new BasicEquivalencer<Integer, Integer>( ), deadline );
 		LinkedList<Diff> result = new LinkedList<Diff>( );
 		for ( DiffOp<Integer, Integer> d : diffs ) {
 			result.add( encode( d ) );
@@ -76,7 +77,7 @@ public class diff_adapter {
 	private static Diff encode( DiffOp<Integer, Integer> diff ) {
 		diff_match_patch.Operation operation;
 		Tuple<Integer> tuple = null;
-		switch ( diff.getOperation() ) {
+		switch ( diff.getOperation( ) ) {
 			case DELETE:
 				tuple = diff.getDeletedText( );
 				operation = diff_match_patch.Operation.DELETE;
@@ -108,7 +109,7 @@ public class diff_adapter {
 		for ( Diff d : diffs ) {
 			decoded.add( decode( d ) );
 		}
-		adiff_cleanupMerge( decoded, KnittingTuple.getNullEquivalencer( ) );
+		adiff_cleanupMerge( decoded, new BasicEquivalencer<Integer, Integer>( ) );
 		diffs.clear( );
 		for ( DiffOp<Integer, Integer> d : decoded ) {
 			diffs.add( encode( d ) );

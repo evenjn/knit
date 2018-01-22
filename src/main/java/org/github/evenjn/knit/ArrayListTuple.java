@@ -19,7 +19,7 @@ package org.github.evenjn.knit;
 
 import java.util.ArrayList;
 
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.yarn.Tuple;
 
 class ArrayListTuple<T> implements
 		Tuple<T> {

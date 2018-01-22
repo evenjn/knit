@@ -27,19 +27,20 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.github.evenjn.lang.BasicEquivalencer;
 import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.Equivalencer;
 import org.github.evenjn.lang.Ring;
-import org.github.evenjn.lang.Tuple;
 import org.github.evenjn.yarn.Cursor;
 import org.github.evenjn.yarn.EndOfCursorException;
+import org.github.evenjn.yarn.Tuple;
 
 /**
  * 
  * <h1>KnittingTuple</h1>
  * 
  * <p>
- * A {@code KnittingTuple} wraps a {@link org.github.evenjn.lang.Tuple Tuple}
+ * A {@code KnittingTuple} wraps a {@link org.github.evenjn.yarn.Tuple Tuple}
  * and provides utility methods to access its contents.
  * </p>
  * 
@@ -158,36 +159,11 @@ public class KnittingTuple<I> implements
 
 	private final Tuple<I> wrapped;
 
-	@SafeVarargs
-	public static <K> KnittingTuple<K> on( K ... elements ) {
-		return wrap( new ArrayTuple<K>( elements ) );
-	}
-
-	public static <K> KnittingTuple<K> wrap( Tuple<K> tuple ) {
-		if ( tuple instanceof KnittingTuple ) {
-			return (KnittingTuple<K>) tuple;
-		}
-		return new KnittingTuple<K>( tuple );
-	}
-
-	public static <K> KnittingTuple<K> wrap( ArrayList<K> arraylist ) {
-		return wrap( new ArrayListTuple<K>( arraylist ) );
-	}
-
-	public static <K> KnittingTuple<K> wrap( Vector<K> vector ) {
-		return wrap( new VectorTuple<K>( vector ) );
-	}
-
-	public static <K> KnittingTuple<K> wrap( K[] array ) {
-		return wrap( new ArrayTuple<K>( array ) );
-	}
-
-	private KnittingTuple(Tuple<I> tuple) {
-		this.wrapped = tuple;
-	}
-
 	/**
-	 * Returns a view of the concatenation of the argument tuple after this tuple.
+	 * <p>
+	 * {@code append} returns a view of the concatenation of the argument tuple
+	 * after this tuple.
+	 * </p>
 	 * 
 	 * @param tail
 	 *          A tuple to concatenate after this tuple.
@@ -214,7 +190,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as an {@link java.util.Iterable Iterable}.
+	 * {@code asIterable} returns a view of this tuple as an
+	 * {@link java.util.Iterable Iterable}.
 	 * </p>
 	 * 
 	 * @return A view of this tuple as an {@link java.util.Iterable Iterable}.
@@ -226,7 +203,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as an {@link java.util.Iterator Iterator}.
+	 * {@code asIterator} returns a view of this tuple as an
+	 * {@link java.util.Iterator Iterator}.
 	 * </p>
 	 * 
 	 * @return A view of this tuple as an {@link java.util.Iterator Iterator}.
@@ -253,7 +231,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as a
+	 * {@code asKnittingCursable} returns a view of this tuple as a
 	 * {@link org.github.evenjn.knit.KnittingCursable KnittingCursable}.
 	 * </p>
 	 * 
@@ -267,7 +245,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as a
+	 * {@code asKnittingCursor} returns a view of this tuple as a
 	 * {@link org.github.evenjn.knit.KnittingCursor KnittingCursor}.
 	 * </p>
 	 * 
@@ -281,7 +259,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as a {@link java.util.stream.Stream Stream}.
+	 * {@code asStream} returns a view of this tuple as a
+	 * {@link java.util.stream.Stream Stream}.
 	 * </p>
 	 * 
 	 * @return A view of this tuple as a {@link java.util.stream.Stream Stream}.
@@ -293,15 +272,14 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as a {@link org.github.evenjn.knit.TupleValue
-	 * TupleValue}.
+	 * {@code asTupleValue} returns a view of this tuple as a
+	 * {@link org.github.evenjn.knit.TupleValue TupleValue}.
 	 * </p>
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#asTupleValue(Equivalencer)
-	 * asTupleValue(Equivalencer)} using an equivalencer that marks two objects as
-	 * equivalent if and only if they are {@linkplain java.lang.Object#equals
-	 * equal} to each other or both {@code null}.
+	 * asTupleValue(Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @return A view of this tuple as a {@link org.github.evenjn.knit.TupleValue
@@ -309,19 +287,19 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public TupleValue<I> asTupleValue( ) {
-		return new TupleValue<>( this, KnittingTuple.getNullEquivalencer( ) );
+		return new TupleValue<>( this, KnittingTuple.private_equivalencer( ) );
 	}
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple as a {@link org.github.evenjn.knit.TupleValue
-	 * TupleValue}.
+	 * {@code asTupleValue} returns a view of this tuple as a
+	 * {@link org.github.evenjn.knit.TupleValue TupleValue}.
 	 * </p>
 	 * 
 	 * <p>
 	 * The resulting TupleValue implementation of
 	 * {@linkplain java.lang.Object#equals(Object) equals}, when invoked passing a
-	 * {@link org.github.evenjn.lang.Tuple Tuple} argument, uses the argument
+	 * {@link org.github.evenjn.yarn.Tuple Tuple} argument, uses the argument
 	 * {@code equivalencer} to decide whether an element of this tuple is equal to
 	 * an element of the argument tuple.
 	 * </p>
@@ -338,8 +316,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Adds all elements of this tuple to the argument collection, then returns
-	 * it.
+	 * {@code collect} adds all elements of this tuple to the argument collection,
+	 * then returns it.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -357,7 +335,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Feeds a consumer with the elements of this tuple.
+	 * {@code consume} feeds a consumer with the elements of this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -380,15 +358,14 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns {@code true} when the argument tuple is a subtuple of this tuple;
-	 * {@code false} otherwise.
+	 * {@code contains} returns {@code true} when the argument tuple is a subtuple
+	 * of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#contains(Tuple,Equivalencer)
-	 * contains(Tuple, Equivalencer)} using an equivalencer that marks two objects
-	 * as equivalent if and only if they are {@linkplain java.lang.Object#equals
-	 * equal} to each other or both {@code null}.
+	 * contains(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param other
@@ -398,13 +375,13 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> boolean contains( Tuple<Y> other ) {
-		return contains( other, getNullEquivalencer( ) );
+		return contains( other, private_equivalencer( ) );
 	}
 
 	/**
 	 * <p>
-	 * Returns {@code true} when the argument tuple is a subtuple of this tuple;
-	 * {@code false} otherwise.
+	 * {@code contains} returns {@code true} when the argument tuple is a subtuple
+	 * of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -429,14 +406,13 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns an alignment of this tuple with the argument tuple.
+	 * {@code diff} returns an alignment of this tuple with the argument tuple.
 	 * </p>
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#diff(Tuple,Equivalencer)
-	 * diff(Tuple, Equivalencer)} using an equivalencer that marks two objects as
-	 * equivalent if and only if they are {@linkplain java.lang.Object#equals
-	 * equal} to each other or both {@code null}.
+	 * diff(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param other
@@ -445,13 +421,13 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> Iterable<DiffPair<I, Y>> diff( Tuple<Y> other ) {
-		return diff( other, getNullEquivalencer( ) );
+		return diff( other, private_equivalencer( ) );
 	}
 
 	/**
 	 * <p>
-	 * Returns an alignment of this tuple with the argument tuple, represented as
-	 * a list of {@link org.github.evenjn.knit.DiffPair pairs}.
+	 * {@code diff} returns an alignment of this tuple with the argument tuple,
+	 * represented as a list of {@link org.github.evenjn.knit.DiffPair pairs}.
 	 * </p>
 	 * 
 	 * <p>
@@ -525,17 +501,15 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the <a href=
-	 * "https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance"
-	 * >Damerau–Levenshtein distance</a> between this tuple and the argument
-	 * tuple.
+	 * {@code distance} Returns the
+	 * <a href= "https://en.wikipedia.org/wiki/Levenshtein_distance" >Levenshtein
+	 * distance</a> between this tuple and the argument tuple.
 	 * </p>
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#distance(Tuple,Equivalencer)
-	 * distance(Tuple, Equivalencer)} using an equivalencer that marks two objects
-	 * as equivalent if and only if they are {@linkplain java.lang.Object#equals
-	 * equal} to each other or both {@code null}.
+	 * distance(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param other
@@ -544,15 +518,14 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> int distance( Tuple<Y> other ) {
-		return distance( other, getNullEquivalencer( ) );
+		return distance( other, private_equivalencer( ) );
 	}
 
 	/**
 	 * <p>
-	 * Returns the <a href=
-	 * "https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance"
-	 * >Damerau–Levenshtein distance</a> between this tuple and the argument
-	 * tuple.
+	 * {@code distance} returns the
+	 * <a href= "https://en.wikipedia.org/wiki/Levenshtein_distance" >Levenshtein
+	 * distance</a> between this tuple and the argument tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -638,15 +611,14 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns {@code true} when the argument tuple is a suffix of this tuple;
-	 * {@code false} otherwise.
+	 * {@code endsWith} returns {@code true} when the argument tuple is a suffix
+	 * of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#endsWith(Tuple,Equivalencer)
-	 * endsWith(Tuple, Equivalencer)} using an equivalencer that marks two objects
-	 * as equivalent if and only if they are {@linkplain java.lang.Object#equals
-	 * equal} to each other or both {@code null}.
+	 * endsWith(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param other
@@ -656,13 +628,13 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public boolean endsWith( Tuple<I> other ) {
-		return endsWith( other, getNullEquivalencer( ) );
+		return endsWith( other, private_equivalencer( ) );
 	}
 
 	/**
 	 * <p>
-	 * Returns {@code true} when the argument tuple is a suffix of this tuple;
-	 * {@code false} otherwise.
+	 * {@code endsWith} returns {@code true} when the argument tuple is a suffix
+	 * of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -688,18 +660,16 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns {@code true} when this tuple and the argument tuple have the same
-	 * number of slots, and when the content of each i-th slot of this tuple is
-	 * equivalent to the content of the i-th slot of the argument tuple. Returns
-	 * {@code false} otherwise.
+	 * {@code equivalentTo} returns {@code true} when this tuple and the argument
+	 * tuple have the same number of slots, and when the content of each i-th slot
+	 * of this tuple is equivalent to the content of the i-th slot of the argument
+	 * tuple. Returns {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#equivalentTo(Tuple,Equivalencer)
-	 * equivalentTo(Tuple, Equivalencer)} using an equivalencer that marks two
-	 * objects as equivalent if and only if they are
-	 * {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
+	 * equivalentTo(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * 
@@ -712,15 +682,15 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> boolean equivalentTo( Tuple<Y> other ) {
-		return equivalentTo( other, getNullEquivalencer( ) );
+		return equivalentTo( other, private_equivalencer( ) );
 	}
 
 	/**
 	 * <p>
-	 * Returns {@code true} when this tuple and the argument tuple have the same
-	 * number of slots, and when the content of each i-th slot of this tuple is
-	 * equivalent to the content of the i-th slot of the argument tuple. Returns
-	 * {@code false} otherwise.
+	 * {@code equivalentTo} returns {@code true} when this tuple and the argument
+	 * tuple have the same number of slots, and when the content of each i-th slot
+	 * of this tuple is equivalent to the content of the i-th slot of the argument
+	 * tuple. Returns {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -767,10 +737,8 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * This method invokes
 	 * {@link KnittingTuple#findSubtuple(Tuple,int,Equivalencer)
-	 * findSubtuple(Tuple,int,Equivalencer)} using an equivalencer that marks two
-	 * objects as equivalent if and only if they are
-	 * {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
+	 * findSubtuple(Tuple,int,Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param other
@@ -785,7 +753,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> Optional<Integer> findSubtuple( Tuple<Y> other, int skip ) {
-		return findSubtuple( other, skip, getNullEquivalencer( ) );
+		return findSubtuple( other, skip, private_equivalencer( ) );
 	}
 
 	/**
@@ -844,7 +812,8 @@ public class KnittingTuple<I> implements
 				int j = i + 1;
 				int end = i + target_size;
 				int k = 1;
-				while ( j < end && equal_null( get( j ), other.get( k ) ) ) {
+				while ( j < end
+						&& equivalencer.equivalent( get( j ), other.get( k ) ) ) {
 					j++;
 					k++;
 				}
@@ -875,44 +844,6 @@ public class KnittingTuple<I> implements
 			throw new IllegalArgumentException( );
 		}
 		return wrapped.get( index );
-	}
-
-	/**
-	 * <p>
-	 * Returns a view showing elements of this tuple in slots between n and m,
-	 * including n and excluding m.
-	 * </p>
-	 * 
-	 * @param n
-	 *          The index of the first element of the view.
-	 * @param m
-	 *          One plus the index of the last element of the view.
-	 * @return A view showing elements of this tuple in slots between n and m,
-	 *         including n and excluding m.
-	 * @throws IllegalArgumentException
-	 *           when {@code n} is negative, when {@code m} is negative, when
-	 *           {@code n} is larger than {@code m}, when {@code m} is larger than
-	 *           the size of this tuple, when {@code n} is larger than the size of
-	 *           this tuple.
-	 * @since 1.0
-	 */
-	public KnittingTuple<I> subTuple( int n, int m ) {
-		if ( n < 0 ) {
-			throw new IllegalArgumentException( );
-		}
-		if ( m < 0 ) {
-			throw new IllegalArgumentException( );
-		}
-		if ( n > size( ) ) {
-			throw new IllegalArgumentException( );
-		}
-		if ( m > size( ) ) {
-			throw new IllegalArgumentException( );
-		}
-		if ( n > m ) {
-			throw new IllegalArgumentException( );
-		}
-		return wrap( new Subtuple<>( wrapped, n, m - n ) );
 	}
 
 	/**
@@ -988,10 +919,8 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * This method invokes
 	 * {@link KnittingTuple#longestCommonSubtuple(Tuple,Equivalencer)
-	 * longestCommonSubtuple(Tuple, Equivalencer)} using an equivalencer that
-	 * marks two objects as equivalent if and only if they are
-	 * {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
+	 * longestCommonSubtuple(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param tuple
@@ -1002,7 +931,7 @@ public class KnittingTuple<I> implements
 	 */
 	public <Y> KnittingTuple<I> longestCommonSubtuple(
 			Tuple<Y> tuple ) {
-		return longestCommonSubtuple( tuple, getNullEquivalencer( ) );
+		return longestCommonSubtuple( tuple, private_equivalencer( ) );
 	}
 
 	/**
@@ -1046,10 +975,8 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * This method invokes
 	 * {@link KnittingTuple#longestCommonSubtupleIntersection(Cursor,Equivalencer)
-	 * longestCommonSubtupleIntersection(Cursor, Equivalencer)} using an
-	 * equivalencer that marks two objects as equivalent if and only if they are
-	 * {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
+	 * longestCommonSubtupleIntersection(Cursor, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param masks
@@ -1061,7 +988,7 @@ public class KnittingTuple<I> implements
 	public <Y> KnittingTuple<I> longestCommonSubtupleIntersection(
 			Cursor<? extends Tuple<Y>> masks ) {
 		return longestCommonSubtupleIntersection( masks,
-				getNullEquivalencer( ) );
+				private_equivalencer( ) );
 	}
 
 	/**
@@ -1140,10 +1067,8 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * This method invokes
 	 * {@link KnittingTuple#longestCommonSubtupleUnion(Cursor,Equivalencer)
-	 * longestCommonSubtupleUnion(Cursor, Equivalencer)} using an equivalencer
-	 * that marks two objects as equivalent if and only if they are
-	 * {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
+	 * longestCommonSubtupleUnion(Cursor, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param masks
@@ -1154,7 +1079,7 @@ public class KnittingTuple<I> implements
 	 */
 	public <Y> KnittingTuple<I> longestCommonSubtupleUnion(
 			Cursor<? extends Tuple<Y>> masks ) {
-		return longestCommonSubtupleUnion( masks, getNullEquivalencer( ) );
+		return longestCommonSubtupleUnion( masks, private_equivalencer( ) );
 	}
 
 	/**
@@ -1432,7 +1357,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the size of this tuple.
+	 * {@code size} returns the size of this tuple.
 	 * </p>
 	 * 
 	 * @return The size of this tuple.
@@ -1461,12 +1386,45 @@ public class KnittingTuple<I> implements
 		};
 	}
 
-	private static <T> boolean equal_null( T first, T second ) {
-		if ( first == null && second == null )
-			return true;
-		if ( first == null || second == null )
-			return false;
-		return first.equals( second );
+	/**
+	 * <p>
+	 * {@code subTuple} returns a view showing elements of this tuple in slots
+	 * between {@code n} and {@code m}, including {@code n} and excluding
+	 * {@code m}.
+	 * </p>
+	 * 
+	 * @param n
+	 *          The index, in this tuple, of the element that will appear first in
+	 *          the resulting view.
+	 * @param m
+	 *          One plus the index, in this tuple, of the element that will appear
+	 *          last in the resulting view.
+	 * @return A view showing elements of this tuple in slots between {@code n}
+	 *         and {@code m}, including {@code n} and excluding {@code m}.
+	 * @throws IllegalArgumentException
+	 *           when {@code n} is negative, when {@code m} is negative, when
+	 *           {@code n} is larger than {@code m}, when {@code m} is larger than
+	 *           the size of this tuple, when {@code n} is larger than the size of
+	 *           this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> subTuple( int n, int m ) {
+		if ( n < 0 ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( m < 0 ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( n > size( ) ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( m > size( ) ) {
+			throw new IllegalArgumentException( );
+		}
+		if ( n > m ) {
+			throw new IllegalArgumentException( );
+		}
+		return wrap( new Subtuple<>( wrapped, n, m - n ) );
 	}
 
 	/**
@@ -1477,10 +1435,8 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * This method invokes {@link KnittingTuple#startsWith(Tuple,Equivalencer)
-	 * startsWith(Tuple, Equivalencer)} using an equivalencer that marks two
-	 * objects as equivalent if and only if they are
-	 * {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
+	 * startsWith(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
 	 * @param other
@@ -1490,7 +1446,7 @@ public class KnittingTuple<I> implements
 	 * @since 1.0
 	 */
 	public <Y> boolean startsWith( Tuple<Y> other ) {
-		return startsWith( other, getNullEquivalencer( ) );
+		return startsWith( other, private_equivalencer( ) );
 	}
 
 	/**
@@ -1598,6 +1554,10 @@ public class KnittingTuple<I> implements
 		return wrap( new Subtuple<>( wrapped, 0, final_len ) );
 	}
 
+	private KnittingTuple(Tuple<I> tuple) {
+		this.wrapped = tuple;
+	}
+
 	/**
 	 * <p>
 	 * Returns an empty tuple.
@@ -1615,10 +1575,10 @@ public class KnittingTuple<I> implements
 
 	@SuppressWarnings("unchecked")
 	private static <K> KnittingTuple<K> private_empty( ) {
-		return (KnittingTuple<K>) neo;
+		return (KnittingTuple<K>) empty;
 	}
 
-	private static final KnittingTuple<Void> neo = wrap( new Tuple<Void>( ) {
+	private static final KnittingTuple<Void> empty = wrap( new Tuple<Void>( ) {
 
 		@Override
 		public Void get( int index ) {
@@ -1632,26 +1592,106 @@ public class KnittingTuple<I> implements
 
 	} );
 
-	/**
-	 * Returns an equivalencer that marks two objects as equivalent if and only if
-	 * they are {@linkplain java.lang.Object#equals equal} to each other or both
-	 * {@code null}.
-	 * 
-	 * @return an equivalencer that marks two objects as equivalent if and only if
-	 *         they are {@linkplain java.lang.Object#equals equal} to each other
-	 *         or both {@code null}.
-	 */
-	public static <K, Y> Equivalencer<K, Y> getNullEquivalencer( ) {
-		return new Equivalencer<K, Y>( ) {
+	@SuppressWarnings("unchecked")
+	private static <K, Y> Equivalencer<K, Y> private_equivalencer( ) {
+		return (Equivalencer<K, Y>) basic_equivalencer;
+	}
 
-			@Override
-			public boolean equivalent( K first, Y second ) {
-				if ( first == null && second == null )
-					return true;
-				if ( first == null || second == null )
-					return false;
-				return first.equals( second );
-			}
-		};
+	private final static BasicEquivalencer<Object, Object> basic_equivalencer =
+			new BasicEquivalencer<Object, Object>( );
+
+	/**
+	 * <p>
+	 * {@code on} returns a new {@code KnittingTuple} providing access to the
+	 * argument elements.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of the argument elements.
+	 * @param elements
+	 *          Elements to be wrapped in a new {@code KnittingTuple}.
+	 * @return A new {@code KnittingTuple} providing access to the argument
+	 *         elements.
+	 * @since 1.0
+	 */
+	@SafeVarargs
+	public static <K> KnittingTuple<K> on( K ... elements ) {
+		return wrap( new ArrayTuple<K>( elements ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.util.ArrayList ArrayList}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument {@link java.util.ArrayList
+	 *          ArrayList}.
+	 * @param arraylist
+	 *          An {@link java.util.ArrayList ArrayList} of elements.
+	 * @return A view of the elements in the argument {@link java.util.ArrayList
+	 *         ArrayList}.
+	 * @since 1.0
+	 */
+	public static <K> KnittingTuple<K> wrap( ArrayList<K> arraylist ) {
+		return wrap( new ArrayListTuple<K>( arraylist ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument array.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument array.
+	 * @param array
+	 *          An array of elements.
+	 * @return A view of the elements in the argument array.
+	 * @since 1.0
+	 */
+	public static <K> KnittingTuple<K> wrap( K[] array ) {
+		return wrap( new ArrayTuple<K>( array ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument
+	 *          {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * @param tuple
+	 *          A {@link org.github.evenjn.yarn.Tuple Tuple} of elements.
+	 * @return A view of the elements in the argument
+	 *         {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * @since 1.0
+	 */
+	public static <K> KnittingTuple<K> wrap( Tuple<K> tuple ) {
+		if ( tuple instanceof KnittingTuple ) {
+			return (KnittingTuple<K>) tuple;
+		}
+		return new KnittingTuple<K>( tuple );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.util.Vector Vector}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument {@link java.util.Vector
+	 *          Vector}.
+	 * @param vector
+	 *          A {@link java.util.Vector Vector} of elements.
+	 * @return A view of the elements in the argument {@link java.util.Vector
+	 *         Vector}.
+	 * @since 1.0
+	 */
+	public static <K> KnittingTuple<K> wrap( Vector<K> vector ) {
+		return wrap( new VectorTuple<K>( vector ) );
 	}
 }

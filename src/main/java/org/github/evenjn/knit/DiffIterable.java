@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.github.evenjn.lang.Equivalencer;
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.yarn.Tuple;
 
 class DiffIterable<F, B> implements
 		Iterable<DiffPair<F, B>> {

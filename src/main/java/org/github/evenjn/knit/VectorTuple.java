@@ -19,7 +19,7 @@ package org.github.evenjn.knit;
 
 import java.util.Vector;
 
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.yarn.Tuple;
 
 class VectorTuple<T> implements
 		Tuple<T> {

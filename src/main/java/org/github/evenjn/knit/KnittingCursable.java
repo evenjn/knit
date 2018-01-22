@@ -214,8 +214,10 @@ public class KnittingCursable<I> implements
 	}
 
 	/**
-	 * Returns a view of the concatenation of the argument cursable after this
-	 * cursable.
+	 * <p>
+	 * {@code append} returns a view of the concatenation of the argument cursable
+	 * after this cursable.
+	 * </p>
 	 * 
 	 * @param tail
 	 *          A cursable to concatenate after this cursable.
@@ -229,7 +231,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this cursable as a {@link java.util.Iterator}.
+	 * {@code asIterator} returns a view of this cursable as a
+	 * {@link java.util.Iterator}.
 	 * </p>
 	 * 
 	 * <p>
@@ -247,7 +250,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this cursable as a {@link java.util.stream.Stream}.
+	 * {@code asStream} returns a view of this cursable as a
+	 * {@link java.util.stream.Stream}.
 	 * </p>
 	 * 
 	 * <p>
@@ -265,8 +269,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Adds all elements of this cursable to the argument collection, then returns
-	 * it.
+	 * {@code collect} adds all elements of this cursable to the argument
+	 * collection, then returns it.
 	 * </p>
 	 * 
 	 * <p>
@@ -291,7 +295,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Feeds a consumer with the elements of this cursable.
+	 * {@code consume} feeds a consumer with the elements of this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -323,9 +327,9 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a cursable where each element is a cursor providing access to a
-	 * subsequence of contiguous elements in this cursable that satisfy the
-	 * argument {@code stateless_predicate}.
+	 * {@code crop} returns a cursable where each element is a cursor providing
+	 * access to a subsequence of contiguous elements in this cursable that
+	 * satisfy the argument {@code stateless_predicate}.
 	 * </p>
 	 * 
 	 * @param stateless_predicate
@@ -344,9 +348,9 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a cursable where each element is a cursor providing access to a
-	 * subsequence of contiguous elements that would recontsruct the original
-	 * cursable if concatenated.
+	 * {@code cut} returns a cursable where each element is a cursor providing
+	 * access to a subsequence of contiguous elements that would recontsruct the
+	 * original cursable if concatenated.
 	 * </p>
 	 * 
 	 * @param stateful_predicate
@@ -364,8 +368,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a cursable that traverses this cursable and the argument
-	 * {@code other_cursor} in parallel, applying the argument
+	 * {@code entwine} returns a cursable that traverses this cursable and the
+	 * argument {@code other_cursor} in parallel, applying the argument
 	 * {@code stateless_bifunction} to each pair of elements, and providing a view
 	 * of the result of each application.
 	 * </p>
@@ -417,10 +421,10 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns true when this cursable and the {@code other} cursable have the
-	 * same number of elements, and when each i-th element of this cursable is
-	 * equivalent to the i-th element of the {@code other} cursable. Returns false
-	 * otherwise.
+	 * {@code equivalentTo} returns true when this cursable and the {@code other}
+	 * cursable have the same number of elements, and when each i-th element of
+	 * this cursable is equivalent to the i-th element of the {@code other}
+	 * cursable. Returns false otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -447,10 +451,10 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns true when this cursable and the {@code other} cursable have the
-	 * same number of elements, and when each i-th element of this cursable is
-	 * equivalent to the i-th element of the {@code other} cursable. Returns false
-	 * otherwise.
+	 * {@code equivalentTo} returns true when this cursable and the {@code other}
+	 * cursable have the same number of elements, and when each i-th element of
+	 * this cursable is equivalent to the i-th element of the {@code other}
+	 * cursable. Returns false otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -499,8 +503,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view hiding the elements which do not satisfy the argument
-	 * {@code stateless_predicate} in this cursable.
+	 * {@code filter} returns a view hiding the elements which do not satisfy the
+	 * argument {@code stateless_predicate} in this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -526,7 +530,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapArray} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the arrays returned by the argument {@code stateless_array_map}.
 	 * </p>
@@ -557,7 +561,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapCursable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the cursables returned by the argument {@code stateless_cursable_map}.
 	 * </p>
@@ -588,7 +592,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapCursable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the cursables returned by the argument {@code stateless_cursable_map_h}.
 	 * </p>
@@ -619,9 +623,9 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Each invocation of {@link #pull(Rook)} on the returned
-	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
-	 * cursable, transforms it using
+	 * {@code flatmapCursor} returns a {@code KnittingCursable} such that each
+	 * invocation of {@link #pull(Rook)} on it pulls a new {@code KnittingCursor}
+	 * from this cursable, transforms it using
 	 * {@link KnittingCursor#flatmapCursor(CursorMap)} with the argument
 	 * {@code stateless_cursor_map}, then returns the resulting cursor.
 	 * </p>
@@ -652,9 +656,9 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Each invocation of {@link #pull(Rook)} on the returned
-	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
-	 * cursable, transforms it using
+	 * {@code flatmapCursor} returns a {@code KnittingCursable} such that each
+	 * invocation of {@link #pull(Rook)} on it pulls a new {@code KnittingCursor}
+	 * from this cursable, transforms it using
 	 * {@link KnittingCursor#flatmapCursor(Rook, CursorRingMap)} with the rook
 	 * already available and the argument {@code stateless_cursor_map_h}, then
 	 * returns the resulting cursor.
@@ -686,7 +690,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the iterables returned by the argument {@code stateless_iterable_map}.
 	 * </p>
@@ -717,7 +721,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterable} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the iterables returned by the argument {@code stateless_iterable_map_h}.
 	 * </p>
@@ -748,7 +752,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterator} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the iterators returned by the argument {@code stateless_iterator_map}.
 	 * </p>
@@ -779,7 +783,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapIterator} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the iterators returned by the argument {@code stateless_iterator_map_h}.
 	 * </p>
@@ -810,7 +814,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapOptional} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorMap)} except that the view shows elements in
 	 * the optionals returned by the argument {@code stateless_optional_map}.
 	 * </p>
@@ -841,7 +845,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapOptional} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the optionals returned by the argument {@code stateless_optional_map_h}.
 	 * </p>
@@ -873,7 +877,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code flatmapStream} returns a view realizing the same transformation as
 	 * {@link #flatmapCursor(CursorRingMap)} except that the view shows elements
 	 * in the streams returned by the argument {@code stateless_stream_map_h}.
 	 * </p>
@@ -904,8 +908,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view showing the first {@code show} elements of this cursable
-	 * visible after hiding the first {@code hide} elements.
+	 * {@code head} returns a view showing the first {@code show} elements of this
+	 * cursable visible after hiding the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
@@ -944,7 +948,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view hiding the first {@code hide} elements of this cursable.
+	 * {@code headless} returns a view hiding the first {@code hide} elements of
+	 * this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -974,8 +979,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Each invocation of {@link #pull(Rook)} on the returned
-	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
+	 * {@code map} returns a {@code KnittingCursable} such that each invocation of
+	 * {@link #pull(Rook)} on it pulls a new {@code KnittingCursor} from this
 	 * cursable, transforms it using {@link KnittingCursor#map(Function)} with the
 	 * argument {@code stateless_function}, then returns the resulting cursor.
 	 * </p>
@@ -1006,8 +1011,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Each invocation of {@link #pull(Rook)} on the returned
-	 * {@code KnittingCursable} pulls a new {@code KnittingCursor} from this
+	 * {@code map} returns a {@code KnittingCursable} such that each invocation of
+	 * {@link #pull(Rook)} on it pulls a new {@code KnittingCursor} from this
 	 * cursable, transforms it using
 	 * {@link KnittingCursor#map(Rook, RingFunction)} with the rook already
 	 * available and the argument {@code stateless_function_h}, then returns the
@@ -1040,9 +1045,9 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view that, for each element of this cursable, provides a
-	 * {@link org.github.evenjn.knit.Numbered Numbered} wrapper, containing the
-	 * element itself and the number of elements preceding it.
+	 * {@code numbered} returns a view that, for each element of this cursable,
+	 * provides a {@link org.github.evenjn.knit.Numbered Numbered} wrapper,
+	 * containing the element itself and the number of elements preceding it.
 	 * </p>
 	 * 
 	 * <p>
@@ -1067,7 +1072,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * When this cursable provides access to one element only, this method returns
+	 * When this cursable provides access to one element only, {@code one} returns
 	 * it. Otherwise, it throws an {@code IllegalStateException}.
 	 * </p>
 	 * 
@@ -1095,8 +1100,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * When this cursable provides access to one non-null element only, this
-	 * method returns it wrapped in an optional.
+	 * When this cursable provides access to one non-null element only,
+	 * {@code optionalOne} returns it wrapped in an optional.
 	 * </p>
 	 * 
 	 * <p>
@@ -1108,7 +1113,8 @@ public class KnittingCursable<I> implements
 	 * 
 	 * <p>
 	 * When it not the case that there is exactly one element, or when the only
-	 * element accessible is {@code null}, this method returns an empty optional.
+	 * element accessible is {@code null}, {@code optionalOne} returns an empty
+	 * optional.
 	 * </p>
 	 * 
 	 * <p>
@@ -1127,8 +1133,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view providing access to the elements of this cursable. The view
-	 * passes the elements to the argument consumer.
+	 * {@code peek} returns a view providing access to the elements of this
+	 * cursable. The view passes the elements to the argument consumer.
 	 * </p>
 	 * 
 	 * <p>
@@ -1166,8 +1172,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the concatenation of the argument cursable before this
-	 * cursable.
+	 * {@code prepend} returns a view of the concatenation of the argument
+	 * cursable before this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -1194,8 +1200,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a {@code KnittingCursor} wrapping a cursor obtained from the
-	 * wrapped cursable.
+	 * {@code pull} returns a {@code KnittingCursor} wrapping a cursor obtained
+	 * from the wrapped cursable.
 	 * </p>
 	 * 
 	 * @param rook
@@ -1211,7 +1217,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlArray} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
 	 * arrays returned by {@link ArrayPurl} objects supplied by the argument
 	 * {@code factory}.
@@ -1243,7 +1249,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlCursable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
 	 * cursables returned by {@link CursablePurl} objects supplied by the argument
 	 * {@code factory}.
@@ -1275,7 +1281,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlCursable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
 	 * in arrays returned by {@link CursableRingPurl} objects supplied by the
 	 * argument {@code factory}.
@@ -1308,7 +1314,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a complex view.
+	 * {@code purlCursor} returns a complex view.
 	 * </p>
 	 * 
 	 * <p>
@@ -1355,7 +1361,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a complex view.
+	 * {@code purlCursor} returns a complex view.
 	 * </p>
 	 * 
 	 * <p>
@@ -1402,7 +1408,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
 	 * iterables returned by {@link IterablePurl} objects supplied by the argument
 	 * {@code factory}.
@@ -1434,7 +1440,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterable} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
 	 * in iterables returned by {@link IterableRingPurl} objects supplied by the
 	 * argument {@code factory}.
@@ -1467,7 +1473,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterator} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
 	 * iterators returned by {@link IteratorPurl} objects supplied by the argument
 	 * {@code factory}.
@@ -1499,7 +1505,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlIterator} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
 	 * in iterators returned by {@link IteratorRingPurl} objects supplied by the
 	 * argument {@code factory}.
@@ -1532,7 +1538,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlOptional} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorPurler)} except that the view shows elements in
 	 * optionals returned by {@link OptionalPurl} objects supplied by the argument
 	 * {@code factory}.
@@ -1565,7 +1571,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlOptional} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
 	 * in optionals returned by {@link OptionalRingPurl} objects supplied by the
 	 * argument {@code factory}.
@@ -1599,7 +1605,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view realizing the same transformation as
+	 * {@code purlStream} returns a view realizing the same transformation as
 	 * {@link #purlCursor(CursorRingPurler)} except that the view shows elements
 	 * in streams returned by {@link StreamRingPurl} objects supplied by the
 	 * argument {@code factory}.
@@ -1631,8 +1637,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns the result of a computation taking into account all the elements of
-	 * this cursable.
+	 * {@code reduce} returns the result of a computation taking into account all
+	 * the elements of this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -1677,7 +1683,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Pulls a {@code KnittingCursor} from this cursable and invokes
+	 * {@code roll} pulls a {@code KnittingCursor} from this cursable and invokes
 	 * {@link KnittingCursor#roll() roll()} on it.
 	 * </p>
 	 * 
@@ -1695,7 +1701,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Counts the number of elements in this cursable.
+	 * {@code count} returns the number of elements in this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -1718,8 +1724,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the last {@code show} elements visible after hiding the
-	 * last {@code hide} elements in this cursable.
+	 * {@code tail} returns a view of the last {@code show} elements visible after
+	 * hiding the last {@code hide} elements in this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -1769,7 +1775,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view hiding the last {@code hide} elements in this cursable.
+	 * {@code tailless} returns a view hiding the last {@code hide} elements in
+	 * this cursable.
 	 * </p>
 	 * 
 	 * <p>
@@ -1805,7 +1812,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns an empty cursable.
+	 * {@code empty} returns an empty cursable.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -1820,10 +1827,10 @@ public class KnittingCursable<I> implements
 
 	@SuppressWarnings("unchecked")
 	private static <K> KnittingCursable<K> private_empty( ) {
-		return (KnittingCursable<K>) neo;
+		return (KnittingCursable<K>) empty;
 	}
 
-	private static final KnittingCursable<Void> neo =
+	private static final KnittingCursable<Void> empty =
 			wrap( new Cursable<Void>( ) {
 
 				@Override
@@ -1834,8 +1841,8 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns new {@code KnittingCursable} providing access to the argument
-	 * elements.
+	 * {@code on} returns a new {@code KnittingCursable} providing access to the
+	 * argument elements.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -1860,14 +1867,17 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the elements in the argument cursable.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link org.github.evenjn.yarn.Cursable Cursable}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument cursable.
+	 *          The type of elements in the argument
+	 *          {@link org.github.evenjn.yarn.Cursable Cursable}.
 	 * @param cursable
-	 *          A cursable of elements.
-	 * @return A view of the elements in the argument cursable.
+	 *          A {@link org.github.evenjn.yarn.Cursable Cursable} of elements.
+	 * @return A view of the elements in the argument
+	 *         {@link org.github.evenjn.yarn.Cursable Cursable}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursable<K> wrap( Cursable<K> cursable ) {
@@ -1879,14 +1889,17 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the elements in the argument iterable.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.lang.Iterable Iterable}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument iterable.
+	 *          The type of elements in the argument {@link java.lang.Iterable
+	 *          Iterable}.
 	 * @param iterable
-	 *          An iterable of elements.
-	 * @return A view of the elements in the argument iterable.
+	 *          An {@link java.lang.Iterable Iterable} of elements.
+	 * @return A view of the elements in the argument {@link java.lang.Iterable
+	 *         Iterable}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursable<K> wrap( Iterable<K> iterable ) {
@@ -1895,7 +1908,7 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of the elements in the argument array.
+	 * {@code wrap} returns a view of the elements in the argument array.
 	 * </p>
 	 * 
 	 * @param <K>

@@ -17,7 +17,7 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.yarn.Tuple;
 
 class NumberedTuple<I> implements
 		Tuple<Numbered<I>> {

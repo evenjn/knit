@@ -34,7 +34,7 @@ import org.github.evenjn.lang.BasicRook;
 import org.github.evenjn.lang.Equivalencer;
 import org.github.evenjn.lang.Ring;
 import org.github.evenjn.lang.Rook;
-import org.github.evenjn.lang.Tuple;
+import org.github.evenjn.yarn.Tuple;
 import org.github.evenjn.yarn.ArrayMap;
 import org.github.evenjn.yarn.ArrayPurl;
 import org.github.evenjn.yarn.Cursable;
@@ -2350,10 +2350,10 @@ public class KnittingCursor<I> implements
 
 	@SuppressWarnings("unchecked")
 	private static <K> KnittingCursor<K> private_empty( ) {
-		return (KnittingCursor<K>) neo;
+		return (KnittingCursor<K>) empty;
 	}
 
-	private static final KnittingCursor<Void> neo = wrap( new Cursor<Void>( ) {
+	private static final KnittingCursor<Void> empty = wrap( new Cursor<Void>( ) {
 
 		@Override
 		public Void next( )
@@ -2364,7 +2364,8 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code on} returns a view of the argument elements.
+	 * {@code on} returns a new {@code KnittingCursor} providing access to the
+	 * argument elements.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -2382,15 +2383,17 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument tuple.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link org.github.evenjn.yarn.Tuple Tuple}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument tuple.
+	 *          The type of elements in the argument
+	 *          {@link org.github.evenjn.yarn.Tuple Tuple}.
 	 * @param tuple
-	 *          A tuple of elements.
+	 *          A {@link org.github.evenjn.yarn.Tuple Tuple} of elements.
 	 * @return A new {@code KnittingCursor} providing access to the elements in
-	 *         the argument tuple.
+	 *         the argument {@link org.github.evenjn.yarn.Tuple Tuple}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Tuple<K> tuple ) {
@@ -2411,15 +2414,17 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument cursor.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link org.github.evenjn.yarn.Cursor Cursor}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument cursor.
+	 *          The type of elements in the argument
+	 *          {@link org.github.evenjn.yarn.Cursor Cursor}.
 	 * @param cursor
-	 *          A cursor of elements.
+	 *          A {@link org.github.evenjn.yarn.Cursor Cursor} of elements.
 	 * @return A new {@code KnittingCursor} providing access to the elements in
-	 *         the argument cursor.
+	 *         the argument {@link org.github.evenjn.yarn.Cursor Cursor}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Cursor<K> cursor ) {
@@ -2428,15 +2433,17 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument iterable.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.lang.Iterable Iterable}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument iterable.
+	 *          The type of elements in the argument {@link java.lang.Iterable
+	 *          Iterable}.
 	 * @param iterable
-	 *          An iterable of elements.
+	 *          An {@link java.lang.Iterable Iterable} of elements.
 	 * @return A new {@code KnittingCursor} providing access to the elements in
-	 *         the argument iterable.
+	 *         the argument {@link java.lang.Iterable Iterable}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Iterable<K> iterable ) {
@@ -2445,15 +2452,17 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument iterator.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.util.Iterator Iterator}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument iterator.
+	 *          The type of elements in the argument {@link java.util.Iterator
+	 *          Iterator}.
 	 * @param iterator
-	 *          An iterator of elements.
+	 *          An {@link java.util.Iterator Iterator} of elements.
 	 * @return A new {@code KnittingCursor} providing access to the elements in
-	 *         the argument iterator.
+	 *         the argument {@link java.util.Iterator Iterator}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Iterator<K> iterator ) {
@@ -2488,15 +2497,17 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument optional.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.util.Optional Optional}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument optional.
+	 *          The type of elements in the argument {@link java.util.Optional
+	 *          Optional}.
 	 * @param optional
-	 *          An optional.
+	 *          An {@link java.util.Optional Optional}.
 	 * @return A new {@code KnittingCursor} providing access to the element in the
-	 *         argument optional, if any.
+	 *         argument {@link java.util.Optional Optional}, if any.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Optional<K> optional ) {
@@ -2518,15 +2529,17 @@ public class KnittingCursor<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument stream.
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.util.stream.Stream Stream}.
 	 * </p>
 	 * 
 	 * @param <K>
-	 *          The type of elements in the argument stream.
+	 *          The type of elements in the argument
+	 *          {@link java.util.stream.Stream Stream}.
 	 * @param stream
-	 *          A stream of elements.
+	 *          A {@link java.util.stream.Stream Stream} of elements.
 	 * @return A new {@code KnittingCursor} providing access to the elements in
-	 *         the argument stream.
+	 *         the argument {@link java.util.stream.Stream Stream}.
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Stream<K> stream ) {
