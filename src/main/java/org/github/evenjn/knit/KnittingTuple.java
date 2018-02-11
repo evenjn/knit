@@ -100,8 +100,10 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
+ * <li>{@link #numbered()}</li>
  * <li>{@link #prepend(Tuple)}</li>
  * <li>{@link #reverse()}</li>
+ * <li>{@link #subTuple(int, int)}</li>
  * <li>{@link #tail(int, int)}</li>
  * <li>{@link #tailless(int)}</li>
  * </ul>
@@ -161,8 +163,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code append} returns a view of the concatenation of the argument tuple
-	 * after this tuple.
+	 * Method {@code append} returns a view of the concatenation of the argument
+	 * tuple after this tuple.
 	 * </p>
 	 * 
 	 * @param tail
@@ -190,11 +192,11 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asIterable} returns a view of this tuple as an
-	 * {@link java.util.Iterable Iterable}.
+	 * Method {@code asIterable} returns a view of this tuple as an
+	 * {@link java.lang.Iterable Iterable}.
 	 * </p>
 	 * 
-	 * @return A view of this tuple as an {@link java.util.Iterable Iterable}.
+	 * @return A view of this tuple as an {@link java.lang.Iterable Iterable}.
 	 * @since 1.0
 	 */
 	public Iterable<I> asIterable( ) {
@@ -203,7 +205,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asIterator} returns a view of this tuple as an
+	 * Method {@code asIterator} returns a view of this tuple as an
 	 * {@link java.util.Iterator Iterator}.
 	 * </p>
 	 * 
@@ -231,7 +233,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asKnittingCursable} returns a view of this tuple as a
+	 * Method {@code asKnittingCursable} returns a view of this tuple as a
 	 * {@link org.github.evenjn.knit.KnittingCursable KnittingCursable}.
 	 * </p>
 	 * 
@@ -245,7 +247,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asKnittingCursor} returns a view of this tuple as a
+	 * Method {@code asKnittingCursor} returns a view of this tuple as a
 	 * {@link org.github.evenjn.knit.KnittingCursor KnittingCursor}.
 	 * </p>
 	 * 
@@ -259,7 +261,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asStream} returns a view of this tuple as a
+	 * Method {@code asStream} returns a view of this tuple as a
 	 * {@link java.util.stream.Stream Stream}.
 	 * </p>
 	 * 
@@ -272,7 +274,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asTupleValue} returns a view of this tuple as a
+	 * Method {@code asTupleValue} returns a view of this tuple as a
 	 * {@link org.github.evenjn.knit.TupleValue TupleValue}.
 	 * </p>
 	 * 
@@ -292,7 +294,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code asTupleValue} returns a view of this tuple as a
+	 * Method {@code asTupleValue} returns a view of this tuple as a
 	 * {@link org.github.evenjn.knit.TupleValue TupleValue}.
 	 * </p>
 	 * 
@@ -316,8 +318,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code collect} adds all elements of this tuple to the argument collection,
-	 * then returns it.
+	 * Method {@code collect} adds all elements of this tuple to the argument
+	 * collection, then returns it.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -335,7 +337,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code consume} feeds a consumer with the elements of this tuple.
+	 * Method {@code consume} feeds a consumer with the elements of this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -358,8 +360,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code contains} returns {@code true} when the argument tuple is a subtuple
-	 * of this tuple; {@code false} otherwise.
+	 * Method {@code contains} returns {@code true} when the argument tuple is a
+	 * subtuple of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -380,8 +382,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code contains} returns {@code true} when the argument tuple is a subtuple
-	 * of this tuple; {@code false} otherwise.
+	 * Method {@code contains} returns {@code true} when the argument tuple is a
+	 * subtuple of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -406,7 +408,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code diff} returns an alignment of this tuple with the argument tuple.
+	 * Method {@code diff} returns an alignment of this tuple with the argument
+	 * tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -426,8 +429,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code diff} returns an alignment of this tuple with the argument tuple,
-	 * represented as a list of {@link org.github.evenjn.knit.DiffPair pairs}.
+	 * Method {@code diff} returns an alignment of this tuple with the argument
+	 * tuple, represented as a list of {@link org.github.evenjn.knit.DiffPair
+	 * pairs}.
 	 * </p>
 	 * 
 	 * <p>
@@ -501,7 +505,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code distance} Returns the
+	 * Method {@code distance} returns the
 	 * <a href= "https://en.wikipedia.org/wiki/Levenshtein_distance" >Levenshtein
 	 * distance</a> between this tuple and the argument tuple.
 	 * </p>
@@ -523,7 +527,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code distance} returns the
+	 * Method {@code distance} returns the
 	 * <a href= "https://en.wikipedia.org/wiki/Levenshtein_distance" >Levenshtein
 	 * distance</a> between this tuple and the argument tuple.
 	 * </p>
@@ -611,8 +615,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code endsWith} returns {@code true} when the argument tuple is a suffix
-	 * of this tuple; {@code false} otherwise.
+	 * Method {@code endsWith} returns {@code true} when the argument tuple is a
+	 * suffix of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -633,8 +637,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code endsWith} returns {@code true} when the argument tuple is a suffix
-	 * of this tuple; {@code false} otherwise.
+	 * Method {@code endsWith} returns {@code true} when the argument tuple is a
+	 * suffix of this tuple; {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -660,10 +664,10 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code equivalentTo} returns {@code true} when this tuple and the argument
-	 * tuple have the same number of slots, and when the content of each i-th slot
-	 * of this tuple is equivalent to the content of the i-th slot of the argument
-	 * tuple. Returns {@code false} otherwise.
+	 * Method {@code equivalentTo} returns {@code true} when this tuple and the
+	 * argument tuple have the same number of slots, and when the content of each
+	 * i-th slot of this tuple is equivalent to the content of the i-th slot of
+	 * the argument tuple. Returns {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -687,10 +691,10 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code equivalentTo} returns {@code true} when this tuple and the argument
-	 * tuple have the same number of slots, and when the content of each i-th slot
-	 * of this tuple is equivalent to the content of the i-th slot of the argument
-	 * tuple. Returns {@code false} otherwise.
+	 * Method {@code equivalentTo} returns {@code true} when this tuple and the
+	 * argument tuple have the same number of slots, and when the content of each
+	 * i-th slot of this tuple is equivalent to the content of the i-th slot of
+	 * the argument tuple. Returns {@code false} otherwise.
 	 * </p>
 	 * 
 	 * <p>
@@ -729,8 +733,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the index of the first slot of a subtuple that fulfils certain
-	 * requirements, if such a subtuple exists.
+	 * Method {@code findSubtuple} returns the index of the first slot of a
+	 * subtuple that fulfils certain requirements, if such a subtuple exists.
 	 * </p>
 	 * 
 	 * 
@@ -758,8 +762,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the index of the first slot of a subtuple that fulfils certain
-	 * requirements, if such a subtuple exists.
+	 * Method {@code findSubtuple} returns the index of the first slot of a
+	 * subtuple that fulfils certain requirements, if such a subtuple exists.
 	 * </p>
 	 * 
 	 * <p>
@@ -827,7 +831,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the element mapped to {@code index} by this tuple.
+	 * Method {@code get} returns the element mapped to the argument {@code index}
+	 * by this tuple.
 	 * </p>
 	 * 
 	 * @param index
@@ -848,15 +853,16 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view showing the first {@code show} elements of this tuple
-	 * visible after hiding the first {@code hide} elements.
+	 * Method {@code head} returns a view showing the first {@code show} elements
+	 * of this tuple visible after hiding the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
 	 * when the arguments are out of the range of this tuple. This behaviour is
 	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
-	 * KnittingCursor's head}.
+	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
+	 * KnittingCursor}.
 	 * </p>
 	 * 
 	 * <p>
@@ -885,14 +891,16 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view hiding the first {@code hide} elements of this tuple.
+	 * Method {@code headless} returns a view hiding the first {@code hide}
+	 * elements of this tuple.
 	 * </p>
 	 * 
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
 	 * when the arguments are out of the range of this tuple. This behaviour is
 	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
-	 * KnittingCursor's head}.
+	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
+	 * KnittingCursor}.
 	 * </p>
 	 * 
 	 * <p>
@@ -912,8 +920,33 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a longest common subsequence between this tuple and the argument
-	 * tuple. Elements are drawn from this tuple.
+	 * Method {@code longestCommonPrefix} returns the longest common prefix of
+	 * this tuple and the argument tuple.
+	 * </p>
+	 * 
+	 * @param other
+	 *          Another tuple.
+	 * @param equivalencer
+	 *          A system that can tell whether two objects are equivalent.
+	 * @return The common prefix of this tuple and the argument tuple.
+	 * @since 1.0
+	 */
+	public <Y> int longestCommonPrefix( Tuple<Y> other,
+			Equivalencer<I, Y> equivalencer ) {
+		int n = Math.min( size( ), other.size( ) );
+		for ( int i = 0; i < n; i++ ) {
+			if ( !equivalencer.equivalent( get( i ), other.get( i ) ) ) {
+				return i;
+			}
+		}
+		return n;
+	}
+
+	/**
+	 * <p>
+	 * Method {@code longestCommonSubtuple} returns a longest common subsequence
+	 * between this tuple and the argument tuple. Elements are drawn from this
+	 * tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -936,8 +969,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a longest common subsequence between this tuple and the argument
-	 * tuple. Elements are drawn from this tuple.
+	 * Method {@code longestCommonSubtuple} returns a longest common subsequence
+	 * between this tuple and the argument tuple. Elements are drawn from this
+	 * tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -967,9 +1001,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the intersection of some longest common subsequences between this
-	 * tuple and each tuple in the argument cursor. Elements are drawn from this
-	 * tuple.
+	 * Method {@code longestCommonSubtupleIntersection} returns the intersection
+	 * of some of the longest common subsequences between this tuple and each
+	 * tuple in the argument cursor. Elements are drawn from this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -993,9 +1027,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the intersection of some longest common subsequences between this
-	 * tuple and each tuple in the argument cursor. Elements are drawn from this
-	 * tuple.
+	 * Method {@code longestCommonSubtupleIntersection} returns the intersection
+	 * of some of the longest common subsequences between this tuple and each
+	 * tuple in the argument cursor. Elements are drawn from this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -1060,8 +1094,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the union of some longest common subsequences between this tuple
-	 * and each tuple in the argument cursor. Elements are drawn from this tuple.
+	 * Method {@code longestCommonSubtupleUnion} returns the union of some of the
+	 * longest common subsequences between this tuple and each tuple in the
+	 * argument cursor. Elements are drawn from this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -1084,8 +1119,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the union of some longest common subsequences between this tuple
-	 * and each tuple in the argument cursor. Elements are drawn from this tuple.
+	 * Method {@code longestCommonSubtupleUnion} returns the union of some of the
+	 * longest common subsequences between this tuple and each tuple in the
+	 * argument cursor. Elements are drawn from this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -1144,28 +1180,10 @@ public class KnittingTuple<I> implements
 	}
 
 	/**
-	 * Returns the longest common prefix of this tuple and the argument tuple.
-	 * 
-	 * @param other
-	 *          Another tuple.
-	 * @param equivalencer
-	 *          A system that can tell whether two objects are equivalent.
-	 * @return The common prefix of this tuple and the argument tuple.
-	 * @since 1.0
-	 */
-	public <Y> int longestCommonPrefix( Tuple<Y> other,
-			Equivalencer<I, Y> equivalencer ) {
-		int n = Math.min( size( ), other.size( ) );
-		for ( int i = 0; i < n; i++ ) {
-			if ( !equivalencer.equivalent( get( i ), other.get( i ) ) ) {
-				return i;
-			}
-		}
-		return n;
-	}
-
-	/**
-	 * Returns the longest common suffix of this tuple and the argument tuple.
+	 * <p>
+	 * Method {@code longestCommonPrefix} returns the longest common suffix of
+	 * this tuple and the argument tuple.
+	 * </p>
 	 * 
 	 * @param other
 	 *          Another tuple.
@@ -1190,9 +1208,9 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view. For each element {@code E} of this tuple, the view shows
-	 * the element returned by the argument {@code stateless_function} when
-	 * invoked with argument {@code E}.
+	 * Method {@code map} returns a view. For each element {@code E} of this
+	 * tuple, the view shows the element returned by the argument
+	 * {@code stateless_function} when invoked with argument {@code E}.
 	 * </p>
 	 * 
 	 * @param <O>
@@ -1209,10 +1227,10 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view. For each element {@code E} of this tuple, the view shows
-	 * the element wrapped in a {@link org.github.evenjn.knit.Numbered Numbered}
-	 * object, containing the element itself and the number of elements preceding
-	 * it in this tuple..
+	 * Method {@code numbered} returns a view. For each element {@code E} of this
+	 * tuple, the view shows the element wrapped in a
+	 * {@link org.github.evenjn.knit.Numbered Numbered} object, containing the
+	 * element itself and the number of elements preceding it in this tuple..
 	 * </p>
 	 * 
 	 * @return A complex view.
@@ -1224,8 +1242,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * When this tuple has a single slot, this method returns the content of that
-	 * slot. Otherwise, it throws an {@code IllegalStateException}.
+	 * When this tuple has a single slot, method {@code one} returns the content
+	 * of that slot. Otherwise, it throws an {@code IllegalStateException}.
 	 * </p>
 	 * 
 	 * @return The only element accessible via this tuple.
@@ -1241,8 +1259,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * When this tuple provides access to one non-null element only, this method
-	 * returns it wrapped in an optional.
+	 * When this tuple provides access to one non-null element only, method
+	 * {@code optionalOne} returns it wrapped in an optional.
 	 * </p>
 	 * 
 	 * <p>
@@ -1261,8 +1279,10 @@ public class KnittingTuple<I> implements
 	}
 
 	/**
-	 * Returns a view of the concatenation of the argument tuple before this
-	 * tuple.
+	 * <p>
+	 * Method {@code prepend} returns a view of the concatenation of the argument
+	 * tuple before this tuple.
+	 * </p>
 	 * 
 	 * @param head
 	 *          A tuple to concatenate before this tuple.
@@ -1290,8 +1310,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns the result of a computation taking into account all the elements of
-	 * this tuple.
+	 * Method {@code reduce} returns the result of a computation taking into
+	 * account all the elements of this tuple.
 	 * </p>
 	 * 
 	 * <p>
@@ -1332,7 +1352,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view of this tuple where the order of the elements is reversed.
+	 * Method {@code reverse} returns a view of this tuple where the order of the
+	 * elements is reversed.
 	 * </p>
 	 * 
 	 * @return a view of this tuple where the order of the elements is reversed.
@@ -1357,7 +1378,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code size} returns the size of this tuple.
+	 * Method {@code size} returns the size of this tuple.
 	 * </p>
 	 * 
 	 * @return The size of this tuple.
@@ -1388,8 +1409,56 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code subTuple} returns a view showing elements of this tuple in slots
-	 * between {@code n} and {@code m}, including {@code n} and excluding
+	 * Method {@code startsWith} returns {@code true} when the argument tuple is a
+	 * prefix of this tuple; {@code false} otherwise.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method invokes {@link KnittingTuple#startsWith(Tuple,Equivalencer)
+	 * startsWith(Tuple, Equivalencer)} using a
+	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
+	 * </p>
+	 * 
+	 * @param other
+	 *          Another tuple.
+	 * @return {@code true} when the argument tuple is a prefix of this tuple;
+	 *         {@code false} otherwise.
+	 * @since 1.0
+	 */
+	public <Y> boolean startsWith( Tuple<Y> other ) {
+		return startsWith( other, private_equivalencer( ) );
+	}
+
+	/**
+	 * <p>
+	 * Method {@code startsWith} returns {@code true} when the argument tuple is a
+	 * prefix of this tuple; {@code false} otherwise.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method uses the argument {@code equivalencer} to decide whether an
+	 * element of this tuple is equal to an element of the argument tuple.
+	 * </p>
+	 * 
+	 * @param other
+	 *          Another tuple.
+	 * @param equivalencer
+	 *          A system that can tell whether two objects are equivalent.
+	 * @return {@code true} when the argument tuple is a prefix of this tuple;
+	 *         {@code false} otherwise.
+	 * @since 1.0
+	 */
+	public <Y> boolean startsWith( Tuple<Y> other,
+			Equivalencer<I, Y> equivalencer ) {
+		if ( size( ) < other.size( ) )
+			return false;
+		return head( 0, other.size( ) ).equivalentTo( other, equivalencer );
+	}
+
+	/**
+	 * <p>
+	 * Method {@code subTuple} returns a view showing elements of this tuple in
+	 * slots between {@code n} and {@code m}, including {@code n} and excluding
 	 * {@code m}.
 	 * </p>
 	 * 
@@ -1429,63 +1498,16 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns {@code true} when the argument tuple is a prefix of this tuple;
-	 * {@code false} otherwise.
-	 * </p>
-	 * 
-	 * <p>
-	 * This method invokes {@link KnittingTuple#startsWith(Tuple,Equivalencer)
-	 * startsWith(Tuple, Equivalencer)} using a
-	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
-	 * </p>
-	 * 
-	 * @param other
-	 *          Another tuple.
-	 * @return {@code true} when the argument tuple is a prefix of this tuple;
-	 *         {@code false} otherwise.
-	 * @since 1.0
-	 */
-	public <Y> boolean startsWith( Tuple<Y> other ) {
-		return startsWith( other, private_equivalencer( ) );
-	}
-
-	/**
-	 * <p>
-	 * Returns {@code true} when the argument tuple is a prefix of this tuple;
-	 * {@code false} otherwise.
-	 * </p>
-	 * 
-	 * <p>
-	 * This method uses the argument {@code equivalencer} to decide whether an
-	 * element of this tuple is equal to an element of the argument tuple.
-	 * </p>
-	 * 
-	 * @param other
-	 *          Another tuple.
-	 * @param equivalencer
-	 *          A system that can tell whether two objects are equivalent.
-	 * @return {@code true} when the argument tuple is a prefix of this tuple;
-	 *         {@code false} otherwise.
-	 * @since 1.0
-	 */
-	public <Y> boolean startsWith( Tuple<Y> other,
-			Equivalencer<I, Y> equivalencer ) {
-		if ( size( ) < other.size( ) )
-			return false;
-		return head( 0, other.size( ) ).equivalentTo( other, equivalencer );
-	}
-
-	/**
-	 * <p>
-	 * Returns a view of the last {@code show} elements of this tuple visible
-	 * after hiding the last {@code hide} elements.
+	 * Method {@code tail} returns a view of the last {@code show} elements of
+	 * this tuple visible after hiding the last {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
 	 * when the arguments are out of the range of this tuple. This behaviour is
 	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
-	 * KnittingCursor's head}.
+	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
+	 * KnittingCursor}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1524,14 +1546,16 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns a view hiding the last {@code hide} elements of this tuple.
+	 * Method {@code tailless} returns a view hiding the last {@code hide}
+	 * elements of this tuple.
 	 * </p>
 	 * 
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
 	 * when the arguments are out of the range of this tuple. This behaviour is
 	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
-	 * KnittingCursor's head}.
+	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
+	 * KnittingCursor}.
 	 * </p>
 	 * 
 	 * <p>
@@ -1560,7 +1584,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * Returns an empty tuple.
+	 * Method {@code empty} returns an empty tuple.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -1602,8 +1626,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code on} returns a new {@code KnittingTuple} providing access to the
-	 * argument elements.
+	 * Method {@code on} returns a new {@code KnittingTuple} providing access to
+	 * the argument elements.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -1621,7 +1645,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument
+	 * Method {@code wrap} returns a view of the elements in the argument
 	 * {@link java.util.ArrayList ArrayList}.
 	 * </p>
 	 * 
@@ -1640,7 +1664,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument array.
+	 * Method {@code wrap} returns a view of the elements in the argument array.
 	 * </p>
 	 * 
 	 * @param <K>
@@ -1656,7 +1680,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument
+	 * Method {@code wrap} returns a view of the elements in the argument
 	 * {@link org.github.evenjn.yarn.Tuple Tuple}.
 	 * </p>
 	 * 
@@ -1678,7 +1702,7 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument
+	 * Method {@code wrap} returns a view of the elements in the argument
 	 * {@link java.util.Vector Vector}.
 	 * </p>
 	 * 
