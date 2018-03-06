@@ -354,17 +354,16 @@ public class KnittingCursable<I> implements
 	 * original cursable if concatenated.
 	 * </p>
 	 * 
-	 * @param stateful_predicate
+	 * @param predicate
 	 *          A stateful system that identifies elements that mark beginning of
-	 *          a new element of the partition.
+	 *          a new subsequence. The predicate might be stateless or stateful.
 	 * @return a cursable where each element is a cursor providing access to a
-	 *         partition of the elements in this cursable.
+	 *         subsequence of contiguous elements in this cursable.
 	 * @since 1.0
 	 */
-	@Deprecated
 	public KnittingCursable<KnittingCursor<I>>
-			cut( Predicate<I> stateful_predicate ) {
-		return KnittingCursable.wrap( h -> pull( h ).cut( stateful_predicate ) );
+			cut( Predicate<I> predicate ) {
+		return KnittingCursable.wrap( h -> pull( h ).cut( predicate ) );
 	}
 
 	/**

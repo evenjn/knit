@@ -539,22 +539,19 @@ public class KnittingCursor<I> implements
 	 * cursor if concatenated.
 	 * </p>
 	 * 
-	 * @param stateful_predicate
-	 *          A stateful system that identifies elements that mark beginning of
-	 *          a new element of the partition.
+	 * @param predicate
+	 *          A system that identifies elements that mark beginning of a new
+	 *          subsequence. The predicate might be stateless or stateful.
 	 * @return a cursor where each element is a cursor providing access to a
-	 *         partition of the elements in this cursor.
+	 *         subsequence of the elements in this cursor.
 	 * @throws IllegalStateException
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	@Deprecated
-	public KnittingCursor<KnittingCursor<I>>
-			cut( Predicate<I> stateful_predicate )
-					throws IllegalStateException {
+	public KnittingCursor<KnittingCursor<I>> cut( Predicate<I> predicate )
+			throws IllegalStateException {
 		lock( );
-		return KnittingCursor
-				.wrap( new CutCursor<I>( wrapped, stateful_predicate ) );
+		return KnittingCursor.wrap( new CutCursor<I>( wrapped, predicate ) );
 	}
 
 	/**
