@@ -148,6 +148,7 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #flatmapOptional(OptionalMap)}</li>
  * <li>{@link #flatmapOptional(Rook, OptionalRingMap)}</li>
  * <li>{@link #flatmapStream(Rook, StreamRingMap)}</li>
+ * <li>{@link #head(int)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -1280,6 +1281,26 @@ public class KnittingCursor<I> implements
 		}
 		is_cached = true;
 		return true;
+	}
+
+	/**
+	 * <p>
+	 * {@code head} returns a view showing the first {@code show} elements in this
+	 * cursor.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a convenient shorthand to invoke {@link #head(int, int)} passing
+	 * zero as the first argument.
+	 * </p>
+	 * 
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view showing the first {@code show} elements in this cursor.
+	 * @since 1.0
+	 */
+	public KnittingCursor<I> head( int show ) {
+		return head( 0, show );
 	}
 
 	/**

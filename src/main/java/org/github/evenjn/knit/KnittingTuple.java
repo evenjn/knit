@@ -97,6 +97,8 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #asStream()}</li>
  * <li>{@link #asTupleValue()}</li>
  * <li>{@link #asTupleValue(Equivalencer)}</li>
+ * <li>{@link #entwine(Tuple)}</li>
+ * <li>{@link #head(int)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -104,6 +106,7 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #prepend(Tuple)}</li>
  * <li>{@link #reverse()}</li>
  * <li>{@link #subTuple(int, int)}</li>
+ * <li>{@link #tail(int)}</li>
  * <li>{@link #tail(int, int)}</li>
  * <li>{@link #tailless(int)}</li>
  * </ul>
@@ -664,6 +667,46 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
+	 * {@code entwine} returns a complex view.
+	 * </p>
+	 * 
+	 * <p>
+	 * It returns a tuple where each N-th element is the result of applying the
+	 * argument {@code stateless_bifunction} to the N-th element of this tuple and
+	 * the the N-th element of the argument tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * The size of the returned tuple is the size of the smallest tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a transformation method.
+	 * </p>
+	 * 
+	 * @param <R>
+	 *          The type of elements accessible via the argument tuple.
+	 * @param <M>
+	 *          The type of elements returned by the bifunction.
+	 * @param other_tuple
+	 *          The tuple to use together with this tuple.
+	 * @param stateless_bifunction
+	 *          The stateless bifunction to apply to each pair of element.
+	 * @return a tuple where each N-th element is the result of applying the
+	 *         argument {@code stateless_bifunction} to the N-th element of this
+	 *         tuple and the the N-th element of the argument tuple.
+	 * @since 1.0
+	 */
+	public <R, M> KnittingTuple<M> entwine(
+			Tuple<R> other_tuple,
+			BiFunction<? super I, ? super R, M> stateless_bifunction )
+			throws IllegalStateException {
+		return wrap(
+				new EntwineTuple<>( wrapped, other_tuple, stateless_bifunction ) );
+	}
+
+	/**
+	 * <p>
 	 * Method {@code equivalentTo} returns {@code true} when this tuple and the
 	 * argument tuple have the same number of slots, and when the content of each
 	 * i-th slot of this tuple is equivalent to the content of the i-th slot of
@@ -853,8 +896,28 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
+	 * {@code head} returns a view showing the first {@code show} elements in this
+	 * tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a convenient shorthand to invoke {@link #head(int, int)} passing
+	 * zero as the first argument.
+	 * </p>
+	 * 
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view showing the first {@code show} elements of this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> head( int show ) {
+		return head( 0, show );
+	}
+
+	/**
+	 * <p>
 	 * Method {@code head} returns a view showing the first {@code show} elements
-	 * of this tuple visible after hiding the first {@code hide} elements.
+	 * in this tuple visible after hiding the first {@code hide} elements.
 	 * </p>
 	 * 
 	 * <p>
@@ -879,7 +942,7 @@ public class KnittingTuple<I> implements
 	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements of this tuple
+	 * @return A view showing the first {@code show} elements in this tuple
 	 *         visible after hiding the first {@code hide} elements.
 	 * @since 1.0
 	 */
@@ -1498,6 +1561,27 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
+	 * {@code tail} returns a view showing the last {@code show} elements in this
+	 * tuple.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a convenient shorthand to invoke {@link #last(int, int)} passing
+	 * zero as the first argument.
+	 * </p>
+	 * 
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view showing the last {@code show} elements of this tuple.
+	 * @since 1.0
+	 */
+	public KnittingTuple<I> tail( int show ) {
+		return tail( 0, show );
+	}
+
+	
+	/**
+	 * <p>
 	 * Method {@code tail} returns a view of the last {@code show} elements of
 	 * this tuple visible after hiding the last {@code hide} elements.
 	 * </p>
@@ -1698,6 +1782,28 @@ public class KnittingTuple<I> implements
 			return (KnittingTuple<K>) tuple;
 		}
 		return new KnittingTuple<K>( tuple );
+	}
+
+	/**
+	 * <p>
+	 * Method {@code wrap} returns a view of the element, if any, in the argument
+	 * {@link java.util.Optional Optional}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of the element, if any, in the argument
+	 *          {@link java.util.Optional Optional}.
+	 * @param optional
+	 *          An {@link java.util.Optional Optional} element.
+	 * @return A view of the element, if any, in the argument
+	 *         {@link java.util.Optional Optional}.
+	 * @since 1.0
+	 */
+	public static <K> KnittingTuple<K> wrap( Optional<K> optional ) {
+		if ( optional.isPresent( ) ) {
+			return on( optional.get( ) );
+		}
+		return empty( );
 	}
 
 	/**

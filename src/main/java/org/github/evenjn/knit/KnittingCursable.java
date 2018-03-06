@@ -160,6 +160,7 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #flatmapOptional(OptionalMap)}</li>
  * <li>{@link #flatmapOptional(OptionalRingMap)}</li>
  * <li>{@link #flatmapStream(StreamRingMap)}</li>
+ * <li>{@link #head(int)}</li>
  * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -904,6 +905,26 @@ public class KnittingCursable<I> implements
 						.flatmapStream( rook, stateless_stream_map_h );
 			}
 		} );
+	}
+
+	/**
+	 * <p>
+	 * {@code head} returns a view showing the first {@code show} elements in this
+	 * cursable.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a convenient shorthand to invoke {@link #head(int, int)} passing
+	 * zero as the first argument.
+	 * </p>
+	 * 
+	 * @param show
+	 *          The number of elements to show. A negative numbers counts as zero.
+	 * @return A view showing the first {@code show} elements in this cursable.
+	 * @since 1.0
+	 */
+	public KnittingCursable<I> head( int show ) {
+		return head( 0, show );
 	}
 
 	/**
