@@ -114,6 +114,7 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #collect(Collection)}</li>
  * <li>{@link #count()}</li>
  * <li>{@link #consume(Ring)}</li>
+ * <li>{@link #isEmpty()}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
  * <li>{@link #reduce(Object, BiFunction)}</li>
@@ -132,7 +133,6 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #append(Cursor)}</li>
  * <li>{@link #asIterator()}</li>
  * <li>{@link #asStream()}</li>
- * <li>{@link #crop(Predicate)}</li>
  * <li>{@link #cut(Predicate)}</li>
  * <li>{@link #entwine(Cursor, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
@@ -500,36 +500,6 @@ public class KnittingCursor<I> implements
 		catch ( EndOfCursorException e ) {
 			return so_far;
 		}
-	}
-
-	/**
-	 * <p>
-	 * {@code crop} returns a cursor where each element is a cursor providing
-	 * access to a subsequence of contiguous elements in this cursor that satisfy
-	 * the argument {@code stateless_predicate}.
-	 * </p>
-	 * 
-	 * <p>
-	 * This is a transformation method.
-	 * </p>
-	 * 
-	 * @param stateless_predicate
-	 *          A stateless system that identifies elements that should be kept
-	 *          together.
-	 * @return a cursor where each element is a cursor providing access to a
-	 *         subsequence of contiguous elements in this cursor that satisfy the
-	 *         argument {@code stateless_predicate}.
-	 * @throws IllegalStateException
-	 *           when this cursor is not in pristine state.
-	 * @since 1.0
-	 */
-	@Deprecated
-	public KnittingCursor<KnittingCursor<I>>
-			crop( Predicate<I> stateless_predicate )
-					throws IllegalStateException {
-		lock( );
-		return KnittingCursor
-				.wrap( new CropCursor<I>( wrapped, stateless_predicate.negate( ) ) );
 	}
 
 	/**
@@ -1365,6 +1335,38 @@ public class KnittingCursor<I> implements
 		lock( );
 		int final_hide = hide < 0 ? 0 : hide;
 		return wrap( Subcursor.skip( wrapped, final_hide ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code isEmpty} returns {@code true} when this cursor is empty.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method invokes this cursor's
+	 * {@link org.github.evenjn.yarn.Cursor#next() next()} method once and returns
+	 * {@code true} unless the invocation throws a
+	 * {@link org.github.evenjn.yarn.EndOfCursorException EndOfCursorException}.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
+	 * 
+	 * @return {@code true} when this cursor is empty.
+	 * @throws IllegalStateException
+	 *           when this cursor is not in pristine state.
+	 * @since 1.0
+	 */
+	public boolean isEmpty( ) {
+		lock( );
+		try {
+			wrapped.next( );
+			return true;
+		}
+		catch ( EndOfCursorException e ) {
+			return false;
+		}
 	}
 
 	/**
@@ -2368,17 +2370,17 @@ public class KnittingCursor<I> implements
 
 	@SuppressWarnings("unchecked")
 	private static <K> KnittingCursor<K> private_empty( ) {
-		return (KnittingCursor<K>) empty;
+		return (KnittingCursor<K>) wrap( empty );
 	}
 
-	private static final KnittingCursor<Void> empty = wrap( new Cursor<Void>( ) {
+	private static final Cursor<Void> empty = new Cursor<Void>( ) {
 
 		@Override
 		public Void next( )
 				throws EndOfCursorException {
 			throw EndOfCursorException.neo( );
 		}
-	} );
+	};
 
 	/**
 	 * <p>
@@ -2397,37 +2399,6 @@ public class KnittingCursor<I> implements
 	@SafeVarargs
 	public static <K> KnittingCursor<K> on( K ... elements ) {
 		return wrap( new ArrayCursor<K>( elements ) );
-	}
-
-	/**
-	 * <p>
-	 * {@code wrap} returns a view of the elements in the argument
-	 * {@link org.github.evenjn.yarn.Tuple Tuple}.
-	 * </p>
-	 * 
-	 * @param <K>
-	 *          The type of elements in the argument
-	 *          {@link org.github.evenjn.yarn.Tuple Tuple}.
-	 * @param tuple
-	 *          A {@link org.github.evenjn.yarn.Tuple Tuple} of elements.
-	 * @return A new {@code KnittingCursor} providing access to the elements in
-	 *         the argument {@link org.github.evenjn.yarn.Tuple Tuple}.
-	 * @since 1.0
-	 */
-	public static <K> KnittingCursor<K> wrap( Tuple<K> tuple ) {
-		return new KnittingCursor<>( new Cursor<K>( ) {
-
-			private int i = 0;
-
-			@Override
-			public K next( )
-					throws EndOfCursorException {
-				if ( i >= tuple.size( ) ) {
-					throw EndOfCursorException.neo( );
-				}
-				return tuple.get( i++ );
-			}
-		} );
 	}
 
 	/**
@@ -2484,16 +2455,7 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Iterator<K> iterator ) {
-		return wrap( new Cursor<K>( ) {
-
-			@Override
-			public K next( )
-					throws EndOfCursorException {
-				if ( iterator.hasNext( ) )
-					return iterator.next( );
-				throw EndOfCursorException.neo( );
-			}
-		} );
+		return wrap( new IteratorCursor<>( iterator ) );
 	}
 
 	/**
@@ -2529,20 +2491,7 @@ public class KnittingCursor<I> implements
 	 * @since 1.0
 	 */
 	public static <K> KnittingCursor<K> wrap( Optional<K> optional ) {
-		return new KnittingCursor<>( new Cursor<K>( ) {
-
-			private boolean consumed = false;
-
-			@Override
-			public K next( )
-					throws EndOfCursorException {
-				if ( consumed || !optional.isPresent( ) ) {
-					throw EndOfCursorException.neo( );
-				}
-				consumed = true;
-				return optional.get( );
-			}
-		} );
+		return wrap( new OptionalCursor<>( optional ) );
 	}
 
 	/**
@@ -2562,5 +2511,24 @@ public class KnittingCursor<I> implements
 	 */
 	public static <K> KnittingCursor<K> wrap( Stream<K> stream ) {
 		return wrap( stream.iterator( ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument
+	 *          {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * @param tuple
+	 *          A {@link org.github.evenjn.yarn.Tuple Tuple} of elements.
+	 * @return A new {@code KnittingCursor} providing access to the elements in
+	 *         the argument {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * @since 1.0
+	 */
+	public static <K> KnittingCursor<K> wrap( Tuple<K> tuple ) {
+		return wrap( new TupleCursor<>( tuple ) );
 	}
 }

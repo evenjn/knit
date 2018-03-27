@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2016 Marco Trevisan
+ * Copyright 2018 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,30 @@
  */
 package org.github.evenjn.knit;
 
-import java.util.Vector;
-
+import org.github.evenjn.yarn.Cursor;
+import org.github.evenjn.yarn.EndOfCursorException;
 import org.github.evenjn.yarn.Tuple;
 
-class VectorTuple<T> implements
-		Tuple<T> {
+class TupleCursor<I> implements
+		Cursor<I> {
 
-	private final Vector<T> vector;
+	private final Tuple<I> tuple;
 
-	public VectorTuple(Vector<T> vector) {
-		this.vector = vector;
+	private int i = 0;
+
+	TupleCursor(Tuple<I> tuple) {
+		this.tuple = tuple;
 	}
 
 	@Override
-	public T get( int index ) {
-		if ( index < 0 || index >= vector.size( ) ) {
-			throw new IllegalArgumentException( );
+	public I next( )
+			throws EndOfCursorException {
+		if ( i >= tuple.size( ) ) {
+			throw EndOfCursorException.neo( );
 		}
-		return vector.get( index );
-	}
-
-	@Override
-	public int size( ) {
-		return vector.size( );
+		I result = tuple.get( i );
+		i++;
+		return result;
 	}
 
 }

@@ -24,8 +24,9 @@ class ConcatenateCursor<I> implements
 		Cursor<I> {
 
 	private final Cursor<? extends I> head;
+
 	private final Cursor<? extends I> tail;
-	
+
 	private boolean in_head = true;
 
 	public ConcatenateCursor(Cursor<? extends I> head, Cursor<? extends I> tail) {

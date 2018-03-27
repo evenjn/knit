@@ -29,7 +29,7 @@ import org.github.evenjn.yarn.EndOfCursorException;
 class ArrayCursor<T> implements
 		Cursor<T> {
 
-	private T[] array;
+	private final T[] array;
 
 	private int i = 0;
 
@@ -50,7 +50,7 @@ class ArrayCursor<T> implements
 class ArrayCursable<T> implements
 		Cursable<T> {
 
-	private T[] array;
+	private final T[] array;
 
 	public ArrayCursable(T[] array) {
 		this.array = array;
@@ -65,7 +65,7 @@ class ArrayCursable<T> implements
 class ArrayIterator<T> implements
 		Iterator<T> {
 
-	private T[] array;
+	private final T[] array;
 
 	private int i = 0;
 
@@ -90,7 +90,7 @@ class ArrayIterator<T> implements
 class ArrayIterable<T> implements
 		Iterable<T> {
 
-	private T[] array;
+	private final T[] array;
 
 	public ArrayIterable(T[] array) {
 		this.array = array;
@@ -105,7 +105,7 @@ class ArrayIterable<T> implements
 class ArrayTuple<T> implements
 		Tuple<T> {
 
-	private T[] array;
+	private final T[] array;
 
 	public ArrayTuple(T[] array) {
 		this.array = array;

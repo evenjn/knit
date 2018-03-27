@@ -24,18 +24,15 @@ import org.github.evenjn.yarn.Tuple;
 class ArrayListTuple<T> implements
 		Tuple<T> {
 
-	private ArrayList<T> arraylist;
-
-	private int size = 0;
+	private final ArrayList<T> arraylist;
 
 	public ArrayListTuple(ArrayList<T> arraylist) {
 		this.arraylist = arraylist;
-		size = arraylist.size( );
 	}
 
 	@Override
 	public T get( int index ) {
-		if ( index >= size ) {
+		if ( index < 0 || index >= arraylist.size( ) ) {
 			throw new IllegalArgumentException( );
 		}
 		return arraylist.get( index );
@@ -43,7 +40,7 @@ class ArrayListTuple<T> implements
 
 	@Override
 	public int size( ) {
-		return size;
+		return arraylist.size( );
 	}
 
 }

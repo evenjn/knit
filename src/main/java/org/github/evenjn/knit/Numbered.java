@@ -53,4 +53,8 @@ public class Numbered<K> {
 	public int getNumber( ) {
 		return number;
 	}
+
+	public String toString( ) {
+		return number + " " + wrapped.toString( );
+	}
 }

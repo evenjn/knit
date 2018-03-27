@@ -70,6 +70,7 @@ import org.github.evenjn.yarn.RingFunction;
 import org.github.evenjn.yarn.StreamRingMap;
 import org.github.evenjn.yarn.StreamRingPurl;
 import org.github.evenjn.yarn.StreamRingPurler;
+import org.github.evenjn.yarn.Tuple;
 
 /**
  * 
@@ -125,6 +126,7 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #count()}</li>
  * <li>{@link #equivalentTo(Cursable)}</li>
  * <li>{@link #equivalentTo(Cursable, Equivalencer)}</li>
+ * <li>{@link #isEmpty()}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
  * <li>{@link #reduce(Object, BiFunction)}</li>
@@ -144,7 +146,6 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <li>{@link #append(Cursable)}</li>
  * <li>{@link #asIterator(Rook)}</li>
  * <li>{@link #asStream(Rook)}</li>
- * <li>{@link #crop(Predicate)}</li>
  * <li>{@link #cut(Predicate)}</li>
  * <li>{@link #entwine(Cursable, BiFunction)}</li>
  * <li>{@link #filter(Predicate)}</li>
@@ -193,8 +194,11 @@ import org.github.evenjn.yarn.StreamRingPurler;
  * <ul>
  * <li>{@link #empty()}</li>
  * <li>{@link #on(Object...)}</li>
+ * <li>{@link #wrap(Cursable)}</li>
  * <li>{@link #wrap(Iterable)}</li>
  * <li>{@link #wrap(Object[])}</li>
+ * <li>{@link #wrap(Optional)}</li>
+ * <li>{@link #wrap(Tuple)}</li>
  * </ul>
  *
  * <p>
@@ -324,27 +328,6 @@ public class KnittingCursable<I> implements
 			Consumer<? super I> consumer = consumer_provider.get( rook );
 			pull( rook ).peek( consumer ).roll( );
 		}
-	}
-
-	/**
-	 * <p>
-	 * {@code crop} returns a cursable where each element is a cursor providing
-	 * access to a subsequence of contiguous elements in this cursable that
-	 * satisfy the argument {@code stateless_predicate}.
-	 * </p>
-	 * 
-	 * @param stateless_predicate
-	 *          A stateless system that identifies elements that should be kept
-	 *          together.
-	 * @return a cursable where each element is a cursor providing access to a
-	 *         subsequence of contiguous elements in this cursable that satisfy
-	 *         the argument {@code stateless_predicate}.
-	 * @since 1.0
-	 */
-	@Deprecated
-	public KnittingCursable<KnittingCursor<I>>
-			crop( Predicate<I> stateless_predicate ) {
-		return KnittingCursable.wrap( h -> pull( h ).crop( stateless_predicate ) );
 	}
 
 	/**
@@ -995,6 +978,28 @@ public class KnittingCursable<I> implements
 				return Subcursor.skip( wrapped.pull( rook ), final_hide );
 			}
 		} );
+	}
+
+	/**
+	 * <p>
+	 * {@code isEmpty} returns {@code true} when this cursable is empty.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is a rolling method.
+	 * </p>
+	 * 
+	 * @return {@code true} when this cursable is empty.
+	 * @since 1.0
+	 */
+	public boolean isEmpty( ) {
+		try ( BasicRook rook = new BasicRook( ) ) {
+			wrapped.pull( rook ).next( );
+			return true;
+		}
+		catch ( EndOfCursorException e ) {
+			return false;
+		}
 	}
 
 	/**
@@ -1940,5 +1945,43 @@ public class KnittingCursable<I> implements
 	 */
 	public static <K> KnittingCursable<K> wrap( K[] array ) {
 		return wrap( new ArrayCursable<K>( array ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link java.util.Optional Optional}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument {@link java.util.Optional
+	 *          Optional}.
+	 * @param optional
+	 *          An {@link java.util.Optional Optional}.
+	 * @return A new {@code KnittingCursable} providing access to the element in
+	 *         the argument {@link java.util.Optional Optional}, if any.
+	 * @since 1.0
+	 */
+	public static <K> KnittingCursable<K> wrap( Optional<K> optional ) {
+		return wrap( new OptionalCursable<>( optional ) );
+	}
+
+	/**
+	 * <p>
+	 * {@code wrap} returns a view of the elements in the argument
+	 * {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * </p>
+	 * 
+	 * @param <K>
+	 *          The type of elements in the argument
+	 *          {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * @param tuple
+	 *          A {@link org.github.evenjn.yarn.Tuple Tuple} of elements.
+	 * @return A view of the elements in the argument
+	 *         {@link org.github.evenjn.yarn.Tuple Tuple}.
+	 * @since 1.0
+	 */
+	public static <K> KnittingCursable<K> wrap( Tuple<K> tuple ) {
+		return wrap( new TupleCursable<K>( tuple ) );
 	}
 }
