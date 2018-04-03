@@ -149,7 +149,6 @@ import org.github.evenjn.yarn.StreamRingPurl;
  * <li>{@link #flatmapOptional(Rook, OptionalRingMap)}</li>
  * <li>{@link #flatmapStream(Rook, StreamRingMap)}</li>
  * <li>{@link #head(int)}</li>
- * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
  * <li>{@link #map(Rook, RingFunction)}</li>
@@ -1257,55 +1256,25 @@ public class KnittingCursor<I> implements
 	 * </p>
 	 * 
 	 * <p>
-	 * This is a convenient shorthand to invoke {@link #head(int, int)} passing
-	 * zero as the first argument.
-	 * </p>
-	 * 
-	 * @param show
-	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements in this cursor.
-	 * @since 1.0
-	 */
-	public KnittingCursor<I> head( int show ) {
-		return head( 0, show );
-	}
-
-	/**
-	 * <p>
-	 * {@code head} returns a view showing the first {@code show} elements in this
-	 * cursor visible after hiding the first {@code hide} elements.
-	 * </p>
-	 * 
-	 * <p>
-	 * The returned view may be empty. This happens when this cursor's size is
-	 * smaller than {@code hide}.
-	 * </p>
-	 * 
-	 * <p>
 	 * The returned view may contain less than {@code show} elements. This happens
-	 * when this cursor's size is smaller than {@code hide + show}.
+	 * when this cursor's size is smaller than {@code show}.
 	 * </p>
 	 * 
 	 * <p>
 	 * This is a transformation method.
 	 * </p>
 	 *
-	 * @param hide
-	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements in this cursor
-	 *         visible after hiding the first {@code hide} elements.
+	 * @return A view showing the first {@code show} elements in this cursor.
 	 * @throws IllegalStateException
 	 *           when this cursor is not in pristine state.
 	 * @since 1.0
 	 */
-	public KnittingCursor<I> head( int hide, int show )
-			throws IllegalStateException {
+	public KnittingCursor<I> head( int show ) {
 		lock( );
 		int final_show = show < 0 ? 0 : show;
-		int final_hide = hide < 0 ? 0 : hide;
-		return wrap( Subcursor.sub( wrapped, final_hide, final_show ) );
+		return wrap( Subcursor.sub( wrapped, 0, final_show ) );
 	}
 
 	/**
@@ -1362,10 +1331,10 @@ public class KnittingCursor<I> implements
 		lock( );
 		try {
 			wrapped.next( );
-			return true;
+			return false;
 		}
 		catch ( EndOfCursorException e ) {
-			return false;
+			return true;
 		}
 	}
 

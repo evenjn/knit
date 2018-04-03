@@ -55,15 +55,15 @@ class Diff {
 
     // Trim off common prefix (speedup).
     int commonlength_p = text1.longestCommonPrefix(text2, equivalencer);
-    KnittingTuple<T> commonprefix1 = text1.head(0, commonlength_p);
-    KnittingTuple<Y> commonprefix2 = text2.head(0, commonlength_p);
+    KnittingTuple<T> commonprefix1 = text1.head(commonlength_p);
+    KnittingTuple<Y> commonprefix2 = text2.head(commonlength_p);
     text1 = text1.headless(commonlength_p);
     text2 = text2.headless(commonlength_p);
 
     // Trim off common suffix (speedup).
     int commonlength_s = text1.longestCommonSuffix(text2, equivalencer);
-    KnittingTuple<T> commonsuffix1 = text1.tail(0, commonlength_s);
-    KnittingTuple<Y> commonsuffix2 = text2.tail(0, commonlength_s);
+    KnittingTuple<T> commonsuffix1 = text1.tail(commonlength_s);
+    KnittingTuple<Y> commonsuffix2 = text2.tail(commonlength_s);
     text1 = text1.tailless(commonlength_s);
     text2 = text2.tailless(commonlength_s);
 
@@ -109,8 +109,8 @@ class Diff {
       if (opt.isPresent()) {
       	int i = opt.get();
         // Shorter text is inside the longer text (speedup).
-        diffs.add(DiffOp.delete(text1.head(0, i)));	
-        diffs.add(DiffOp.equal(text1.head(i, text2.size()),text2));
+        diffs.add(DiffOp.delete(text1.head(i)));	
+        diffs.add(DiffOp.equal(text1.headless(i).head(text2.size()),text2));
         diffs.add(DiffOp.delete(text1.headless(i + text2.size())));
         return diffs;
       }
@@ -128,8 +128,8 @@ class Diff {
       if (opt.isPresent()) {
       	int i = opt.get();
         // Shorter text is inside the longer text (speedup).
-        diffs.add(DiffOp.insert(text2.head(0, i)));
-        diffs.add(DiffOp.equal(text1, text2.head(i, text1.size())));
+        diffs.add(DiffOp.insert(text2.head(i)));
+        diffs.add(DiffOp.equal(text1, text2.headless(i).head(text1.size())));
         diffs.add(DiffOp.insert(text2.headless(i + text1.size())));
         return diffs;
       }
@@ -270,8 +270,8 @@ class Diff {
       int x,
       int y,
       long deadline) {
-  	KnittingTuple<T> text1a = text1.head(0, x);
-  	KnittingTuple<Y> text2a = text2.head(0, y);
+  	KnittingTuple<T> text1a = text1.head(x);
+  	KnittingTuple<Y> text2a = text2.head(y);
     KnittingTuple<T> text1b = text1.headless(x);
     KnittingTuple<Y> text2b = text2.headless(y);
 
@@ -328,14 +328,14 @@ class Diff {
                 thisDiff = pointer.previous();
                 assert thisDiff.getOperation() == Operation.EQUAL
                        : "Previous diff should have been an equality.";
-                KnittingTuple<T> t_f = thisDiff.getTextFront().append(text_delete.head(0, commonlength));
-                KnittingTuple<Y> t_b = thisDiff.getTextBack().append(text_insert.head(0, commonlength));
+                KnittingTuple<T> t_f = thisDiff.getTextFront().append(text_delete.head(commonlength));
+                KnittingTuple<Y> t_b = thisDiff.getTextBack().append(text_insert.head(commonlength));
                 thisDiff.setEqualText(t_f, t_b);
                 pointer.next();
               } else {
                 pointer.add(DiffOp.equal(
-                		text_delete.head(0, commonlength),
-                    text_insert.head(0, commonlength)));
+                		text_delete.head(commonlength),
+                    text_insert.head(commonlength)));
               }
               text_insert = text_insert.headless(commonlength);
               text_delete = text_delete.headless(commonlength);
@@ -346,8 +346,8 @@ class Diff {
               thisDiff = pointer.next();
               assert thisDiff.getOperation() == Operation.EQUAL
                   : "this Diff should have been an equality.";
-              KnittingTuple<T> text_1 = thisDiff.getTextFront().prepend(text_delete.tail(0, commonlength));
-              KnittingTuple<Y> text_2 = thisDiff.getTextBack().prepend(text_insert.tail(0, commonlength));
+              KnittingTuple<T> text_1 = thisDiff.getTextFront().prepend(text_delete.tail(commonlength));
+              KnittingTuple<Y> text_2 = thisDiff.getTextBack().prepend(text_insert.tail(commonlength));
               thisDiff.setEqualText(text_1, text_2);
               text_insert = text_insert.tailless(commonlength);
               text_delete = text_delete.tailless(commonlength);

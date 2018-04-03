@@ -162,7 +162,6 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #flatmapOptional(OptionalRingMap)}</li>
  * <li>{@link #flatmapStream(StreamRingMap)}</li>
  * <li>{@link #head(int)}</li>
- * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
  * <li>{@link #map(RingFunction)}</li>
@@ -891,60 +890,31 @@ public class KnittingCursable<I> implements
 
 	/**
 	 * <p>
-	 * {@code head} returns a view showing the first {@code show} elements in this
+	 * {@code head} returns a view showing the first {@code show} elements of this
 	 * cursable.
 	 * </p>
 	 * 
 	 * <p>
-	 * This is a convenient shorthand to invoke {@link #head(int, int)} passing
-	 * zero as the first argument.
-	 * </p>
-	 * 
-	 * @param show
-	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements in this cursable.
-	 * @since 1.0
-	 */
-	public KnittingCursable<I> head( int show ) {
-		return head( 0, show );
-	}
-
-	/**
-	 * <p>
-	 * {@code head} returns a view showing the first {@code show} elements of this
-	 * cursable visible after hiding the first {@code hide} elements.
-	 * </p>
-	 * 
-	 * <p>
-	 * The returned view may be empty. This happens when this cursable's size is
-	 * smaller than {@code hide}.
-	 * </p>
-	 * 
-	 * <p>
 	 * The returned view may contain less than {@code show} elements. This happens
-	 * when this cursable's size is smaller than {@code hide + show}.
+	 * when this cursable's size is smaller than {@code show}.
 	 * </p>
 	 * 
 	 * <p>
 	 * This is a transformation method.
 	 * </p>
 	 *
-	 * @param hide
-	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements of this cursable
-	 *         visible after hiding the first {@code hide} elements.
+	 * @return A view showing the first {@code show} elements of this cursable.
 	 * @since 1.0
 	 */
-	public KnittingCursable<I> head( int hide, int show ) {
+	public KnittingCursable<I> head( int show ) {
 		int final_show = show < 0 ? 0 : show;
-		int final_hide = hide < 0 ? 0 : hide;
 		return wrap( new Cursable<I>( ) {
 
 			@Override
 			public Cursor<I> pull( Rook rook ) {
-				return Subcursor.sub( wrapped.pull( rook ), final_hide, final_show );
+				return Subcursor.sub( wrapped.pull( rook ), 0, final_show );
 			}
 		} );
 	}
@@ -995,10 +965,10 @@ public class KnittingCursable<I> implements
 	public boolean isEmpty( ) {
 		try ( BasicRook rook = new BasicRook( ) ) {
 			wrapped.pull( rook ).next( );
-			return true;
+			return false;
 		}
 		catch ( EndOfCursorException e ) {
-			return false;
+			return true;
 		}
 	}
 

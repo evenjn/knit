@@ -99,7 +99,6 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #asTupleValue(Equivalencer)}</li>
  * <li>{@link #entwine(Tuple)}</li>
  * <li>{@link #head(int)}</li>
- * <li>{@link #head(int, int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
  * <li>{@link #numbered()}</li>
@@ -972,55 +971,26 @@ public class KnittingTuple<I> implements
 	 * </p>
 	 * 
 	 * <p>
-	 * This is a convenient shorthand to invoke {@link #head(int, int)} passing
-	 * zero as the first argument.
-	 * </p>
-	 * 
-	 * @param show
-	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements of this tuple.
-	 * @since 1.0
-	 */
-	public KnittingTuple<I> head( int show ) {
-		return head( 0, show );
-	}
-
-	/**
-	 * <p>
-	 * {@code head} returns a view showing the first {@code show} elements in this
-	 * tuple visible after hiding the first {@code hide} elements.
-	 * </p>
-	 * 
-	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
 	 * when the arguments are out of the range of this tuple. This behaviour is
-	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int)
 	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
 	 * KnittingCursor}.
 	 * </p>
 	 * 
 	 * <p>
-	 * The returned view may be empty. This happens when this tuple's size is
-	 * smaller than {@code hide}.
-	 * </p>
-	 * 
-	 * <p>
 	 * The returned view may contain less than {@code show} elements. This happens
-	 * when this tuple's size is smaller than {@code hide + show}.
+	 * when this tuple's size is smaller than {@code show}.
 	 * </p>
 	 * 
-	 * @param hide
-	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the first {@code show} elements in this tuple
-	 *         visible after hiding the first {@code hide} elements.
+	 * @return A view showing the first {@code show} elements in this tuple.
 	 * @since 1.0
 	 */
-	public KnittingTuple<I> head( int hide, int show ) {
+	public KnittingTuple<I> head( int show ) {
 		int final_show = show < 0 ? 0 : show;
-		int final_hide = hide < 0 ? 0 : hide;
-		return wrap( new Subtuple<>( wrapped, final_hide, final_show ) );
+		return wrap( new Subtuple<>( wrapped, 0, final_show ) );
 	}
 
 	/**
@@ -1596,7 +1566,7 @@ public class KnittingTuple<I> implements
 			Equivalencer<I, Y> equivalencer ) {
 		if ( size( ) < other.size( ) )
 			return false;
-		return head( 0, other.size( ) ).equivalentTo( other, equivalencer );
+		return head( other.size( ) ).equivalentTo( other, equivalencer );
 	}
 
 	/**
@@ -1642,59 +1612,30 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code tail} returns a view showing the last {@code show} elements in this
-	 * tuple.
-	 * </p>
-	 * 
-	 * <p>
-	 * This is a convenient shorthand to invoke {@link #last(int, int)} passing
-	 * zero as the first argument.
-	 * </p>
-	 * 
-	 * @param show
-	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view showing the last {@code show} elements of this tuple.
-	 * @since 1.0
-	 */
-	public KnittingTuple<I> tail( int show ) {
-		return tail( 0, show );
-	}
-
-	/**
-	 * <p>
-	 * {@code tail} returns a view of the last {@code show} elements of this tuple
-	 * visible after hiding the last {@code hide} elements.
+	 * {@code tail} returns a view of the last {@code show} elements of this tuple.
 	 * </p>
 	 * 
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
-	 * when the arguments are out of the range of this tuple. This behaviour is
-	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
+	 * when the argument is out of the range of this tuple. This behaviour is
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int)
 	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
 	 * KnittingCursor}.
 	 * </p>
 	 * 
 	 * <p>
-	 * The returned view may be empty. This happens when this tuple's size is
-	 * smaller than {@code hide}.
-	 * </p>
-	 * 
-	 * <p>
 	 * The returned view may contain less than {@code show} elements. This happens
-	 * when this tuple's size is smaller than {@code hide + show}.
+	 * when this tuple's size is smaller than {@code show}.
 	 * </p>
 	 *
-	 * @param hide
-	 *          The number of elements to hide. A negative numbers counts as zero.
 	 * @param show
 	 *          The number of elements to show. A negative numbers counts as zero.
-	 * @return A view of the last {@code show} elements of this tuple visible
-	 *         after hiding the last {@code hide} elements.
+	 * @return A view of the last {@code show} elements of this tuple.
 	 * @since 1.0
 	 */
-	public KnittingTuple<I> tail( int hide, int show ) {
+	public KnittingTuple<I> tail( int show ) {
 		int final_show = show < 0 ? 0 : show;
-		int final_hide = hide < 0 ? 0 : hide;
+		int final_hide = 0;
 		int len = size( ) - final_hide;
 		if ( len > final_show ) {
 			len = final_show;
