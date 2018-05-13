@@ -54,7 +54,7 @@ import org.github.evenjn.yarn.Tuple;
  * <li>As a resource to be harvested, invoking a rolling method such as
  * {@link #collect(Collection)};</li>
  * <li>As a value to be compared, invoking a comparison method such as
- * {@link #diff(Tuple)};</li>
+ * {@link #equivalentTo(Tuple)};</li>
  * <li>As a resource to transform, invoking a transformation method such as
  * {@link #map(Function)};</li>
  * </ul>
@@ -68,14 +68,13 @@ import org.github.evenjn.yarn.Tuple;
  * 
  * <p>
  * Public instance methods of {@code KnittingTuple} fall into one of the
- * following five categories:
+ * following four categories:
  * </p>
  * 
  * <ul>
  * <li>Object methods (inherited from {@link java.lang.Object Object})</li>
- * <li>Tuple methods ({@link #get(int)}, {@link #size()})</li>
+ * <li>Tuple methods ({@link #get(int)} and {@link #size()})</li>
  * <li>Transformation methods (listed below)</li>
- * <li>Comparison methods (listed below)</li>
  * <li>Other methods (listed below)</li>
  * </ul>
  * 
@@ -95,8 +94,6 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #asKnittingCursable()}</li>
  * <li>{@link #asKnittingCursor()}</li>
  * <li>{@link #asStream()}</li>
- * <li>{@link #asTupleValue()}</li>
- * <li>{@link #asTupleValue(Equivalencer)}</li>
  * <li>{@link #entwine(Tuple)}</li>
  * <li>{@link #head(int)}</li>
  * <li>{@link #headless(int)}</li>
@@ -106,26 +103,7 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #reverse()}</li>
  * <li>{@link #subTuple(int, int)}</li>
  * <li>{@link #tail(int)}</li>
- * <li>{@link #tail(int, int)}</li>
  * <li>{@link #tailless(int)}</li>
- * </ul>
- *
- * <p>
- * Tuple comparison methods compares this tuple with one or more tuples. The
- * following methods are comparisons:
- * </p>
- * 
- * <ul>
- * <li>{@link #contains(Tuple)}</li>
- * <li>{@link #contains(Tuple, Equivalencer)}</li>
- * <li>{@link #endsWith(Tuple)}</li>
- * <li>{@link #endsWith(Tuple, Equivalencer)}</li>
- * <li>{@link #equivalentTo(Tuple)}</li>
- * <li>{@link #equivalentTo(Tuple, Equivalencer)}</li>
- * <li>{@link #findSubtuple(Tuple, int)}</li>
- * <li>{@link #findSubtuple(Tuple, int, Equivalencer)}</li>
- * <li>{@link #startsWith(Tuple)}</li>
- * <li>{@link #startsWith(Tuple, Equivalencer)}</li>
  * </ul>
  *
  * <p>
@@ -135,10 +113,23 @@ import org.github.evenjn.yarn.Tuple;
  * <ul>
  * <li>{@link #collect(Collection)}</li>
  * <li>{@link #consume(Ring)}</li>
+ * <li>{@link #contains(Tuple)}</li>
+ * <li>{@link #contains(Tuple, Equivalencer)}</li>
+ * <li>{@link #endsWith(Tuple)}</li>
+ * <li>{@link #endsWith(Tuple, Equivalencer)}</li>
+ * <li>{@link #equivalentTo(Tuple)}</li>
+ * <li>{@link #equivalentTo(Tuple, Equivalencer)}</li>
+ * <li>{@link #find(Object, int)}</li>
+ * <li>{@link #find(Object, int, Equivalencer)}</li>
+ * <li>{@link #findSubtuple(Tuple, int)}</li>
+ * <li>{@link #findSubtuple(Tuple, int, Equivalencer)}</li>
  * <li>{@link #isEmpty()}</li>
  * <li>{@link #one()}</li>
  * <li>{@link #optionalOne()}</li>
  * <li>{@link #reduce(Object, BiFunction)}</li>
+ * <li>{@link #startsWith(Tuple)}</li>
+ * <li>{@link #startsWith(Tuple, Equivalencer)}</li>
+ * <li>{@link #subtuple(int, int)}</li>
  * </ul>
  *
  * <p>
@@ -354,7 +345,6 @@ public class KnittingTuple<I> implements
 			return false;
 		return findSubtuple( other, 0, equivalencer ).isPresent( );
 	}
-
 
 	/**
 	 * <p>
@@ -1068,7 +1058,8 @@ public class KnittingTuple<I> implements
 
 	/**
 	 * <p>
-	 * {@code tail} returns a view of the last {@code show} elements of this tuple.
+	 * {@code tail} returns a view of the last {@code show} elements of this
+	 * tuple.
 	 * </p>
 	 * 
 	 * <p>
