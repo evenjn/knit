@@ -8,27 +8,7 @@ package org.github.evenjn.knit;
  *          The type of wrapped element.
  * @since 1.0
  */
-public class Numbered<K> {
-
-	private final K wrapped;
-
-	private final int number;
-
-	/**
-	 * <p>
-	 * Constructor.
-	 * </p>
-	 * 
-	 * @param object
-	 *          The object to wrap.
-	 * @param number
-	 *          The label to associate with the object to wrap.
-	 * @since 1.0
-	 */
-	public Numbered(K object, int number) {
-		this.wrapped = object;
-		this.number = number;
-	}
+public interface Numbered<K> {
 
 	/**
 	 * <p>
@@ -38,9 +18,7 @@ public class Numbered<K> {
 	 * @return The wrapped object.
 	 * @since 1.0
 	 */
-	public K get( ) {
-		return wrapped;
-	}
+	public K get( );
 
 	/**
 	 * <p>
@@ -50,11 +28,6 @@ public class Numbered<K> {
 	 * @return The integer label associated with the wrapped object.
 	 * @since 1.0
 	 */
-	public int getNumber( ) {
-		return number;
-	}
+	public int getNumber( );
 
-	public String toString( ) {
-		return number + " " + wrapped.toString( );
-	}
 }

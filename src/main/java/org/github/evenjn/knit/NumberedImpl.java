@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2017 Marco Trevisan
+ * Copyright 2018 Marco Trevisan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,28 @@
  */
 package org.github.evenjn.knit;
 
-import org.github.evenjn.yarn.Tuple;
+class NumberedImpl<K> implements Numbered<K> {
 
-class NumberedTuple<I> implements
-		Tuple<Numbered<I>> {
+	private final K wrapped;
 
-	private Tuple<I> base;
+	private final int number;
 
-	NumberedTuple(Tuple<I> base) {
-		this.base = base;
+	public NumberedImpl(K object, int number) {
+		this.wrapped = object;
+		this.number = number;
 	}
 
 	@Override
-	public Numbered<I> get( int index ) {
-		return new NumberedImpl<I>( base.get( index ), index );
+	public K get( ) {
+		return wrapped;
 	}
 
 	@Override
-	public int size( ) {
-		return base.size( );
+	public int getNumber( ) {
+		return number;
 	}
 
+	public String toString( ) {
+		return number + " " + wrapped.toString( );
+	}
 }

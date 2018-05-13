@@ -1,7 +1,7 @@
 /**
  * <p>
- * Knit is a collection of tools to fold and unfold data sequences with
- * limited resources.
+ * Knit is a collection of tools to fold and unfold data sequences with limited
+ * resources.
  * </p>
  * 
  * <p>
@@ -9,14 +9,11 @@
  * </p>
  * 
  * <ul>
- * <li>{@link org.github.evenjn.knit.DebuggingAutoRook DebuggingAutoRook}</li>
  * <li>{@link org.github.evenjn.knit.DiffPair DiffPair}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursable KnittingCursable}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursor KnittingCursor}</li>
  * <li>{@link org.github.evenjn.knit.KnittingTuple KnittingTuple}</li>
  * <li>{@link org.github.evenjn.knit.Numbered Numbered}</li>
- * <li>{@link org.github.evenjn.knit.TupleValue TupleValue}</li>
- * <li>{@link org.github.evenjn.knit.ReusableAutoRook ReusableAutoRook}</li>
  * </ul>
  * 
  * @since 1.0

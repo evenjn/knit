@@ -35,7 +35,7 @@ class NumberedCursor<I> implements
 	public Numbered<I> next( )
 			throws EndOfCursorException {
 		I next = wrapped.next( );
-		return new Numbered<I>( next, i++ );
+		return new NumberedImpl<I>( next, i++ );
 	}
 
 }
