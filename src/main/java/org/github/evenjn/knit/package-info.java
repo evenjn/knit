@@ -5,11 +5,11 @@
  * </p>
  * 
  * <p>
- * The public interface of Knit consists of the following classes:
+ * The public interface of Knit consists of the following classes and
+ * interfaces:
  * </p>
  * 
  * <ul>
- * <li>{@link org.github.evenjn.knit.DiffPair DiffPair}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursable KnittingCursable}</li>
  * <li>{@link org.github.evenjn.knit.KnittingCursor KnittingCursor}</li>
  * <li>{@link org.github.evenjn.knit.KnittingTuple KnittingTuple}</li>

@@ -94,7 +94,7 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #asKnittingCursable()}</li>
  * <li>{@link #asKnittingCursor()}</li>
  * <li>{@link #asStream()}</li>
- * <li>{@link #entwine(Tuple)}</li>
+ * <li>{@link #entwine(Tuple, BiFunction)}</li>
  * <li>{@link #head(int)}</li>
  * <li>{@link #headless(int)}</li>
  * <li>{@link #map(Function)}</li>
@@ -129,7 +129,6 @@ import org.github.evenjn.yarn.Tuple;
  * <li>{@link #reduce(Object, BiFunction)}</li>
  * <li>{@link #startsWith(Tuple)}</li>
  * <li>{@link #startsWith(Tuple, Equivalencer)}</li>
- * <li>{@link #subtuple(int, int)}</li>
  * </ul>
  *
  * <p>
@@ -310,6 +309,9 @@ public class KnittingTuple<I> implements
 	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
+	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @return {@code true} when the argument tuple is a subtuple of this tuple;
@@ -331,6 +333,8 @@ public class KnittingTuple<I> implements
 	 * element of this tuple is equal to an element of the argument tuple.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @param equivalencer
@@ -358,13 +362,15 @@ public class KnittingTuple<I> implements
 	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @return {@code true} when the argument tuple is a suffix of this tuple;
 	 *         {@code false} otherwise.
 	 * @since 1.0
 	 */
-	public boolean endsWith( Tuple<I> other ) {
+	public <Y> boolean endsWith( Tuple<Y> other ) {
 		return endsWith( other, private_equivalencer( ) );
 	}
 
@@ -379,6 +385,8 @@ public class KnittingTuple<I> implements
 	 * element of this tuple is equal to an element of the argument tuple.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @param equivalencer
@@ -450,6 +458,9 @@ public class KnittingTuple<I> implements
 	 * </p>
 	 * 
 	 * 
+	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @return {@code true} when this tuple and the argument tuple have the same
@@ -475,7 +486,8 @@ public class KnittingTuple<I> implements
 	 * element of this tuple is equal to an element of the argument tuple.
 	 * </p>
 	 * 
-	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @param equivalencer
@@ -517,6 +529,8 @@ public class KnittingTuple<I> implements
 	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of the argument object.
 	 * @param other
 	 *          Another object.
 	 * @param skip
@@ -543,6 +557,9 @@ public class KnittingTuple<I> implements
 	 * element of this tuple is equal to an element of the argument element.
 	 * </p>
 	 * 
+	 * 
+	 * @param <Y>
+	 *          The type of the argument object.
 	 * @param other
 	 *          Another object.
 	 * @param equivalencer
@@ -588,6 +605,8 @@ public class KnittingTuple<I> implements
 	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @param skip
@@ -623,6 +642,8 @@ public class KnittingTuple<I> implements
 	 * element of this tuple is equal to an element of the argument tuple.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @param equivalencer
@@ -733,9 +754,9 @@ public class KnittingTuple<I> implements
 	 * 
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
-	 * when the arguments are out of the range of this tuple. This behaviour is
-	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
-	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
+	 * when the argument is out of the range of this tuple. This behaviour is
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#headless(int)
+	 * headless} as defined in {@link org.github.evenjn.knit.KnittingCursor
 	 * KnittingCursor}.
 	 * </p>
 	 * 
@@ -979,6 +1000,8 @@ public class KnittingTuple<I> implements
 	 * {@link org.github.evenjn.lang.BasicEquivalencer BasicEquivalencer}.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @return {@code true} when the argument tuple is a prefix of this tuple;
@@ -1000,6 +1023,8 @@ public class KnittingTuple<I> implements
 	 * element of this tuple is equal to an element of the argument tuple.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument tuple.
 	 * @param other
 	 *          Another tuple.
 	 * @param equivalencer
@@ -1105,8 +1130,8 @@ public class KnittingTuple<I> implements
 	 * <p>
 	 * Unlike {@link #subTuple(int, int)} this mehtod does not throw any exception
 	 * when the arguments are out of the range of this tuple. This behaviour is
-	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#head(int, int)
-	 * head} as defined in {@link org.github.evenjn.knit.KnittingCursor
+	 * consistent with {@link org.github.evenjn.knit.KnittingCursor#headless(int)
+	 * headless} as defined in {@link org.github.evenjn.knit.KnittingCursor
 	 * KnittingCursor}.
 	 * </p>
 	 * 

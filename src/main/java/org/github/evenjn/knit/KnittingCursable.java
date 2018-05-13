@@ -443,6 +443,8 @@ public class KnittingCursable<I> implements
 	 * This is a rolling method.
 	 * </p>
 	 * 
+	 * @param <Y>
+	 *          The type of elements in the argument cursable.
 	 * @param other
 	 *          Another cursable.
 	 * @param equivalencer
